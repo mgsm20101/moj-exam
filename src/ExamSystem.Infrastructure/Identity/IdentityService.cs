@@ -3,6 +3,9 @@ using Microsoft.AspNetCore.Identity;
 
 namespace ExamSystem.Infrastructure.Identity;
 
+/// <summary>
+/// Validates user credentials against ASP.NET Core Identity, including lockout enforcement and role resolution.
+/// </summary>
 public class IdentityService : IIdentityService
 {
     private readonly UserManager<ApplicationUser> _userManager;

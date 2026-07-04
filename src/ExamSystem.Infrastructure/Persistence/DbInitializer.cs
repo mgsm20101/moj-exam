@@ -2,6 +2,7 @@ using ExamSystem.Infrastructure.Identity;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 
 namespace ExamSystem.Infrastructure.Persistence;
 
@@ -46,6 +47,14 @@ public static class DbInitializer
         if (createResult.Succeeded)
         {
             await userManager.AddToRoleAsync(adminUser, AdminRole);
+        }
+        else
+        {
+            var loggerFactory = serviceProvider.GetRequiredService<ILoggerFactory>();
+            var logger = loggerFactory.CreateLogger(nameof(DbInitializer));
+            var errors = string.Join("; ", createResult.Errors.Select(e => e.Description));
+            logger.LogError("Failed to seed admin user '{AdminUserName}': {Errors}", adminUserName, errors);
+            throw new InvalidOperationException($"Failed to seed admin user '{adminUserName}': {errors}");
         }
     }
 }

@@ -7,6 +7,9 @@ using Microsoft.IdentityModel.Tokens;
 
 namespace ExamSystem.Infrastructure.Identity;
 
+/// <summary>
+/// Generates signed JWT access tokens for authenticated users using HMAC-SHA256.
+/// </summary>
 public class JwtTokenGenerator : IJwtTokenGenerator
 {
     private readonly JwtSettings _settings;
@@ -14,6 +17,11 @@ public class JwtTokenGenerator : IJwtTokenGenerator
     public JwtTokenGenerator(IOptions<JwtSettings> options)
     {
         _settings = options.Value;
+
+        if (string.IsNullOrWhiteSpace(_settings.Key) || Encoding.UTF8.GetByteCount(_settings.Key) < 32)
+        {
+            throw new InvalidOperationException("Jwt:Key must be configured and at least 32 bytes (256 bits) for HMAC-SHA256.");
+        }
     }
 
     public string GenerateToken(string userId, string userName, IReadOnlyList<string> roles)
