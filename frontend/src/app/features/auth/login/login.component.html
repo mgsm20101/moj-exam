@@ -1,0 +1,17 @@
+<div class="login-page">
+  <form [formGroup]="form" (ngSubmit)="submit()" class="login-card">
+    <h1>تسجيل دخول الأدمن</h1>
+
+    <label for="userName">اسم المستخدم</label>
+    <input id="userName" type="text" formControlName="userName" />
+
+    <label for="password">كلمة المرور</label>
+    <input id="password" type="password" formControlName="password" />
+
+    <p class="error" *ngIf="errorMessage">{{ errorMessage }}</p>
+
+    <button type="submit" [disabled]="form.invalid || loading">
+      {{ loading ? 'جاري الدخول...' : 'دخول' }}
+    </button>
+  </form>
+</div>
