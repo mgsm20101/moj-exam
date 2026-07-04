@@ -1,0 +1,17 @@
+## .NET
+bin/
+obj/
+*.user
+
+## Angular / Node
+frontend/node_modules/
+frontend/dist/
+frontend/.angular/
+
+## IDE
+.vs/
+.vscode/
+
+## Secrets
+*.env
+appsettings.*.local.json
