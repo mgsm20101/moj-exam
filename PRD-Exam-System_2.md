@@ -1,0 +1,563 @@
+# PRD — نظام الامتحانات الإلكترونية (Online Examination System)
+
+**الإصدار:** 1.2
+**التاريخ:** يوليو 2026
+**الحالة:** Draft — للمراجعة
+**تحديث v1.1:** إضافة نظام الدخول بالدفعات (Batch Gate / Waiting Room)، ملف نشر الاستضافة المجانية (Free-Tier Deployment Profile)، والفحص المستمر للكفاءة (Continuous Performance Monitoring).
+**تحديث v1.2:** إضافة نوع سؤال ثالث "أكمل" (Fill-in-the-Blank) بكلمة واحدة، مع قواعد التصحيح التلقائي (Normalization) لأنواع الأسئلة الثلاثة.
+
+---
+
+## 1. نظرة عامة (Executive Summary)
+
+نظام امتحانات إلكتروني (Web-Based) يتيح للممتحنين التسجيل الذاتي ببياناتهم الأساسية (الاسم، الرقم القومي، البريد الإلكتروني) ثم أداء امتحان مكوّن من عدة موضوعات (Topics)، بحيث تظهر الأسئلة بشكل **عشوائي** داخل كل موضوع مع الالتزام بترتيب الصعوبة **من السهل إلى الصعب**، ويدير النظام **Admin** يتحكم في كل إعدادات الامتحان (الوقت، الدرجات، عدد الأسئلة... إلخ)، وفي النهاية يحصل على **Dashboard** بتقارير شاملة مع إمكانية استخراج بيانات الناجحين والراسبين ليوم محدد أو لمدى زمني (Date Range).
+
+### 1.1 الأهداف (Goals)
+
+| # | الهدف | مقياس النجاح (Success Metric) |
+|---|-------|-------------------------------|
+| G1 | تمكين الممتحنين من أداء الامتحان دون تدخل بشري | إتمام دورة الامتحان كاملة Self-Service |
+| G2 | ضمان عدالة وتنوع الأسئلة بين الممتحنين | لا يتطابق ترتيب الأسئلة بين ممتحنَين متجاورين |
+| G3 | تحكم كامل للأدمن في إعدادات الامتحان | تعديل أي Parameter دون تدخل مطوّر |
+| G4 | تقارير فورية دقيقة | استخراج تقرير يومي في أقل من 3 ثوانٍ |
+| G5 | موثوقية أثناء الامتحان | Auto-Save + Resume عند انقطاع الاتصال |
+| G6 | العمل بكفاءة على استضافة مجانية محدودة الموارد | دخول منظم بالدفعات (20×20) + مراقبة أداء مستمرة (P95 < 1s) |
+
+### 1.2 خارج النطاق (Out of Scope — v1)
+
+- الأسئلة المقالية والتصحيح اليدوي — v1 يدعم ثلاثة أنواع مصحَّحة آليًا فقط: **اختيار من متعدد (MCQ) + صح/خطأ (True-False) + أكمل بكلمة واحدة (Fill-in-the-Blank)**
+- Proctoring بالكاميرا / التعرف على الوجه
+- تطبيق موبايل Native (الواجهة Responsive Web تكفي)
+- الدفع الإلكتروني / رسوم الامتحان
+- تكامل مع أنظمة خارجية (LMS / SSO)
+
+---
+
+## 2. الأدوار والشخصيات (Personas & Roles)
+
+### 2.1 الممتحن (Candidate)
+- يدخل النظام عبر رابط عام، يسجّل بياناته، يؤدي الامتحان، يشاهد نتيجته (حسب إعداد الأدمن).
+- **لا يحتاج حساب مسبق** — التسجيل الذاتي هو نقطة الدخول.
+
+### 2.2 مدير النظام (Admin)
+- يدير بنك الأسئلة والموضوعات.
+- يضبط إعدادات الامتحان (المدة، الدرجات، درجة النجاح، توزيع الأسئلة).
+- يتابع الامتحانات الجارية (Live Monitoring).
+- يستخرج التقارير ويصدّرها.
+
+### 2.3 (اختياري — Phase لاحقة) مشرف تقارير (Report Viewer)
+- صلاحية قراءة فقط على الـ Dashboard والتقارير دون تعديل الإعدادات.
+
+---
+
+## 3. المتطلبات الوظيفية (Functional Requirements)
+
+### FR-1: تسجيل الممتحن (Candidate Registration)
+
+| ID | المتطلب | الأولوية |
+|----|---------|----------|
+| FR-1.1 | نموذج تسجيل يضم: الاسم الرباعي، الرقم القومي، البريد الإلكتروني | Must |
+| FR-1.2 | التحقق من الرقم القومي: 14 رقمًا + بنية صحيحة (رقم القرن، تاريخ الميلاد، كود المحافظة) | Must |
+| FR-1.3 | استخراج تاريخ الميلاد والنوع والمحافظة تلقائيًا من الرقم القومي (Derived Fields) | Should |
+| FR-1.4 | التحقق من صيغة البريد الإلكتروني (Email Format Validation) | Must |
+| FR-1.5 | منع التكرار: رقم قومي واحد = محاولة واحدة لكل امتحان (Configurable من الأدمن) | Must |
+| FR-1.6 | (اختياري) تفعيل OTP على البريد قبل بدء الامتحان — Feature Flag يتحكم فيه الأدمن | Could |
+| FR-1.7 | شاشة تعليمات قبل البدء (Instructions Page): المدة، عدد الأسئلة، قواعد الامتحان، مع زر "ابدأ الامتحان" | Must |
+
+**قواعد التحقق من الرقم القومي المصري:**
+
+```
+البنية: C YYMMDD GG NNNN S
+- C  : رقم القرن (2 = مواليد 19xx، 3 = مواليد 20xx)
+- YYMMDD : تاريخ الميلاد — يجب أن يكون تاريخًا صحيحًا
+- GG : كود المحافظة (01–35، 88 = مواليد الخارج)
+- NNNN : رقم تسلسلي (الرقم قبل الأخير: فردي = ذكر، زوجي = أنثى)
+- S  : رقم تحقق
+```
+
+### FR-2: محرك الامتحان (Exam Engine)
+
+| ID | المتطلب | الأولوية |
+|----|---------|----------|
+| FR-2.1 | يتكون الامتحان من عدة موضوعات (Topics) بترتيب يحدده الأدمن | Must |
+| FR-2.2 | اختيار الأسئلة **عشوائيًا** من بنك الأسئلة لكل (موضوع × مستوى صعوبة) حسب الأعداد المحددة في الإعدادات | Must |
+| FR-2.3 | ترتيب العرض داخل كل موضوع: Easy → Medium → Hard (العشوائية داخل نفس المستوى فقط) | Must |
+| FR-2.4 | خلط ترتيب الإجابات (Answer Shuffling) لكل سؤال لكل ممتحن — Configurable | Should |
+| FR-2.5 | حفظ **Snapshot** كامل للأسئلة المُقدَّمة لكل محاولة (نص السؤال + الإجابات + الترتيب) لضمان سلامة المراجعة لاحقًا حتى لو عُدّل السؤال في البنك | Must |
+| FR-2.6 | مؤقّت **Server-Side** هو مصدر الحقيقة (Source of Truth) — مؤقّت الواجهة للعرض فقط، والتحقق من `ExpiresAtUtc` يتم مع **كل** Request حفظ/تسليم (لا اعتماد إجباري على SignalR — انظر قسم 11) | Must |
+| FR-2.7 | Auto-Submit تلقائي عند انتهاء الوقت حتى لو الممتحن غير متصل — عبر آليتين: Background Job (عند توفره) + **Lazy Auto-Submit** كضمانة (أي Request لاحق — من الأدمن أو التقارير — يفحص المحاولات منتهية الوقت ويغلقها ويصححها تلقائيًا) | Must |
+| FR-2.8 | Auto-Save لكل إجابة فور اختيارها (لا يوجد زر "حفظ") | Must |
+| FR-2.9 | Resume: عند انقطاع الاتصال أو إغلاق المتصفح، يعود الممتحن لنفس الجلسة بنفس الأسئلة والوقت المتبقي (بالرقم القومي) | Must |
+| FR-2.10 | التنقل بين الأسئلة: التالي/السابق + خريطة أسئلة (Question Navigator) توضح المُجاب/غير المُجاب/المُعلَّم للمراجعة | Should |
+| FR-2.11 | إمكانية تعليم سؤال للمراجعة (Flag for Review) | Could |
+| FR-2.12 | شاشة تأكيد قبل التسليم النهائي توضح عدد الأسئلة غير المُجابة | Must |
+| FR-2.13 | التصحيح التلقائي الفوري (Auto-Grading) عند التسليم لأنواع الأسئلة الثلاثة وفق قواعد التصحيح أدناه | Must |
+| FR-2.14 | عرض النتيجة للممتحن فور التسليم — قابل للتفعيل/الإيقاف من الأدمن (فوري / بعد انتهاء فترة الامتحان / لا يُعرض) | Must |
+
+#### خوارزمية اختيار وترتيب الأسئلة (Question Selection Algorithm)
+
+```
+Input : ExamConfig (لكل Topic: عدد الأسئلة المطلوب من كل Difficulty)
+Output: قائمة أسئلة مرتبة خاصة بهذه المحاولة (Attempt)
+
+FOR EACH topic IN exam.Topics ORDER BY topic.DisplayOrder:
+    FOR EACH difficulty IN [Easy, Medium, Hard]:
+        pool     = QuestionBank.Where(topic, difficulty, IsActive)
+        required = config[topic][difficulty].Count
+        IF pool.Count < required → ERROR عند تفعيل الامتحان (Validation مسبق)
+        selected = RandomSample(pool, required, seed: attemptId)   // بدون تكرار
+        shuffled = Shuffle(selected, seed: attemptId)              // عشوائية داخل المستوى
+        APPEND shuffled TO attemptQuestions
+        
+PERSIST attemptQuestions AS Snapshot (AttemptQuestions table)
+```
+
+**ملاحظات تصميمية:**
+- الـ Seed مرتبط بـ AttemptId ⇒ إعادة توليد نفس الترتيب ممكنة للتدقيق (Deterministic Replay).
+- التحقق من كفاية بنك الأسئلة يتم **عند تفعيل الامتحان (Publish)** وليس وقت دخول الممتحن.
+
+#### أنواع الأسئلة وقواعد التصحيح التلقائي (Question Types & Auto-Grading Rules)
+
+| النوع | شكل الإجابة | قاعدة التصحيح |
+|-------|-------------|----------------|
+| **اختيار من متعدد (MCQ)** | اختيار واحد من 3–5 اختيارات | صحيح إذا `SelectedOptionId == CorrectOptionId` |
+| **صح / خطأ (True-False)** | زرّان: صح / خطأ | صحيح إذا الاختيار يطابق الإجابة المحددة |
+| **أكمل (Fill-in-the-Blank)** | حقل نصي — **كلمة واحدة فقط** | مقارنة نصية بعد الـ Normalization (أدناه) |
+
+**قواعد سؤال "أكمل" (Fill-in-the-Blank Rules):**
+
+1. الإجابة النموذجية **كلمة إنجليزية واحدة بحروف صغيرة (lowercase) فقط** — الأدمن يُدخلها كذلك، والنظام يفرض ذلك بـ Validation عند حفظ السؤال (Regex: `^[a-z0-9]+$`، لا مسافات ولا رموز).
+2. **Normalization Pipeline** على إجابة الممتحن قبل المقارنة:
+   ```
+   Trim() → ToLowerInvariant() → إزالة أي مسافات داخلية
+   → المقارنة: normalizedAnswer == question.CorrectAnswerText
+   ```
+   ⇒ الممتحن لو كتب "Server " أو "SERVER" تُحتسب صحيحة إذا الإجابة النموذجية "server".
+3. **Frontend Enforcement:** حقل الإدخال يمنع المسافات، يحوّل الحروف لـ lowercase أثناء الكتابة (تجربة مريحة + منع أخطاء شكلية)، مع `maxlength` معقول (مثال: 50 حرفًا).
+4. المطابقة **حرفية تامة** بعد الـ Normalization — لا يوجد تصحيح إملائي أو مطابقة تقريبية (Fuzzy Matching) في v1، لضمان عدالة وشفافية النتيجة.
+5. (اختياري — Could) دعم **إجابات بديلة مقبولة** لنفس السؤال (Synonyms List): مثال "db" و"database" — يُخزَّنان كقائمة والمطابقة مع أيٍّ منها تُحتسب صحيحة.
+6. سؤال "أكمل" يخضع لنفس منظومة الصعوبة والدرجات والعشوائية مثل باقي الأنواع، ولا يوجد خلط إجابات له (لا اختيارات أصلًا).
+
+### FR-3: إدارة بنك الأسئلة (Question Bank Management — Admin)
+
+| ID | المتطلب | الأولوية |
+|----|---------|----------|
+| FR-3.1 | CRUD كامل للموضوعات (Topics) مع ترتيب العرض (Display Order) | Must |
+| FR-3.2 | CRUD للأسئلة: نص السؤال، نوعه (**MCQ / True-False / FillBlank**)، الإجابات أو الإجابة النموذجية (كلمة واحدة lowercase لنوع FillBlank)، مستوى الصعوبة (Easy/Medium/Hard)، الموضوع، الدرجة (اختياري Override) | Must |
+| FR-3.2.1 | Validation عند حفظ سؤال FillBlank: الإجابة النموذجية كلمة واحدة `[a-z0-9]+` — يُرفض الحفظ خلاف ذلك برسالة واضحة | Must |
+| FR-3.3 | دعم نصوص عربية كاملة RTL + إمكانية إدراج صورة داخل السؤال | Must |
+| FR-3.4 | استيراد أسئلة بالجملة من ملف Excel بقالب محدد (Bulk Import + Validation Report) | Should |
+| FR-3.5 | تفعيل/تعطيل سؤال (Soft Delete / IsActive) — لا حذف فعلي لسؤال استُخدم في محاولة سابقة | Must |
+| FR-3.6 | إحصائية لكل سؤال: عدد مرات الظهور، نسبة الإجابة الصحيحة (Question Difficulty Analytics) | Could |
+| FR-3.7 | عدّاد مباشر في شاشة الإعدادات: المتاح في البنك مقابل المطلوب لكل (Topic × Difficulty) | Should |
+
+### FR-4: إعدادات الامتحان (Exam Configuration — Admin)
+
+| ID | المتطلب | الأولوية |
+|----|---------|----------|
+| FR-4.1 | إنشاء امتحان: الاسم، الوصف، فترة الإتاحة (Start/End DateTime) | Must |
+| FR-4.2 | مدة الامتحان بالدقائق (Duration) | Must |
+| FR-4.3 | تحديد الموضوعات المشاركة وترتيبها وعدد الأسئلة من كل مستوى صعوبة لكل موضوع | Must |
+| FR-4.4 | نظام الدرجات: درجة لكل مستوى صعوبة (مثال: Easy=1, Medium=2, Hard=3) أو درجة موحدة، مع إمكانية Override على مستوى السؤال | Must |
+| FR-4.5 | درجة النجاح (Pass Mark) كنسبة مئوية أو درجة مطلقة | Must |
+| FR-4.6 | عدد المحاولات المسموحة لكل رقم قومي (Default = 1) | Must |
+| FR-4.7 | إعدادات العرض: خلط الإجابات، عرض النتيجة الفورية، السماح بالرجوع للسؤال السابق | Should |
+| FR-4.8 | دورة حياة الامتحان: Draft → Published → Active → Closed → Archived | Must |
+| FR-4.9 | Validation عند النشر: كفاية بنك الأسئلة، منطقية التواريخ، اكتمال الإعدادات | Must |
+| FR-4.10 | استنساخ امتحان (Clone Exam) بإعداداته لإعادة الاستخدام | Could |
+
+### FR-5: المتابعة الحية (Live Monitoring — Admin)
+
+| ID | المتطلب | الأولوية |
+|----|---------|----------|
+| FR-5.1 | شاشة حية: عدد الممتحنين حاليًا، من أنهى، من انقطع اتصاله | Should |
+| FR-5.2 | إنهاء محاولة قسريًا أو منح وقت إضافي لممتحن محدد (استثناءات) | Could |
+| FR-5.3 | تحديث لحظي عبر SignalR | Should |
+
+### FR-6: التقارير والـ Dashboard (Reporting — Admin)
+
+| ID | المتطلب | الأولوية |
+|----|---------|----------|
+| FR-6.1 | Dashboard رئيسي: إجمالي الممتحنين، نسبة النجاح، متوسط الدرجات، متوسط زمن الحل — مع فلتر زمني | Must |
+| FR-6.2 | **تقرير الناجحين والراسبين ليوم محدد** (اختيار تاريخ واحد) | Must |
+| FR-6.3 | **تقرير الناجحين والراسبين لمدى زمني** (From–To Date Range) | Must |
+| FR-6.4 | تفاصيل التقرير: الاسم، الرقم القومي، البريد، تاريخ/وقت الامتحان، الدرجة، النسبة، الحالة (ناجح/راسب)، زمن الحل | Must |
+| FR-6.5 | تصدير التقارير: Excel (أساسي) + CSV + PDF | Must |
+| FR-6.6 | أداء الموضوعات: متوسط الدرجة لكل Topic لكشف نقاط الضعف العامة | Should |
+| FR-6.7 | تحليل الأسئلة: أصعب 10 أسئلة (أقل نسبة إجابة صحيحة) | Could |
+| FR-6.8 | تقرير تفصيلي لممتحن واحد: ورقة إجابته كاملة (من الـ Snapshot) | Should |
+| FR-6.9 | رسوم بيانية: توزيع الدرجات (Histogram)، نسب النجاح اليومية (Trend Line) | Should |
+
+### FR-7: المصادقة والصلاحيات (Auth & Authorization)
+
+| ID | المتطلب | الأولوية |
+|----|---------|----------|
+| FR-7.1 | تسجيل دخول الأدمن: Username/Password + JWT | Must |
+| FR-7.2 | جلسة الممتحن: Token مؤقت مرتبط بالمحاولة (Attempt Token) — لا حساب دائم | Must |
+| FR-7.3 | Role-Based Authorization (Admin / ReportViewer مستقبلًا) | Must |
+| FR-7.4 | Audit Log لكل عمليات الأدمن الحساسة (تعديل إعدادات، إنهاء محاولة، تعديل سؤال) | Should |
+
+### FR-8: الدخول بالدفعات وغرفة الانتظار (Batch Gate / Waiting Room)
+
+> **الدافع:** النظام قد يُنشر على استضافة مجانية محدودة الموارد، لذا يُدار الدخول بدفعات (Default: **20 ممتحنًا متزامنًا**) لضمان ثبات الأداء، مع طابور انتظار عادل لمن يتجاوز السعة.
+
+| ID | المتطلب | الأولوية |
+|----|---------|----------|
+| FR-8.1 | إعداد `MaxConcurrentAttempts` على مستوى الامتحان (Default = 20) — قابل للتعديل من الأدمن دون إعادة نشر | Must |
+| FR-8.2 | عند اكتمال السعة: الممتحن الجديد يدخل **طابور انتظار (FIFO Queue)** بعد إتمام تسجيله والتحقق من بياناته | Must |
+| FR-8.3 | شاشة انتظار توضح: ترتيبه في الطابور + تقدير زمني تقريبي، مع تحديث تلقائي (Polling كل 15–30 ثانية) | Must |
+| FR-8.4 | تحرير المقعد (Slot Release) تلقائيًا عند: تسليم محاولة، Auto-Submit، أو إنهاء قسري من الأدمن — ويُستدعى أول شخص في الطابور | Must |
+| FR-8.5 | عند استدعاء دوره: نافذة سماح (Grace Window، Default = 3 دقائق) للبدء، وإلا يُعاد لآخر الطابور أو تُلغى حجزه (Configurable) | Should |
+| FR-8.6 | حماية من فقدان الدور: انقطاع الاتصال أثناء الانتظار لا يُسقط مكانه في الطابور (المكان مرتبط بالرقم القومي وليس بالجلسة) | Must |
+| FR-8.7 | وضع بديل يدوي: الأدمن يتحكم في فتح الدفعات بنفسه (زر "افتح الدفعة التالية") بدلًا من التحرير التلقائي — Configurable | Should |
+| FR-8.8 | لوحة الأدمن تعرض لحظيًا: عدد الممتحنين النشطين / سعة الدفعة / طول الطابور | Should |
+| FR-8.9 | Rate Limiting على نقطة التسجيل لمنع إغراق الطابور (IP-based) | Should |
+
+**تدفق الدفعات:**
+
+```
+تسجيل + Validation ناجح
+  → ActiveAttempts < MaxConcurrentAttempts ؟
+      ├─ نعم → إنشاء Attempt وبدء الامتحان فورًا
+      └─ لا  → إدراج في WaitingQueue (Position = آخر الطابور)
+               → شاشة انتظار (Polling)
+               → عند تحرير Slot → استدعاء أول الطابور (Status: Called)
+               → بدأ خلال Grace Window؟
+                   ├─ نعم → إنشاء Attempt وبدء الامتحان
+                   └─ لا  → إعادة لآخر الطابور / إلغاء (حسب الإعداد)
+```
+
+---
+
+## 4. المتطلبات غير الوظيفية (Non-Functional Requirements)
+
+| الفئة | المتطلب |
+|-------|---------|
+| **Performance** | تحميل السؤال < 500ms، استخراج تقرير يومي < 3s. **نموذج السعة:** دفعات 20 متزامنًا على الاستضافة المجانية (≈ 1–3 req/s ذروة)، مع قابلية رفع `MaxConcurrentAttempts` إلى مئات عند الترقية لاستضافة مدفوعة — دون تغيير في الكود |
+| **Continuous Performance Monitoring** | فحص كفاءة مستمر: (1) k6 Load Test في الـ CI Pipeline يحاكي 20 متزامنًا + 40 كـ Stress، ويُفشِل الـ Build إذا تجاوز P95 حدًّا معرَّفًا. (2) Middleware يسجّل زمن كل Request. (3) لوحة أداء مصغّرة داخل Admin Dashboard تعرض P95/P99 وأخطاء آخر ساعة. (4) `/health` Endpoint يفحص الـ DB والذاكرة. (5) External Uptime Monitor (UptimeRobot) |
+| **Reliability** | Auto-Save لكل إجابة (مع Debounce ثانية واحدة لتقليل الـ Requests)، Resume كامل، لا فقدان بيانات عند انقطاع الاتصال، Lazy Auto-Submit كضمانة مستقلة عن الـ Background Jobs |
+| **Security** | HTTPS إجباري، JWT قصير العمر للممتحن، Rate Limiting على التسجيل، حماية من SQL Injection/XSS، تشفير البيانات الحساسة |
+| **Anti-Cheating (أساسي)** | عشوائية الأسئلة والإجابات، تعطيل النسخ/اللصق وقائمة الزر الأيمن (Best Effort)، تسجيل مغادرة التبويب (Tab-Switch Logging) كمؤشر في التقرير، سؤال واحد بالشاشة (Configurable) |
+| **Usability** | واجهة عربية RTL كاملة، Responsive (يعمل على التابلت والموبايل)، خط واضح، تباين ألوان مناسب |
+| **Auditability** | Snapshot غير قابل للتعديل لكل محاولة + Audit Trail |
+| **Localization** | العربية أولًا، بنية تدعم i18n لإضافة الإنجليزية لاحقًا |
+| **Timekeeping** | كل الحسابات الزمنية UTC في الخادم، العرض بتوقيت القاهرة |
+
+---
+
+## 5. البنية التقنية (Technical Architecture)
+
+### 5.1 الـ Stack المقترح
+
+| الطبقة | التقنية |
+|--------|---------|
+| **Backend** | .NET 8 — Clean Architecture (Domain / Application / Infrastructure / API) + CQRS via MediatR |
+| **ORM** | EF Core 8 — **Provider-Agnostic**: SQL Server (الأساسي) مع دعم PostgreSQL كبديل للاستضافة المجانية (انظر قسم 11) |
+| **Frontend** | Angular 17+ (Standalone Components) + PrimeNG مع دعم RTL كامل |
+| **Real-Time** | SignalR **اختياري** (Live Monitoring فقط) — المؤقّت والطابور يعملان بـ Polling + تحقق Server-Side مع كل Request، لضمان العمل على استضافات لا تدعم WebSockets مستقرة |
+| **Auth** | ASP.NET Identity (Admin) + JWT / Attempt Token (Candidate) |
+| **Background Jobs** | Hosted Service (Auto-Submit، تجميع التقارير اليومية) + **Lazy Evaluation Fallback** لا يعتمد على بقاء السيرفر مستيقظًا |
+| **Export** | ClosedXML (Excel) + QuestPDF (PDF) |
+| **Caching** | IMemoryCache (بنك الأسئلة المنشور، إعدادات الامتحان النشط) |
+
+### 5.2 مخطط عام (High-Level Diagram)
+
+```
+┌──────────────────────────┐        ┌──────────────────────────┐
+│   Candidate SPA (Angular)│        │    Admin SPA (Angular)   │
+│   تسجيل → امتحان → نتيجة │        │  بنك أسئلة │ إعدادات │ تقارير │
+└────────────┬─────────────┘        └────────────┬─────────────┘
+             │  REST + SignalR                   │  REST + SignalR
+             ▼                                   ▼
+┌─────────────────────────────────────────────────────────────┐
+│                      ASP.NET Core 8 API                     │
+│  ┌───────────────┐ ┌───────────────┐ ┌───────────────────┐  │
+│  │  Exam Engine  │ │ Admin Module  │ │ Reporting Module  │  │
+│  │ (CQRS Handlers)│ │(CQRS Handlers)│ │ (Read Models)     │  │
+│  └───────────────┘ └───────────────┘ └───────────────────┘  │
+│  Background Jobs: AutoSubmitExpiredAttempts │ DailyAggregation│
+└────────────────────────────┬────────────────────────────────┘
+                             ▼
+                    ┌────────────────┐
+                    │   SQL Server   │
+                    └────────────────┘
+```
+
+### 5.3 نموذج البيانات (Data Model — Core Entities)
+
+```
+Exams
+├─ Id, Name, Description
+├─ StartAtUtc, EndAtUtc, DurationMinutes
+├─ PassMarkType (Percentage|Absolute), PassMarkValue
+├─ MaxAttemptsPerCandidate, ShuffleAnswers, ShowResultMode
+├─ MaxConcurrentAttempts (Default=20), QueueMode (Auto|Manual), GraceWindowMinutes
+└─ Status (Draft|Published|Active|Closed|Archived)
+
+Topics
+├─ Id, Name, DisplayOrder, IsActive
+
+ExamTopicConfigs               -- توزيع الأسئلة لكل امتحان
+├─ ExamId, TopicId, TopicOrder
+├─ EasyCount, MediumCount, HardCount
+└─ EasyPoints, MediumPoints, HardPoints
+
+Questions                      -- بنك الأسئلة
+├─ Id, TopicId, Text, ImageUrl?
+├─ Type (MCQ|TrueFalse|FillBlank), Difficulty (Easy|Medium|Hard)
+├─ CorrectAnswerText?          -- لنوع FillBlank فقط (lowercase، كلمة واحدة)
+├─ AcceptedAlternatives? (JSON)-- إجابات بديلة مقبولة (اختياري)
+├─ PointsOverride?, IsActive
+└─ QuestionOptions: Id, Text, IsCorrect, DisplayOrder   -- لـ MCQ وTrueFalse فقط
+
+Candidates
+├─ Id, FullName, NationalId (Unique Index), Email
+└─ BirthDate, Gender, Governorate (Derived from NationalId)
+
+ExamAttempts
+├─ Id, ExamId, CandidateId
+├─ StartedAtUtc, ExpiresAtUtc, SubmittedAtUtc?
+├─ Status (InProgress|Submitted|AutoSubmitted|Terminated)
+├─ TotalScore, MaxScore, Percentage, IsPassed
+├─ TabSwitchCount, IpAddress, RandomSeed
+└─ ExamDate (Date only — مفهرس للتقارير اليومية)
+
+WaitingQueue                   -- طابور الدفعات (FR-8)
+├─ Id, ExamId, CandidateId
+├─ EnqueuedAtUtc, Position
+├─ Status (Waiting|Called|Started|Expired|Cancelled)
+└─ CalledAtUtc?  -- لحساب الـ Grace Window
+
+AttemptQuestions               -- الـ Snapshot
+├─ Id, AttemptId, QuestionId
+├─ DisplayOrder, QuestionTextSnapshot, PointsSnapshot
+└─ OptionsSnapshot (JSON: النصوص + الترتيب المعروض)
+
+AttemptAnswers
+├─ AttemptQuestionId
+├─ SelectedOptionId?           -- لـ MCQ وTrueFalse
+├─ AnswerText?                 -- لـ FillBlank (تُخزَّن كما أُدخلت + النسخة المُطبَّعة NormalizedAnswerText)
+├─ IsCorrect, PointsEarned, AnsweredAtUtc, IsFlagged
+
+DailyExamStats (Aggregated)    -- يُغذّى بـ Background Job
+├─ ExamId, Date
+├─ TotalCandidates, PassedCount, FailedCount
+└─ AvgScore, AvgDurationMinutes
+
+AuditLogs
+├─ UserId, Action, EntityType, EntityId, OldValue, NewValue, TimestampUtc
+```
+
+**فهارس أساسية:** `ExamAttempts(ExamId, ExamDate, IsPassed)` لتقارير اليوم/المدى، و`Candidates(NationalId)` Unique.
+
+### 5.4 واجهات الـ API الرئيسية (API Surface — مختصر)
+
+```
+-- Candidate
+POST /api/candidates/register              تسجيل → Attempt فوري أو إدراج في الطابور
+GET  /api/queue/status                     ترتيبي في الطابور + هل حان دوري؟ (Polling)
+POST /api/queue/start                      بدء الامتحان بعد الاستدعاء (داخل الـ Grace Window)
+GET  /api/attempts/current                 استرجاع الجلسة (Resume) + الوقت المتبقي
+GET  /api/attempts/current/questions       أسئلة المحاولة (من الـ Snapshot)
+PUT  /api/attempts/current/answers/{qId}   حفظ إجابة (Auto-Save)
+POST /api/attempts/current/submit          تسليم نهائي + تصحيح
+GET  /api/attempts/current/result          النتيجة (حسب ShowResultMode)
+
+-- Admin: Question Bank
+GET/POST/PUT/DELETE /api/admin/topics
+GET/POST/PUT/DELETE /api/admin/questions
+POST /api/admin/questions/import           Bulk Excel Import
+
+-- Admin: Exam Config
+GET/POST/PUT /api/admin/exams
+POST /api/admin/exams/{id}/publish         مع Validation كفاية البنك
+POST /api/admin/exams/{id}/close
+
+-- Admin: Monitoring & Reports
+GET /api/admin/exams/{id}/live             النشطون / السعة / طول الطابور
+POST /api/admin/exams/{id}/queue/open-next-batch   فتح الدفعة التالية (Manual Mode)
+GET /api/admin/performance                 P95/P99 وأخطاء آخر ساعة (لوحة الكفاءة)
+GET /api/admin/reports/summary?examId=&from=&to=
+GET /api/admin/reports/results?examId=&date=            يوم واحد
+GET /api/admin/reports/results?examId=&from=&to=&status=Passed|Failed
+GET /api/admin/reports/results/export?format=xlsx|csv|pdf
+GET /api/admin/reports/attempts/{attemptId}             ورقة إجابة كاملة
+```
+
+---
+
+## 6. تدفقات المستخدم (Key User Flows)
+
+### 6.1 رحلة الممتحن
+
+```
+فتح الرابط → نموذج التسجيل (اسم/رقم قومي/إيميل)
+  → Validation (بنية الرقم القومي + عدم تجاوز المحاولات)
+  → [السعة مكتملة؟ → شاشة الانتظار (ترتيبك: N) → استدعاء عند تحرير مقعد]
+  → شاشة التعليمات → "ابدأ الامتحان"
+  → توليد Attempt + Snapshot الأسئلة + بدء المؤقّت (Server-Side)
+  → حل الأسئلة (موضوع تلو الآخر، سهل → صعب) مع Auto-Save
+  → [انقطاع اتصال؟ → عودة بنفس الرقم القومي → Resume بنفس الأسئلة والوقت]
+  → شاشة التأكيد → تسليم (أو Auto-Submit عند انتهاء الوقت)
+  → التصحيح الفوري → عرض النتيجة (حسب الإعداد)
+```
+
+### 6.2 رحلة الأدمن
+
+```
+تسجيل دخول → إدارة الموضوعات → إدخال/استيراد بنك الأسئلة (مع الصعوبة)
+  → إنشاء امتحان → ضبط (المدة، التواريخ، توزيع الأسئلة، الدرجات، درجة النجاح)
+  → Publish (بعد Validation) → متابعة حية أثناء الامتحان
+  → بعد/أثناء الامتحان: Dashboard → تقرير يومي أو مدى زمني
+  → فلترة ناجح/راسب → تصدير Excel/PDF
+```
+
+---
+
+## 7. خطة التنفيذ (Implementation Plan)
+
+> تقدير إجمالي: **8–10 أسابيع** لمطوّر Full-Stack واحد بدوام كامل (قابلة للضغط بالتوازي).
+
+### Phase 0 — التأسيس (أسبوع 1)
+- إعداد Solution بـ Clean Architecture (Domain / Application / Infrastructure / API) + مشروع Angular.
+- إعداد EF Core + Migrations الأولية + Seed للأدمن.
+- ASP.NET Identity + JWT + بنية الـ CQRS (MediatR + FluentValidation + Pipeline Behaviors).
+- إعداد RTL Theme في PrimeNG + Layout أساسي.
+- **Deliverable:** Skeleton يعمل بتسجيل دخول أدمن.
+
+### Phase 1 — بنك الأسئلة والإعدادات (أسبوعان)
+- CRUD الموضوعات والأسئلة (مع الصعوبة والصور).
+- شاشة إنشاء الامتحان وضبط التوزيع (Topic × Difficulty Matrix) والدرجات ودرجة النجاح.
+- دورة حياة الامتحان + Validation النشر (كفاية البنك).
+- Bulk Import من Excel.
+- **Deliverable:** أدمن يجهّز امتحانًا كاملًا وينشره.
+
+### Phase 2 — محرك الامتحان (أسبوعان–3)
+- تسجيل الممتحن + Validation الرقم القومي + Attempt Token.
+- **Batch Gate + Waiting Room** (FR-8): عدّاد السعة، الطابور، شاشة الانتظار بالـ Polling، الـ Grace Window.
+- خوارزمية الاختيار العشوائي المتدرج + Snapshot.
+- واجهة الامتحان: عرض الأسئلة، Navigator، Auto-Save (مع Debounce)، Flag for Review.
+- المؤقّت Server-Side (تحقق مع كل Request) + Auto-Submit (Hosted Service + Lazy Fallback) + Resume.
+- التصحيح التلقائي وعرض النتيجة.
+- **Deliverable:** دورة امتحان كاملة End-to-End بنظام الدفعات.
+
+### Phase 3 — التقارير والـ Dashboard (أسبوعان)
+- Dashboard الإحصائي + الرسوم البيانية.
+- تقارير الناجحين/الراسبين (يوم واحد + Date Range) + الفلاتر.
+- Background Job للتجميع اليومي (DailyExamStats).
+- التصدير Excel / CSV / PDF.
+- تقرير ورقة الإجابة التفصيلي.
+- **Deliverable:** منظومة تقارير كاملة قابلة للتصدير.
+
+### Phase 4 — التقوية والاختبار (أسبوع–أسبوعان)
+- Live Monitoring + إجراءات الأدمن الاستثنائية.
+- إجراءات Anti-Cheating (تعطيل النسخ، Tab-Switch Logging).
+- Audit Logs، Rate Limiting، مراجعة أمنية.
+- **Continuous Performance Pipeline:** كتابة k6 Scripts (سيناريو 20 متزامن + 40 Stress) وربطها بـ GitHub Actions، لوحة P95/P99 في الأدمن، `/health` + UptimeRobot.
+- النشر على الاستضافة المجانية المختارة (قسم 11) + اختبار Cold Start وResume عليها فعليًا.
+- UAT مع بيانات حقيقية + إصلاحات.
+- **Deliverable:** نسخة Production-Ready منشورة على الـ Free Tier بمراقبة كفاءة مستمرة.
+
+### أولويات MoSCoW مختصرة
+
+| Must (v1) | Should (v1.x) | Could (v2) |
+|-----------|---------------|------------|
+| التسجيل + Validation الرقم القومي | Bulk Import | تحليلات الأسئلة |
+| العشوائية المتدرجة + Snapshot | Live Monitoring | OTP Email |
+| مؤقّت Server-Side + Auto-Submit + Resume | تقارير الموضوعات والرسوم | أسئلة مقالية + تصحيح يدوي |
+| إعدادات الامتحان كاملة | Audit Log | Report Viewer Role |
+| تقارير يومية/مدى + تصدير Excel | تقرير ورقة الإجابة | Proctoring |
+
+---
+
+## 8. المخاطر وخطط التخفيف (Risks & Mitigations)
+
+| # | الخطر | الأثر | التخفيف |
+|---|-------|-------|---------|
+| R1 | ذروة دخول متزامنة أول دقائق الامتحان | بطء/تعطّل | Caching للأسئلة المنشورة، Connection Pooling، Load Test مسبق |
+| R2 | انقطاع نت جماعي أثناء الامتحان | فقدان محاولات | Auto-Save لحظي + Resume + مؤقّت Server-Side (الوقت لا يضيع) |
+| R3 | تسريب الأسئلة بين الممتحنين | إخلال بالعدالة | بنك أسئلة كبير + عشوائية الاختيار والترتيب والإجابات |
+| R4 | تعديل سؤال بعد استخدامه يفسد النتائج | تقارير خاطئة | الـ Snapshot غير القابل للتعديل + Soft Delete |
+| R5 | نقص بنك الأسئلة عن المطلوب | فشل توليد امتحان | Validation إجباري عند النشر + عدّاد المتاح/المطلوب |
+| R6 | تلاعب بالوقت من المتصفح | غش | المؤقّت والقرارات كلها Server-Side |
+| R7 | أرقام قومية وهمية | بيانات مزيفة | Validation بنيوي كامل + (اختياريًا) OTP Email |
+| R8 | Spin-Down / Cold Start للاستضافة المجانية أثناء امتحان جارٍ | توقف مفاجئ للممتحنين | Keep-Alive Pinger كل 5 دقائق + إيقاظ السيرفر قبل بدء فترة الامتحان بساعة + Resume يغطي أي انقطاع |
+| R9 | حصة CPU/Bandwidth اليومية للـ Free Tier تنفد أثناء يوم امتحانات مزدحم | رفض الطلبات | نموذج الدفعات 20×20 يحد من الاستهلاك + مراقبة الحصة في لوحة الأداء + خطة ترقية جاهزة (تغيير Plan فقط دون تغيير كود) |
+| R10 | عدم استقرار WebSockets على الاستضافة المجانية | تعطل المؤقّت/الطابور | التصميم لا يعتمد على SignalR: Polling + تحقق Server-Side مع كل Request |
+
+---
+
+## 9. أسئلة مفتوحة (Open Questions — تحتاج قرارًا قبل التنفيذ)
+
+1. هل الامتحان **واحد نشط** في كل مرة أم عدة امتحانات متوازية؟ (يؤثر على شاشة دخول الممتحن: رابط مباشر لكل امتحان أم قائمة اختيار).
+2. هل تُعرض النتيجة للممتحن فورًا، أم فقط "تم التسليم" وتظهر النتائج لاحقًا؟ (النظام يدعم الوضعين — من يقرر الافتراضي؟)
+3. هل هناك حد أدنى للنجاح **لكل موضوع** على حدة، أم إجمالي فقط؟
+4. هل يُرسل إيميل تلقائي بالنتيجة للممتحن؟ (يتطلب SMTP Configuration).
+5. البيئة المستهدفة: On-Premises (IIS + SQL Server) أم Cloud؟ — بناءً على طبيعة الجهة يُرجَّح On-Prem.
+6. هل مطلوب دعم أسئلة بصور فقط أم أيضًا معادلات/جداول داخل نص السؤال؟
+
+---
+
+## 10. معايير القبول العامة (Acceptance Criteria — أمثلة)
+
+- ✅ ممتحنان يدخلان نفس الامتحان في نفس اللحظة يحصلان على مجموعتَي أسئلة مختلفتَين (أو ترتيب مختلف على الأقل)، وكل منهما تتدرج أسئلته من السهل إلى الصعب داخل كل موضوع.
+- ✅ إغلاق المتصفح والعودة بعد 5 دقائق يعيد الممتحن لنفس السؤال بنفس إجاباته المحفوظة، والوقت المتبقي منقوصًا منه فترة الغياب.
+- ✅ عند انتهاء الوقت والممتحن غير متصل، تُسلَّم محاولته تلقائيًا وتُحتسب الإجابات المحفوظة.
+- ✅ الأدمن يستخرج قائمة راسبي يوم 2026-07-15 كملف Excel خلال ثوانٍ، ثم يستخرج ناجحي الفترة 2026-07-10 إلى 2026-07-20 بنفس السهولة.
+- ✅ تعديل نص سؤال في البنك بعد امتحان أمس لا يغيّر أي شيء في تقرير أو ورقة إجابة أمس.
+- ✅ عند وجود 20 محاولة نشطة، الممتحن رقم 21 يرى شاشة انتظار بترتيبه، وفور تسليم أي ممتحن يُستدعى تلقائيًا خلال 30 ثانية كحد أقصى.
+- ✅ اختبار k6 بـ 20 مستخدمًا متزامنًا على بيئة الاستضافة المجانية يحقق P95 < 1 ثانية لطلبات الحفظ، وإلا يفشل الـ CI Pipeline.
+- ✅ إيقاف السيرفر يدويًا 10 دقائق أثناء محاولة جارية ثم إعادته: الممتحن يستأنف، والوقت محسوب بدقة، وأي محاولة انتهى وقتها أثناء التوقف تُغلق وتُصحَّح تلقائيًا مع أول Request.
+- ✅ في سؤال "أكمل" إجابته النموذجية "server": كتابة " Server "، "SERVER"، أو "server " تُحتسب كلها صحيحة، بينما "servers" تُحتسب خاطئة.
+- ✅ محاولة الأدمن حفظ سؤال "أكمل" بإجابة نموذجية "Data Base" (مسافة/حروف كبيرة) تُرفض برسالة Validation واضحة.
+
+---
+
+## 11. ملف النشر — الاستضافة المجانية (Free-Tier Deployment Profile)
+
+> النظام مصمَّم ليعمل بكفاءة على استضافة مجانية بفضل نموذج الدفعات (20×20). هذا القسم يوثّق القيود والقرارات المعمارية الخاصة بهذا الوضع.
+
+### 11.1 حسبة السعة (Capacity Math)
+
+```
+20 ممتحنًا متزامنًا:
+- Auto-Save (مع Debounce): ≈ Request كل 15–30 ثانية / مستخدم
+- Queue Polling للمنتظرين: Request كل 15–30 ثانية / منتظر
+⇒ الذروة الإجمالية ≈ 1–3 requests/second
+⇒ ضمن قدرة أي Free Tier بذاكرة 512MB–1GB بهامش أمان كبير
+```
+
+**الاستنتاج:** عنق الزجاجة في الاستضافة المجانية ليس عدد المستخدمين، بل: الـ Cold Start، حصص الاستهلاك اليومية، واستقرار الاتصالات المستمرة — وكلها معالجة أدناه.
+
+### 11.2 مقارنة خيارات الاستضافة المجانية
+
+| الخيار | .NET 8 | قاعدة البيانات | أهم قيد | ملاءمة |
+|--------|--------|----------------|----------|--------|
+| **MonsterASP.NET** (Free Tier) | ✅ Native | ✅ MSSQL مضمّن | حدود موارد الخطة المجانية | **الأنسب** — يحافظ على SQL Server دون تعديل |
+| **Azure App Service F1** | ✅ Native | Azure SQL Free Tier منفصل | حصة CPU يومية محدودة + لا Always-On | جيد للتجارب، خطر ليوم امتحانات كامل |
+| **Render** (Free) | ✅ عبر Docker | PostgreSQL خارجي (Neon/Supabase) | Spin-Down بعد فترة خمول | جيد مع Keep-Alive + تبديل Provider لـ PostgreSQL |
+| **Railway** | ✅ Auto-detect | PostgreSQL مدمج | رصيد شهري محدود وليس مجانيًا دائمًا | مناسب كبيئة Staging |
+
+*(تُراجَع شروط الخطط المجانية قبل النشر — فهي تتغير باستمرار.)*
+
+### 11.3 قرارات معمارية إلزامية لوضع الـ Free Tier
+
+1. **مكافحة الـ Cold Start:** `/health` Endpoint خفيف + UptimeRobot يستدعيه كل 5 دقائق + إجراء تشغيلي بإيقاظ السيرفر قبل فترة الامتحان بساعة.
+2. **لا اعتماد على SignalR:** المؤقّت وشاشة الانتظار بـ Polling، والتحقق من الوقت Server-Side مع كل Request — SignalR يُفعَّل فقط عند توفر بيئة تدعمه (Live Monitoring رفاهية وليست ضرورة).
+3. **Lazy Auto-Submit:** إغلاق المحاولات منتهية الوقت لا يعتمد على Background Job قد لا يعمل أثناء نوم السيرفر — أي Request لاحق يقوم بالتسوية.
+4. **EF Core Provider-Agnostic:** كل الاستعلامات عبر LINQ القياسي دون Raw SQL خاص بمحرك معين، ليكون التبديل SQL Server ↔ PostgreSQL تغيير Configuration فقط.
+5. **Debounce + Batching:** تقليل عدد الـ Requests من الواجهة (حفظ الإجابة بعد ثانية من آخر تغيير).
+6. **Response Compression + Caching:** ضغط الاستجابات وتخزين بنك أسئلة الامتحان المنشور في الذاكرة.
+
+### 11.4 الفحص المستمر للكفاءة (Continuous Efficiency Verification)
+
+| الآلية | التفاصيل | التوقيت |
+|--------|----------|---------|
+| **k6 في CI** | سيناريوهان: Baseline (20 متزامنًا، رحلة كاملة تسجيل→حل→تسليم) وStress (40) — فشل الـ Build إذا P95 > 1s أو Error Rate > 1% | مع كل Deploy |
+| **لوحة أداء داخلية** | Middleware يسجّل زمن كل Request → شاشة في الأدمن تعرض P95/P99 وعدد الأخطاء آخر ساعة | لحظي أثناء الامتحان |
+| **Uptime خارجي** | UptimeRobot على `/health` (فحص DB + ذاكرة) مع تنبيه بريدي عند السقوط | كل 5 دقائق دائمًا |
+| **بروفة قبل يوم الامتحان** | تشغيل سيناريو k6 على بيئة الإنتاج المجانية نفسها قبل اليوم الفعلي بـ 24 ساعة | قبل كل حدث امتحاني |
+
+### 11.5 مسار الترقية (Scale-Up Path)
+
+النموذج نفسه يعمل دون تغيير كود عند الترقية: رفع `MaxConcurrentAttempts` من 20 إلى مئات + Plan مدفوع + تفعيل SignalR وHangfire الكاملين. قرار الترقية يُتَّخذ بناءً على بيانات لوحة الأداء (إذا اقترب P95 من الحد باستمرار).
