@@ -37,11 +37,14 @@ public class ValidationBehavior<TRequest, TResponse> : IPipelineBehavior<TReques
         {
             var failureMethod = responseType.GetMethod(
                 nameof(Result<object>.Failure),
-                new[] { typeof(IEnumerable<string>) });
+                new[] { typeof(IEnumerable<string>) })
+                ?? throw new InvalidOperationException(
+                    $"{responseType} does not expose a static Failure(IEnumerable<string>) method required by ValidationBehavior.");
 
-            return (TResponse)failureMethod!.Invoke(null, new object[] { failures })!;
+            return (TResponse)failureMethod.Invoke(null, new object[] { failures })!;
         }
 
+        // Escape hatch: only requests using Result<T> get exception-free validation failures; others must throw.
         throw new ValidationException(failures.Select(f => new ValidationFailure(string.Empty, f)));
     }
 }

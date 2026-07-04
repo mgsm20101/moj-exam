@@ -18,6 +18,16 @@ public class SampleRequestValidator : AbstractValidator<SampleRequest>
     }
 }
 
+public record PlainRequest(string Name) : IRequest<string>;
+
+public class PlainRequestValidator : AbstractValidator<PlainRequest>
+{
+    public PlainRequestValidator()
+    {
+        RuleFor(x => x.Name).NotEmpty().WithMessage("Name is required.");
+    }
+}
+
 public class ValidationBehaviorTests
 {
     [Fact]
@@ -62,5 +72,20 @@ public class ValidationBehaviorTests
 
         Assert.True(response.IsSuccess);
         Assert.Equal("ok", response.Value);
+    }
+
+    [Fact]
+    public async Task Handle_NonResultResponse_ValidationFails_ThrowsValidationException()
+    {
+        var behavior = new ValidationBehavior<PlainRequest, string>(new[] { new PlainRequestValidator() });
+        var nextCalled = false;
+
+        await Assert.ThrowsAsync<ValidationException>(() => behavior.Handle(new PlainRequest(""), () =>
+        {
+            nextCalled = true;
+            return Task.FromResult("should not happen");
+        }, CancellationToken.None));
+
+        Assert.False(nextCalled);
     }
 }
