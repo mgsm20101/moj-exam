@@ -2044,3 +2044,7 @@ git commit -m "docs: mark Phase 0 foundation plan complete"
 - Live Monitoring/SignalR, Anti-Cheating instrumentation, Audit Log, k6 performance pipeline, actual Free-Tier deployment (Phase 4).
 
 Each of these should get its own plan document following this same skill before implementation begins, per the PRD's phase breakdown.
+
+---
+
+Phase 0 completed on 2026-07-05 — backend (8/8 tests) and frontend (11/11 tests) green, manual E2E login verified against real LocalDB + running Angular dev server. A real layout bug (leftover Angular CLI boilerplate pushing the login submit button off-screen) was discovered and fixed during manual verification — see commit `c1b9ed9`.
