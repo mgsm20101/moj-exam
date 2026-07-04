@@ -26,7 +26,7 @@ export class LoginComponent {
   ) {}
 
   submit(): void {
-    if (this.form.invalid) {
+    if (this.form.invalid || this.loading) {
       return;
     }
 
