@@ -45,6 +45,8 @@ builder.Services.AddCors(options =>
     options.AddPolicy("AllowAngularApp", policy =>
     {
         var allowedOrigins = builder.Configuration["AllowedOrigins"]?.Split(',') ?? Array.Empty<string>();
+        // Empty/misconfigured AllowedOrigins results in an empty array here, which CORS middleware
+        // correctly treats as "no origin allowed" (fail closed) rather than falling back to AllowAnyOrigin().
         policy.WithOrigins(allowedOrigins).AllowAnyHeader().AllowAnyMethod();
     });
 });
@@ -58,6 +60,7 @@ if (app.Environment.IsDevelopment())
 
     using var scope = app.Services.CreateScope();
     var db = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+    // SQL Server uses real migrations; non-SQL-Server providers (e.g. SQLite in integration tests, Task 8) use EnsureCreatedAsync instead.
     if (db.Database.IsSqlServer())
     {
         await db.Database.MigrateAsync();
