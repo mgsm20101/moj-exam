@@ -1412,6 +1412,11 @@ git commit -m "chore(frontend): scaffold Angular 17 standalone workspace with RT
 
 ---
 
+> **Carried forward from Task 9's code review — read before starting Task 10/11:**
+> 1. PrimeNG 17's `lara-light-blue` theme ships **zero RTL CSS** (`grep -c '\[dir=' node_modules/primeng/resources/themes/lara-light-blue/theme.css` → `0`). Components with icons/overlays anchored via `left`/`right` (dropdowns, calendars, input groups, menus) will visually misalign under `dir="rtl"` unless an RTL override stylesheet is added. Budget for this when building the login form/admin layout — don't assume `dir="rtl"` alone is sufficient.
+> 2. Production initial bundle is already at 406.63 kB against `angular.json`'s 500kb warning budget (dev-mode build is 1.45MB, over the 1mb *error* budget, but budgets only apply to the production config by default). Watch this as more PrimeNG components get imported in Tasks 10-11 — there's limited headroom left.
+> 3. `styles.scss`'s font stack (`"Segoe UI", Tahoma, Arial, sans-serif`) has no Arabic web-font fallback (e.g. Noto Sans Arabic/Cairo) and no `@font-face`/Google Fonts import — non-Windows clients will fall back to generic sans-serif for Arabic glyphs. Worth picking a proper Arabic font pairing before the login page (first user-visible screen) ships.
+
 ### Task 10: Angular Core — Auth Service, Interceptor, Guard (TDD)
 
 **Files:**
