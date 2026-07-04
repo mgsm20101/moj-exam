@@ -9,6 +9,9 @@ export interface LoginResponse {
   roles: string[];
 }
 
+// Known Phase 0 tradeoff: localStorage is readable by any injected script (XSS risk).
+// Acceptable short-term given the PRD's short-lived JWT design; revisit before production
+// (target: httpOnly refresh cookie + in-memory access token) as part of a security hardening pass.
 const TOKEN_KEY = 'auth_token';
 
 @Injectable({ providedIn: 'root' })

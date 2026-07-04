@@ -1,5 +1,5 @@
 import { TestBed } from '@angular/core/testing';
-import { Router } from '@angular/router';
+import { ActivatedRouteSnapshot, Router, RouterStateSnapshot } from '@angular/router';
 import { authGuard } from './auth.guard';
 import { AuthService } from '../services/auth.service';
 
@@ -22,7 +22,9 @@ describe('authGuard', () => {
   it('allows navigation when authenticated', () => {
     authService.isAuthenticated.and.returnValue(true);
 
-    const result = TestBed.runInInjectionContext(() => (authGuard as any)());
+    const result = TestBed.runInInjectionContext(() =>
+      authGuard({} as ActivatedRouteSnapshot, {} as RouterStateSnapshot)
+    );
 
     expect(result).toBeTrue();
   });
@@ -32,7 +34,9 @@ describe('authGuard', () => {
     const fakeTree = {} as any;
     router.createUrlTree.and.returnValue(fakeTree);
 
-    const result = TestBed.runInInjectionContext(() => (authGuard as any)());
+    const result = TestBed.runInInjectionContext(() =>
+      authGuard({} as ActivatedRouteSnapshot, {} as RouterStateSnapshot)
+    );
 
     expect(router.createUrlTree).toHaveBeenCalledWith(['/login']);
     expect(result).toBe(fakeTree);
