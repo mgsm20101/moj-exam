@@ -1,4 +1,5 @@
 using ExamSystem.Application.Common.Interfaces;
+using ExamSystem.Domain.Common;
 using ExamSystem.Domain.Exams;
 using ExamSystem.Domain.Questions;
 using ExamSystem.Domain.Topics;
@@ -25,6 +26,27 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser>, IApplica
     {
         base.OnModelCreating(builder);
         builder.ApplyConfigurationsFromAssembly(typeof(ApplicationDbContext).Assembly);
+    }
+
+    // Stamps audit timestamps centrally so no handler can forget to set them (CreatedAtUtc was
+    // previously never set by any handler that constructs a new Exam/Question/Topic, silently
+    // leaving it at DateTime.MinValue for every row in the system).
+    public override Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
+    {
+        var now = DateTime.UtcNow;
+        foreach (var entry in ChangeTracker.Entries<BaseAuditableEntity>())
+        {
+            if (entry.State == EntityState.Added)
+            {
+                entry.Entity.CreatedAtUtc = now;
+            }
+            else if (entry.State == EntityState.Modified)
+            {
+                entry.Entity.ModifiedAtUtc = now;
+            }
+        }
+
+        return base.SaveChangesAsync(cancellationToken);
     }
 
     protected override void ConfigureConventions(ModelConfigurationBuilder configurationBuilder)

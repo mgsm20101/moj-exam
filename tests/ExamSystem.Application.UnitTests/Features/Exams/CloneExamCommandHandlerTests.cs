@@ -29,4 +29,32 @@ public class CloneExamCommandHandlerTests
         Assert.Single(clone.TopicSelections);
         Assert.NotEqual(original.Id, clone.Id);
     }
+
+    [Fact]
+    public async Task Handle_ExamWithNoTopicSelections_ClonesSuccessfullyWithEmptySelections()
+    {
+        using var db = TestDbContextFactory.Create();
+        var original = new Exam { Name = "Bare Exam", StartAtUtc = DateTime.UtcNow, EndAtUtc = DateTime.UtcNow.AddDays(7), DurationMinutes = 60, Status = ExamStatus.Draft };
+        db.Exams.Add(original);
+        await db.SaveChangesAsync(CancellationToken.None);
+
+        var handler = new CloneExamCommandHandler(db);
+        var result = await handler.Handle(new CloneExamCommand(original.Id), CancellationToken.None);
+
+        Assert.True(result.IsSuccess);
+        var clone = db.Exams.Include(e => e.TopicSelections).Single(e => e.Id == result.Value);
+        Assert.Empty(clone.TopicSelections);
+    }
+
+    [Fact]
+    public async Task Handle_ExamNotFound_ReturnsFailure()
+    {
+        using var db = TestDbContextFactory.Create();
+        var handler = new CloneExamCommandHandler(db);
+
+        var result = await handler.Handle(new CloneExamCommand(Guid.NewGuid()), CancellationToken.None);
+
+        Assert.False(result.IsSuccess);
+        Assert.Contains("Exam not found.", result.Errors);
+    }
 }
