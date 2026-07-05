@@ -64,6 +64,42 @@ public class QuestionsControllerTests : IClassFixture<TestWebApplicationFactory>
         Assert.Single(questions!, q => q.Text == "What does CPU stand for?");
     }
 
+    [Fact]
+    public async Task UploadImage_ThenGetReturnedUrl_ServesTheUploadedFile()
+    {
+        // Regression test for a bug where uploaded images were saved to disk successfully
+        // (201/200 OK from the upload endpoint) but the static file middleware returned 404
+        // when fetching the returned URL, because wwwroot didn't exist on disk when the host
+        // was built and ASP.NET Core cached a NullFileProvider for static files as a result.
+        var client = await _factory.CreateAuthenticatedAdminClientAsync();
+
+        using var content = new MultipartFormDataContent();
+        var imageBytes = CreateMinimalPngBytes();
+        var fileContent = new ByteArrayContent(imageBytes);
+        fileContent.Headers.ContentType = new System.Net.Http.Headers.MediaTypeHeaderValue("image/png");
+        content.Add(fileContent, "file", "test-image.png");
+
+        var uploadResponse = await client.PostAsync("/api/admin/questions/image", content);
+        Assert.Equal(HttpStatusCode.OK, uploadResponse.StatusCode);
+
+        var body = await uploadResponse.Content.ReadFromJsonAsync<UploadedImageDto>();
+        Assert.NotNull(body);
+        Assert.False(string.IsNullOrWhiteSpace(body!.Url));
+
+        var getResponse = await client.GetAsync(body.Url);
+
+        Assert.Equal(HttpStatusCode.OK, getResponse.StatusCode);
+    }
+
+    private static byte[] CreateMinimalPngBytes()
+    {
+        // A valid 1x1 transparent PNG.
+        const string base64 =
+            "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNk+A8AAQUBAScY42YAAAAASUVORK5CYII=";
+        return Convert.FromBase64String(base64);
+    }
+
     private record CreatedIdDto(Guid Id);
     private record QuestionListItemDto(Guid Id, string Text);
+    private record UploadedImageDto(string Url);
 }

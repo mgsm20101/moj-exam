@@ -56,6 +56,12 @@ builder.Services.AddCors(options =>
     });
 });
 
+// ASP.NET Core resolves IWebHostEnvironment.WebRootFileProvider once, at Build() time. If wwwroot
+// doesn't exist on disk yet (e.g. fresh clone/fresh migration, since wwwroot is runtime-generated
+// content and not committed to git), it caches a NullFileProvider and static files are never served
+// afterwards -- even if the folder is created later (e.g. lazily on first image upload).
+Directory.CreateDirectory(Path.Combine(builder.Environment.ContentRootPath, "wwwroot"));
+
 var app = builder.Build();
 
 if (app.Environment.IsDevelopment())
