@@ -1,0 +1,47 @@
+<div class="exams-page">
+  <div class="header">
+    <h2>إعدادات الامتحانات</h2>
+    <button type="button" (click)="openCreateForm()">امتحان جديد</button>
+  </div>
+
+  <p class="error" *ngIf="errorMessage">{{ errorMessage }}</p>
+
+  <table class="exams-table">
+    <thead>
+      <tr>
+        <th>الاسم</th>
+        <th>البداية</th>
+        <th>النهاية</th>
+        <th>عدد الأسئلة</th>
+        <th>الدرجة الكلية</th>
+        <th>الحالة</th>
+        <th>إجراءات</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let exam of exams()">
+        <td>{{ exam.name }}</td>
+        <td>{{ exam.startAtUtc | date: 'short' }}</td>
+        <td>{{ exam.endAtUtc | date: 'short' }}</td>
+        <td>{{ exam.totalQuestionCount }}</td>
+        <td>{{ exam.totalPoints }}</td>
+        <td>{{ exam.status }}</td>
+        <td class="actions">
+          <button type="button" (click)="openEditForm(exam.id)" [disabled]="exam.status !== 'Draft'">تعديل</button>
+          <button type="button" (click)="publishExam(exam.id)" *ngIf="exam.status === 'Draft'">نشر</button>
+          <button type="button" (click)="closeExam(exam.id)" *ngIf="exam.status === 'Published'">إغلاق</button>
+          <button type="button" (click)="archiveExam(exam.id)" *ngIf="exam.status === 'Closed'">أرشفة</button>
+          <button type="button" (click)="deleteExam(exam.id)" [disabled]="exam.status !== 'Draft'">حذف</button>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="form-panel" *ngIf="isFormOpen()">
+    <div class="form-panel-header">
+      <h3>{{ editingExam() ? 'تعديل امتحان' : 'امتحان جديد' }}</h3>
+      <button type="button" (click)="closeForm()">إغلاق</button>
+    </div>
+    <app-exam-form [topics]="topics()" [initialValue]="editingExam()" (save)="onSave($event)"></app-exam-form>
+  </div>
+</div>

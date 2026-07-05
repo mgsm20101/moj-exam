@@ -32,6 +32,11 @@ export const routes: Routes = [
         path: 'questions/import',
         loadComponent: () =>
           import('./features/admin/questions/bulk-import.component').then(m => m.BulkImportComponent)
+      },
+      {
+        path: 'exams',
+        loadComponent: () =>
+          import('./features/admin/exams/exams-list.component').then(m => m.ExamsListComponent)
       }
     ]
   }
