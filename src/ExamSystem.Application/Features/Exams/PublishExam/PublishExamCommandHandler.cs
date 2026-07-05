@@ -42,8 +42,15 @@ public class PublishExamCommandHandler : IRequestHandler<PublishExamCommand, Res
             errors.Add("Exam has no topics configured.");
         }
 
+        var inactiveTopicsFlagged = new HashSet<Guid>();
+
         foreach (var selection in exam.TopicSelections)
         {
+            if (!selection.Topic!.IsActive && inactiveTopicsFlagged.Add(selection.TopicId))
+            {
+                errors.Add($"Topic '{selection.Topic.Name}' is no longer active and cannot be used to publish an exam.");
+            }
+
             var available = await _db.Questions.CountAsync(
                 q => q.TopicId == selection.TopicId && q.Difficulty == selection.Difficulty
                      && q.Type == selection.Type && q.IsActive,
@@ -52,7 +59,7 @@ public class PublishExamCommandHandler : IRequestHandler<PublishExamCommand, Res
             if (available < selection.Count)
             {
                 errors.Add(
-                    $"Topic '{selection.Topic!.Name}' needs {selection.Count} {selection.Type}/{selection.Difficulty} " +
+                    $"Topic '{selection.Topic.Name}' needs {selection.Count} {selection.Type}/{selection.Difficulty} " +
                     $"question(s) but only {available} are available.");
             }
         }

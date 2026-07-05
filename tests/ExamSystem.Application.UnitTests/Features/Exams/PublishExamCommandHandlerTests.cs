@@ -84,6 +84,32 @@ public class PublishExamCommandHandlerTests
     }
 
     [Fact]
+    public async Task Handle_InactiveTopic_ReturnsFailureAndStaysDraft()
+    {
+        var db = TestDbContextFactory.Create();
+        var topic = new Topic { Name = "Excel", DisplayOrder = 1, IsActive = false };
+        db.Topics.Add(topic);
+
+        var question = new Question { TopicId = topic.Id, Text = "Q1", Type = QuestionType.Mcq, Difficulty = DifficultyLevel.Medium, IsActive = true };
+        question.Options.Add(new QuestionOption { Text = "A", IsCorrect = false });
+        question.Options.Add(new QuestionOption { Text = "B", IsCorrect = true });
+        db.Questions.Add(question);
+
+        var exam = new Exam { Name = "Excel Basics", StartAtUtc = DateTime.UtcNow.AddHours(1), EndAtUtc = DateTime.UtcNow.AddDays(7), DurationMinutes = 60 };
+        exam.TopicSelections.Add(new ExamTopicSelection { TopicId = topic.Id, DisplayOrder = 1, Difficulty = DifficultyLevel.Medium, Type = QuestionType.Mcq, Count = 1 });
+        db.Exams.Add(exam);
+        await db.SaveChangesAsync(CancellationToken.None);
+
+        var handler = new PublishExamCommandHandler(db);
+
+        var result = await handler.Handle(new PublishExamCommand(exam.Id), CancellationToken.None);
+
+        Assert.False(result.IsSuccess);
+        Assert.Contains(result.Errors, e => e.Contains("is no longer active"));
+        Assert.Equal(ExamStatus.Draft, db.Exams.Single().Status);
+    }
+
+    [Fact]
     public async Task Handle_ExpiredEndDateAndInsufficientBank_ReturnsBothErrorsAccumulated()
     {
         var (db, exam) = await SeedDraftExamAsync(mcqNeeded: 10, mcqAvailable: 3);
