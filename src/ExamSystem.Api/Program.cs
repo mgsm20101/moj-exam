@@ -6,6 +6,7 @@ using ExamSystem.Infrastructure.Identity;
 using ExamSystem.Infrastructure.Persistence;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.FileProviders;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 
@@ -56,13 +57,18 @@ builder.Services.AddCors(options =>
     });
 });
 
-// ASP.NET Core resolves IWebHostEnvironment.WebRootFileProvider once, at Build() time. If wwwroot
-// doesn't exist on disk yet (e.g. fresh clone/fresh migration, since wwwroot is runtime-generated
-// content and not committed to git), it caches a NullFileProvider and static files are never served
-// afterwards -- even if the folder is created later (e.g. lazily on first image upload).
-Directory.CreateDirectory(Path.Combine(builder.Environment.ContentRootPath, "wwwroot"));
-
 var app = builder.Build();
+
+// ASP.NET Core resolves IWebHostEnvironment.WebRootFileProvider from whether wwwroot exists on disk
+// at hosting-environment initialization -- which happens no later than WebApplicationBuilder
+// construction, before any of our own code runs. If wwwroot doesn't exist yet (fresh clone/fresh
+// migration -- it's runtime-generated content and not committed to git), a NullFileProvider gets
+// cached and static files are never served afterwards, even after the folder is created later (e.g.
+// lazily on first image upload). Creating the directory here is too late to affect the cached
+// provider, so we explicitly rebuild it against the now-guaranteed-to-exist directory.
+var webRootPath = app.Environment.WebRootPath ?? Path.Combine(app.Environment.ContentRootPath, "wwwroot");
+Directory.CreateDirectory(webRootPath);
+app.Environment.WebRootFileProvider = new PhysicalFileProvider(webRootPath);
 
 if (app.Environment.IsDevelopment())
 {
