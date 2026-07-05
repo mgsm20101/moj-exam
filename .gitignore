@@ -12,6 +12,9 @@ frontend/.angular/
 .vs/
 .vscode/
 
+## Git worktrees
+.worktrees/
+
 ## Secrets
 *.env
 appsettings.*.local.json
