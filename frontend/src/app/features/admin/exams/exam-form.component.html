@@ -29,6 +29,9 @@
       <label for="mcqPoints">درجة سؤال الاختيار</label>
       <input id="mcqPoints" type="number" min="0" step="0.5" formControlName="mcqPoints" />
     </div>
+    <!-- TrueFalse has no column in the topic matrix below and no way to author a TrueFalse
+         question yet (question-form only offers Mcq/FillBlank) -- this field is intentionally
+         configurable ahead of that feature landing, not an oversight. -->
     <div class="field">
       <label for="trueFalsePoints">درجة سؤال صح/خطأ</label>
       <input id="trueFalsePoints" type="number" min="0" step="0.5" formControlName="trueFalsePoints" />
@@ -51,9 +54,18 @@
   </div>
 
   <div class="field-row toggles">
-    <label><input type="checkbox" formControlName="shuffleAnswers" /> خلط الإجابات</label>
-    <label><input type="checkbox" formControlName="showResultImmediately" /> عرض النتيجة فورًا</label>
-    <label><input type="checkbox" formControlName="allowBackNavigation" /> السماح بالرجوع للسؤال السابق</label>
+    <div class="field">
+      <input id="shuffleAnswers" type="checkbox" formControlName="shuffleAnswers" />
+      <label for="shuffleAnswers">خلط الإجابات</label>
+    </div>
+    <div class="field">
+      <input id="showResultImmediately" type="checkbox" formControlName="showResultImmediately" />
+      <label for="showResultImmediately">عرض النتيجة فورًا</label>
+    </div>
+    <div class="field">
+      <input id="allowBackNavigation" type="checkbox" formControlName="allowBackNavigation" />
+      <label for="allowBackNavigation">السماح بالرجوع للسؤال السابق</label>
+    </div>
   </div>
 
   <h3>توزيع الأسئلة لكل موضوع</h3>
@@ -68,13 +80,13 @@
       <tr *ngFor="let topic of topics; let i = index" [formGroupName]="i">
         <td>{{ topic.name }}</td>
         <td *ngFor="let cell of matrixCells">
-          <input type="number" min="0" [formControlName]="cell.control" />
+          <input type="number" min="0" [formControlName]="cell.control" [attr.aria-label]="topic.name + ' - ' + cell.label" />
         </td>
       </tr>
     </tbody>
   </table>
 
-  <p class="error" *ngIf="validationError">{{ validationError }}</p>
+  <p class="error" *ngIf="validationError()">{{ validationError() }}</p>
 
   <button type="submit">حفظ</button>
 </form>

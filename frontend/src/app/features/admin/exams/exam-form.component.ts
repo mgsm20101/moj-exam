@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, EventEmitter, Input, OnChanges, OnInit, Output, SimpleChanges } from '@angular/core';
+import { ChangeDetectionStrategy, Component, EventEmitter, Input, OnChanges, OnInit, Output, SimpleChanges, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormArray, FormBuilder, FormGroup, ReactiveFormsModule } from '@angular/forms';
 import { Topic } from '../../../core/services/topic.service';
@@ -20,6 +20,22 @@ const MATRIX_CELLS: MatrixCell[] = [
   { control: 'hardFill', difficulty: 'Hard', type: 'FillBlank', label: 'متقدم / أكمل' }
 ];
 
+const DEFAULT_FORM_VALUES = {
+  name: '',
+  description: '',
+  startAtUtc: '',
+  endAtUtc: '',
+  durationMinutes: 60,
+  mcqPoints: 2,
+  trueFalsePoints: 1,
+  fillBlankPoints: 5,
+  passMarkPercentage: 60,
+  maxAttempts: 1,
+  shuffleAnswers: true,
+  showResultImmediately: true,
+  allowBackNavigation: true
+};
+
 @Component({
   selector: 'app-exam-form',
   standalone: true,
@@ -33,22 +49,10 @@ export class ExamFormComponent implements OnInit, OnChanges {
   @Output() save = new EventEmitter<ExamInput>();
 
   readonly matrixCells = MATRIX_CELLS;
-  validationError: string | null = null;
+  readonly validationError = signal<string | null>(null);
 
   readonly form: FormGroup = this.fb.group({
-    name: [''],
-    description: [''],
-    startAtUtc: [''],
-    endAtUtc: [''],
-    durationMinutes: [60],
-    mcqPoints: [2],
-    trueFalsePoints: [1],
-    fillBlankPoints: [5],
-    passMarkPercentage: [60],
-    maxAttempts: [1],
-    shuffleAnswers: [true],
-    showResultImmediately: [true],
-    allowBackNavigation: [true],
+    ...DEFAULT_FORM_VALUES,
     topicRows: this.fb.array([])
   });
 
@@ -70,10 +74,11 @@ export class ExamFormComponent implements OnInit, OnChanges {
 
   private rebuildForm(): void {
     const rows = this.topics.map(topic => {
-      const existing = this.initialValue?.topicSelections.filter(s => s.topicId === topic.id) ?? [];
       const group: Record<string, unknown> = {};
       for (const cell of MATRIX_CELLS) {
-        const match = existing.find(s => s.difficulty === cell.difficulty && s.type === cell.type);
+        const match = this.initialValue?.topicSelections.find(
+          s => s.topicId === topic.id && s.difficulty === cell.difficulty && s.type === cell.type
+        );
         group[cell.control] = [match?.count ?? 0];
       }
       return this.fb.group(group);
@@ -97,28 +102,29 @@ export class ExamFormComponent implements OnInit, OnChanges {
         allowBackNavigation: this.initialValue.allowBackNavigation
       });
     } else {
-      this.form.patchValue({
-        name: '', description: '', startAtUtc: '', endAtUtc: '', durationMinutes: 60,
-        mcqPoints: 2, trueFalsePoints: 1, fillBlankPoints: 5, passMarkPercentage: 60, maxAttempts: 1,
-        shuffleAnswers: true, showResultImmediately: true, allowBackNavigation: true
-      });
+      this.form.patchValue(DEFAULT_FORM_VALUES);
     }
   }
 
+  // datetime-local renders/parses as browser-local wall-clock time with no timezone info,
+  // so this must build the string from local getters -- slicing the UTC ISO string would
+  // silently shift the displayed and resubmitted time by the admin's UTC offset.
   private toLocalInputValue(isoUtc: string): string {
-    return new Date(isoUtc).toISOString().slice(0, 16);
+    const date = new Date(isoUtc);
+    const pad = (n: number) => n.toString().padStart(2, '0');
+    return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}T${pad(date.getHours())}:${pad(date.getMinutes())}`;
   }
 
   submit(): void {
     const value = this.form.value;
 
     if (!value.name || !value.startAtUtc || !value.endAtUtc) {
-      this.validationError = 'الاسم وتاريخ البداية والنهاية مطلوبة.';
+      this.validationError.set('الاسم وتاريخ البداية والنهاية مطلوبة.');
       return;
     }
 
     if (new Date(value.endAtUtc) <= new Date(value.startAtUtc)) {
-      this.validationError = 'تاريخ النهاية يجب أن يكون بعد تاريخ البداية.';
+      this.validationError.set('تاريخ النهاية يجب أن يكون بعد تاريخ البداية.');
       return;
     }
 
@@ -134,11 +140,11 @@ export class ExamFormComponent implements OnInit, OnChanges {
     });
 
     if (topicSelections.length === 0) {
-      this.validationError = 'حدد عدد أسئلة واحد على الأقل من موضوع ومستوى صعوبة.';
+      this.validationError.set('حدد عدد أسئلة واحد على الأقل من موضوع ومستوى صعوبة.');
       return;
     }
 
-    this.validationError = null;
+    this.validationError.set(null);
     this.save.emit({
       name: value.name,
       description: value.description || null,
