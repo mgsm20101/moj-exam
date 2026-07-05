@@ -5,9 +5,12 @@ namespace ExamSystem.Infrastructure.Files;
 
 public class LocalImageStorageService : IImageStorageService
 {
-    private static readonly HashSet<string> AllowedContentTypes = new(StringComparer.OrdinalIgnoreCase)
+    private static readonly Dictionary<string, string> ContentTypeExtensions = new(StringComparer.OrdinalIgnoreCase)
     {
-        "image/jpeg", "image/png", "image/gif", "image/webp"
+        ["image/jpeg"] = ".jpg",
+        ["image/png"] = ".png",
+        ["image/gif"] = ".gif",
+        ["image/webp"] = ".webp"
     };
 
     private readonly IWebHostEnvironment _environment;
@@ -16,7 +19,7 @@ public class LocalImageStorageService : IImageStorageService
 
     public async Task<string> SaveAsync(Stream content, string originalFileName, string contentType, CancellationToken cancellationToken)
     {
-        if (!AllowedContentTypes.Contains(contentType))
+        if (!ContentTypeExtensions.TryGetValue(contentType, out var extension))
         {
             throw new InvalidOperationException($"Unsupported image content type: {contentType}");
         }
@@ -25,7 +28,6 @@ public class LocalImageStorageService : IImageStorageService
         var uploadsDir = Path.Combine(webRoot, "question-images");
         Directory.CreateDirectory(uploadsDir);
 
-        var extension = Path.GetExtension(originalFileName) is { Length: > 0 } ext ? ext : ".jpg";
         var fileName = $"{Guid.NewGuid()}{extension}";
         var fullPath = Path.Combine(uploadsDir, fileName);
 
