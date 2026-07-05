@@ -4,8 +4,6 @@ namespace ExamSystem.Application.Features.Questions.CreateQuestion;
 
 public class CreateQuestionCommandValidator : AbstractValidator<CreateQuestionCommand>
 {
-    private static readonly System.Text.RegularExpressions.Regex FillBlankAnswerPattern = new("^[a-z0-9]+$");
-
     public CreateQuestionCommandValidator(IApplicationDbContext db)
     {
         RuleFor(x => x.Text).NotEmpty().WithMessage("Question text is required.");
@@ -18,7 +16,7 @@ public class CreateQuestionCommandValidator : AbstractValidator<CreateQuestionCo
         {
             RuleFor(x => x.CorrectAnswerText)
                 .NotEmpty()
-                .Must(answer => FillBlankAnswerPattern.IsMatch(answer ?? string.Empty))
+                .Must(answer => FillBlankAnswerRules.AnswerPattern.IsMatch(answer ?? string.Empty))
                 .WithMessage("FillBlank answer must be a single lowercase word (letters/digits only, no spaces).");
 
             RuleFor(x => x.Options)
