@@ -37,7 +37,6 @@ public class UpdateExamCommandHandler : IRequestHandler<UpdateExamCommand, Resul
         exam.ShuffleAnswers = request.ShuffleAnswers;
         exam.ShowResultImmediately = request.ShowResultImmediately;
         exam.AllowBackNavigation = request.AllowBackNavigation;
-        exam.ModifiedAtUtc = DateTime.UtcNow;
 
         // Remove via the DbSet (not exam.TopicSelections.Clear()) and add replacements via the DbSet
         // as well: mutating the same tracked navigation collection for both the removal and the

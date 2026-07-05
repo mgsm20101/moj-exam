@@ -21,7 +21,7 @@ public class CloneExamCommandHandler : IRequestHandler<CloneExamCommand, Result<
 
         var clone = new Exam
         {
-            Name = $"{source.Name} (Copy)",
+            Name = $"{source.Name} (نسخة)",
             Description = source.Description,
             StartAtUtc = source.StartAtUtc,
             EndAtUtc = source.EndAtUtc,

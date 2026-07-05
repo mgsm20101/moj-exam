@@ -70,7 +70,6 @@ public class PublishExamCommandHandler : IRequestHandler<PublishExamCommand, Res
         }
 
         exam.Status = ExamStatus.Published;
-        exam.ModifiedAtUtc = DateTime.UtcNow;
         await _db.SaveChangesAsync(cancellationToken);
 
         return Result<Unit>.Success(Unit.Value);

@@ -22,7 +22,6 @@ public class ArchiveExamCommandHandler : IRequestHandler<ArchiveExamCommand, Res
         }
 
         exam.Status = ExamStatus.Archived;
-        exam.ModifiedAtUtc = DateTime.UtcNow;
         await _db.SaveChangesAsync(cancellationToken);
         return Result<Unit>.Success(Unit.Value);
     }

@@ -25,7 +25,7 @@ public class CloneExamCommandHandlerTests
         Assert.True(result.IsSuccess);
         var clone = db.Exams.Include(e => e.TopicSelections).Single(e => e.Id == result.Value);
         Assert.Equal(ExamStatus.Draft, clone.Status);
-        Assert.Equal("Original Exam (Copy)", clone.Name);
+        Assert.Equal("Original Exam (نسخة)", clone.Name);
         Assert.Single(clone.TopicSelections);
         Assert.NotEqual(original.Id, clone.Id);
     }
