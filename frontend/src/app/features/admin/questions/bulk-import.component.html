@@ -6,6 +6,8 @@
     {{ uploading ? 'جارِ الاستيراد...' : 'استيراد' }}
   </button>
 
+  <p class="error" *ngIf="errorMessage">{{ errorMessage }}</p>
+
   <div class="import-report" *ngIf="report() as r">
     <p>الإجمالي: {{ r.totalRows }} — نجح: {{ r.successCount }} — فشل: {{ r.failureCount }}</p>
     <table *ngIf="r.errors.length > 0">

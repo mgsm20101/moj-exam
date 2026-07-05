@@ -13,6 +13,7 @@ export class BulkImportComponent implements OnInit {
   report = signal<BulkImportReport | null>(null);
   selectedFile: File | null = null;
   uploading = false;
+  errorMessage: string | null = null;
 
   constructor(private readonly questionService: QuestionService) {}
 
@@ -21,7 +22,10 @@ export class BulkImportComponent implements OnInit {
   }
 
   loadSummary(): void {
-    this.questionService.getSummary().subscribe(summary => this.summary.set(summary));
+    this.questionService.getSummary().subscribe({
+      next: summary => this.summary.set(summary),
+      error: () => (this.errorMessage = 'تعذّر تحميل ملخص البنك.')
+    });
   }
 
   onFileSelected(event: Event): void {
@@ -34,13 +38,17 @@ export class BulkImportComponent implements OnInit {
       return;
     }
     this.uploading = true;
+    this.errorMessage = null;
     this.questionService.bulkImport(this.selectedFile).subscribe({
       next: report => {
         this.report.set(report);
         this.uploading = false;
         this.loadSummary();
       },
-      error: () => (this.uploading = false)
+      error: () => {
+        this.uploading = false;
+        this.errorMessage = 'تعذّر استيراد الملف — تحقق من صيغة الملف والاتصال بالخادم.';
+      }
     });
   }
 }
