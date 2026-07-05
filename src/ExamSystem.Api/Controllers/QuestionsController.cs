@@ -2,6 +2,7 @@ using ExamSystem.Application.Common.Interfaces;
 using ExamSystem.Application.Features.Questions.BulkImportQuestions;
 using ExamSystem.Application.Features.Questions.CreateQuestion;
 using ExamSystem.Application.Features.Questions.DeleteQuestion;
+using ExamSystem.Application.Features.Questions.GetQuestionBankSummary;
 using ExamSystem.Application.Features.Questions.GetQuestions;
 using ExamSystem.Application.Features.Questions.UpdateQuestion;
 using ExamSystem.Domain.Questions;
@@ -26,6 +27,13 @@ public class QuestionsController : ControllerBase
     {
         _sender = sender;
         _imageStorage = imageStorage;
+    }
+
+    [HttpGet("summary")]
+    public async Task<IActionResult> GetSummary(CancellationToken cancellationToken)
+    {
+        var result = await _sender.Send(new GetQuestionBankSummaryQuery(), cancellationToken);
+        return Ok(result.Value);
     }
 
     [HttpGet]
