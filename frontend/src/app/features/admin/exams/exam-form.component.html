@@ -1,0 +1,80 @@
+<form [formGroup]="form" (ngSubmit)="submit()" class="exam-form">
+  <div class="field">
+    <label for="examName">اسم الامتحان</label>
+    <input id="examName" type="text" formControlName="name" />
+  </div>
+
+  <div class="field">
+    <label for="examDescription">الوصف</label>
+    <textarea id="examDescription" formControlName="description"></textarea>
+  </div>
+
+  <div class="field-row">
+    <div class="field">
+      <label for="startAtUtc">بداية الإتاحة</label>
+      <input id="startAtUtc" type="datetime-local" formControlName="startAtUtc" />
+    </div>
+    <div class="field">
+      <label for="endAtUtc">نهاية الإتاحة</label>
+      <input id="endAtUtc" type="datetime-local" formControlName="endAtUtc" />
+    </div>
+    <div class="field">
+      <label for="durationMinutes">المدة (دقيقة)</label>
+      <input id="durationMinutes" type="number" min="1" formControlName="durationMinutes" />
+    </div>
+  </div>
+
+  <div class="field-row">
+    <div class="field">
+      <label for="mcqPoints">درجة سؤال الاختيار</label>
+      <input id="mcqPoints" type="number" min="0" step="0.5" formControlName="mcqPoints" />
+    </div>
+    <div class="field">
+      <label for="trueFalsePoints">درجة سؤال صح/خطأ</label>
+      <input id="trueFalsePoints" type="number" min="0" step="0.5" formControlName="trueFalsePoints" />
+    </div>
+    <div class="field">
+      <label for="fillBlankPoints">درجة سؤال أكمل</label>
+      <input id="fillBlankPoints" type="number" min="0" step="0.5" formControlName="fillBlankPoints" />
+    </div>
+  </div>
+
+  <div class="field-row">
+    <div class="field">
+      <label for="passMarkPercentage">درجة النجاح (%)</label>
+      <input id="passMarkPercentage" type="number" min="0" max="100" formControlName="passMarkPercentage" />
+    </div>
+    <div class="field">
+      <label for="maxAttempts">عدد المحاولات المسموحة</label>
+      <input id="maxAttempts" type="number" min="1" formControlName="maxAttempts" />
+    </div>
+  </div>
+
+  <div class="field-row toggles">
+    <label><input type="checkbox" formControlName="shuffleAnswers" /> خلط الإجابات</label>
+    <label><input type="checkbox" formControlName="showResultImmediately" /> عرض النتيجة فورًا</label>
+    <label><input type="checkbox" formControlName="allowBackNavigation" /> السماح بالرجوع للسؤال السابق</label>
+  </div>
+
+  <h3>توزيع الأسئلة لكل موضوع</h3>
+  <table class="matrix-table" formArrayName="topicRows">
+    <thead>
+      <tr>
+        <th>الموضوع</th>
+        <th *ngFor="let cell of matrixCells">{{ cell.label }}</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let topic of topics; let i = index" [formGroupName]="i">
+        <td>{{ topic.name }}</td>
+        <td *ngFor="let cell of matrixCells">
+          <input type="number" min="0" [formControlName]="cell.control" />
+        </td>
+      </tr>
+    </tbody>
+  </table>
+
+  <p class="error" *ngIf="validationError">{{ validationError }}</p>
+
+  <button type="submit">حفظ</button>
+</form>
