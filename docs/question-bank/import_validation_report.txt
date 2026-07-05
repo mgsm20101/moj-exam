@@ -1,0 +1,77 @@
+MCQ rows: 300
+FillBlank rows: 52
+
+Topic x Difficulty coverage (MCQ):
+Topic                     Difficulty
+أساسيات الحاسب والويندوز  Hard          25
+                          Medium        50
+أمن المعلومات والإنترنت   Hard          25
+                          Medium        50
+مهارات ميكروسوفت إكسيل    Hard          25
+                          Medium        50
+مهارات ميكروسوفت وورد     Hard          25
+                          Medium        50
+
+Topic x Difficulty coverage (FillBlank):
+Topic                     Difficulty
+أساسيات الحاسب والويندوز  Hard           5
+                          Medium         4
+أمن المعلومات والإنترنت   Hard           2
+                          Medium         3
+مهارات الإدخال والدقة     Medium         1
+مهارات ميكروسوفت إكسيل    Hard          16
+                          Medium         9
+مهارات ميكروسوفت وورد     Hard           5
+                          Medium         7
+
+Cleanup notes:
+MCQ row 285: answer text 'Extractor: =COUNTIF(B1:B100, "ناجح")' cleaned to match option ب = '=COUNTIF(B1:B100, "ناجح")'
+FIB row 2: normalized 'MAX' -> 'max' (lowercased/space-stripped for FR-3.2.1 compliance)
+FIB row 5: normalized 'RAM' -> 'ram' (lowercased/space-stripped for FR-3.2.1 compliance)
+FIB row 6: normalized 'COUNTIF' -> 'countif' (lowercased/space-stripped for FR-3.2.1 compliance)
+FIB row 7: normalized 'Subject' -> 'subject' (lowercased/space-stripped for FR-3.2.1 compliance)
+FIB row 8: normalized 'Home' -> 'home' (lowercased/space-stripped for FR-3.2.1 compliance)
+FIB row 9: normalized 'End' -> 'end' (lowercased/space-stripped for FR-3.2.1 compliance)
+FIB row 10: normalized 'Ctrl' -> 'ctrl' (lowercased/space-stripped for FR-3.2.1 compliance)
+FIB row 11: normalized 'Shift' -> 'shift' (lowercased/space-stripped for FR-3.2.1 compliance)
+FIB row 12: normalized 'Tab' -> 'tab' (lowercased/space-stripped for FR-3.2.1 compliance)
+FIB row 13: normalized 'Bcc' -> 'bcc' (lowercased/space-stripped for FR-3.2.1 compliance)
+FIB row 14: normalized 'IF' -> 'if' (lowercased/space-stripped for FR-3.2.1 compliance)
+FIB row 15: normalized 'F5' -> 'f5' (lowercased/space-stripped for FR-3.2.1 compliance)
+FIB row 16: normalized 'IFERROR' -> 'iferror' (lowercased/space-stripped for FR-3.2.1 compliance)
+FIB row 17: normalized 'Ribbon' -> 'ribbon' (lowercased/space-stripped for FR-3.2.1 compliance)
+FIB row 18: normalized 'Mail Merge' -> 'mailmerge' (lowercased/space-stripped for FR-3.2.1 compliance)
+FIB row 19: normalized 'XLOOKUP' -> 'xlookup' (lowercased/space-stripped for FR-3.2.1 compliance)
+FIB row 20: normalized 'COUNTA' -> 'counta' (lowercased/space-stripped for FR-3.2.1 compliance)
+FIB row 21: normalized 'ROM' -> 'rom' (lowercased/space-stripped for FR-3.2.1 compliance)
+FIB row 22: normalized 'Macro' -> 'macro' (lowercased/space-stripped for FR-3.2.1 compliance)
+FIB row 23: normalized 'PMT' -> 'pmt' (lowercased/space-stripped for FR-3.2.1 compliance)
+FIB row 24: normalized 'Page Break' -> 'pagebreak' (lowercased/space-stripped for FR-3.2.1 compliance)
+FIB row 25: normalized 'Format as Table' -> 'formatastable' (lowercased/space-stripped for FR-3.2.1 compliance)
+FIB row 26: normalized 'Power Query' -> 'powerquery' (lowercased/space-stripped for FR-3.2.1 compliance)
+FIB row 27: normalized 'NETWORKDAYS' -> 'networkdays' (lowercased/space-stripped for FR-3.2.1 compliance)
+FIB row 28: normalized 'Bookmark' -> 'bookmark' (lowercased/space-stripped for FR-3.2.1 compliance)
+FIB row 29: normalized 'Protect' -> 'protect' (lowercased/space-stripped for FR-3.2.1 compliance)
+FIB row 30: normalized 'Task Bar' -> 'taskbar' (lowercased/space-stripped for FR-3.2.1 compliance)
+FIB row 31: normalized 'YEAR' -> 'year' (lowercased/space-stripped for FR-3.2.1 compliance)
+FIB row 32: normalized 'Transpose' -> 'transpose' (lowercased/space-stripped for FR-3.2.1 compliance)
+FIB row 33: normalized 'Inspect Document' -> 'inspectdocument' (lowercased/space-stripped for FR-3.2.1 compliance)
+FIB row 34: normalized '  Custom Sort' -> 'customsort' (lowercased/space-stripped for FR-3.2.1 compliance)
+FIB row 35: normalized 'NTFS' -> 'ntfs' (lowercased/space-stripped for FR-3.2.1 compliance)
+FIB row 36: normalized 'ROUND' -> 'round' (lowercased/space-stripped for FR-3.2.1 compliance)
+FIB row 37: normalized 'Comments' -> 'comments' (lowercased/space-stripped for FR-3.2.1 compliance)
+FIB row 38: normalized 'RANK' -> 'rank' (lowercased/space-stripped for FR-3.2.1 compliance)
+FIB row 39: normalized 'MOD' -> 'mod' (lowercased/space-stripped for FR-3.2.1 compliance)
+FIB row 40: normalized 'COUNTBLANK' -> 'countblank' (lowercased/space-stripped for FR-3.2.1 compliance)
+FIB row 41: normalized 'NAME' -> 'name' (lowercased/space-stripped for FR-3.2.1 compliance)
+FIB row 42: normalized 'Painter' -> 'painter' (lowercased/space-stripped for FR-3.2.1 compliance)
+FIB row 43: normalized 'Margins' -> 'margins' (lowercased/space-stripped for FR-3.2.1 compliance)
+FIB row 44: normalized 'Crop' -> 'crop' (lowercased/space-stripped for FR-3.2.1 compliance)
+FIB row 45: normalized 'F2' -> 'f2' (lowercased/space-stripped for FR-3.2.1 compliance)
+FIB row 46: normalized 'Firewall' -> 'firewall' (lowercased/space-stripped for FR-3.2.1 compliance)
+FIB row 47: normalized 'PV' -> 'pv' (lowercased/space-stripped for FR-3.2.1 compliance)
+FIB row 48: normalized 'LEN' -> 'len' (lowercased/space-stripped for FR-3.2.1 compliance)
+FIB row 49: normalized 'OLE' -> 'ole' (lowercased/space-stripped for FR-3.2.1 compliance)
+FIB row 51: normalized 'Administrator' -> 'administrator' (lowercased/space-stripped for FR-3.2.1 compliance)
+FIB row 52: normalized 'HTTPS' -> 'https' (lowercased/space-stripped for FR-3.2.1 compliance)
+FIB row 53: normalized 'WAF' -> 'waf' (lowercased/space-stripped for FR-3.2.1 compliance)
