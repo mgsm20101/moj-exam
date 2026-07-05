@@ -1,5 +1,8 @@
 namespace ExamSystem.Domain.Exams;
 
+/// <summary>One row = this exam needs `Count` active questions of `Type`/`Difficulty` from `Topic`.
+/// `DisplayOrder` orders the topic within the exam and must match across every row of the same topic —
+/// enforced by the CQRS layer, not the database.</summary>
 public class ExamTopicSelection : BaseEntity
 {
     public Guid ExamId { get; set; }
