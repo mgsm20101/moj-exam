@@ -109,9 +109,15 @@ public class QuestionsController : ControllerBase
         }
 
         await using var stream = file.OpenReadStream();
-        var result = await _sender.Send(new BulkImportQuestionsCommand(stream), cancellationToken);
-
-        return Ok(result.Value);
+        try
+        {
+            var result = await _sender.Send(new BulkImportQuestionsCommand(stream), cancellationToken);
+            return Ok(result.Value);
+        }
+        catch (InvalidDataException ex)
+        {
+            return BadRequest(new { errors = new[] { ex.Message } });
+        }
     }
 
     public record UpdateQuestionRequest(
