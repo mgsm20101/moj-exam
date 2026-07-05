@@ -1,0 +1,50 @@
+<form [formGroup]="form" class="question-form" (ngSubmit)="submit()">
+  <label for="topicId">الموضوع</label>
+  <select id="topicId" formControlName="topicId">
+    <option value="" disabled>اختر موضوعًا</option>
+    <option *ngFor="let topic of topics" [value]="topic.id">{{ topic.name }}</option>
+  </select>
+
+  <label for="type">نوع السؤال</label>
+  <select id="type" formControlName="type">
+    <option value="Mcq">اختيار من متعدد</option>
+    <option value="FillBlank">أكمل الناقص</option>
+  </select>
+
+  <label for="difficulty">مستوى الصعوبة</label>
+  <select id="difficulty" formControlName="difficulty">
+    <option value="Easy">سهل</option>
+    <option value="Medium">متوسط</option>
+    <option value="Hard">متقدم</option>
+  </select>
+
+  <label for="text">نص السؤال</label>
+  <textarea id="text" formControlName="text"></textarea>
+
+  <label>صورة السؤال (اختياري)</label>
+  <input type="file" accept="image/*" (change)="onImageFileChange($event)" />
+  <img *ngIf="form.value.imageUrl" [src]="form.value.imageUrl" alt="" class="question-image-preview" />
+
+  <ng-container *ngIf="form.value.type === 'FillBlank'">
+    <label for="correctAnswerText">الإجابة النموذجية (كلمة واحدة، حروف صغيرة)</label>
+    <input
+      id="correctAnswerText"
+      type="text"
+      [value]="form.value.correctAnswerText"
+      (input)="onCorrectAnswerInput($any($event.target).value)"
+    />
+  </ng-container>
+
+  <ng-container *ngIf="form.value.type !== 'FillBlank'" formArrayName="options">
+    <div *ngFor="let option of options.controls; let i = index" [formGroupName]="i" class="option-row">
+      <input type="text" formControlName="text" placeholder="نص الاختيار {{ i + 1 }}" />
+      <label>
+        <input type="radio" [name]="'correctOption'" (change)="selectCorrectOption(i)" />
+        صحيحة
+      </label>
+    </div>
+  </ng-container>
+
+  <p class="error" *ngIf="validationError()">{{ validationError() }}</p>
+  <button type="submit">حفظ السؤال</button>
+</form>

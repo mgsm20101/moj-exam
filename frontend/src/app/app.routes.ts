@@ -17,6 +17,21 @@ export const routes: Routes = [
         path: 'dashboard',
         loadComponent: () =>
           import('./features/admin/dashboard/dashboard-placeholder.component').then(m => m.DashboardPlaceholderComponent)
+      },
+      {
+        path: 'topics',
+        loadComponent: () =>
+          import('./features/admin/topics/topics-list.component').then(m => m.TopicsListComponent)
+      },
+      {
+        path: 'questions',
+        loadComponent: () =>
+          import('./features/admin/questions/questions-list.component').then(m => m.QuestionsListComponent)
+      },
+      {
+        path: 'questions/import',
+        loadComponent: () =>
+          import('./features/admin/questions/bulk-import.component').then(m => m.BulkImportComponent)
       }
     ]
   }

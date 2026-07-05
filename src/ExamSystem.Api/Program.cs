@@ -1,10 +1,12 @@
 using System.Text;
+using System.Text.Json.Serialization;
 using ExamSystem.Application;
 using ExamSystem.Infrastructure;
 using ExamSystem.Infrastructure.Identity;
 using ExamSystem.Infrastructure.Persistence;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -12,11 +14,10 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddApplication();
 builder.Services.AddInfrastructure(builder.Configuration);
 
-builder.Services.AddControllers();
+builder.Services.AddControllers()
+    .AddJsonOptions(options => options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter()));
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
-
-var jwtSettings = builder.Configuration.GetSection(JwtSettings.SectionName).Get<JwtSettings>() ?? new JwtSettings();
 
 builder.Services
     .AddAuthentication(options =>
@@ -24,9 +25,13 @@ builder.Services
         options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
         options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
     })
-    .AddJwtBearer(options =>
+    .AddJwtBearer();
+
+builder.Services.AddOptions<JwtBearerOptions>(JwtBearerDefaults.AuthenticationScheme)
+    .Configure<IOptions<JwtSettings>>((bearerOptions, jwtSettingsOptions) =>
     {
-        options.TokenValidationParameters = new TokenValidationParameters
+        var jwtSettings = jwtSettingsOptions.Value;
+        bearerOptions.TokenValidationParameters = new TokenValidationParameters
         {
             ValidateIssuer = true,
             ValidateAudience = true,
@@ -51,6 +56,12 @@ builder.Services.AddCors(options =>
     });
 });
 
+// ASP.NET Core resolves IWebHostEnvironment.WebRootFileProvider once, at Build() time. If wwwroot
+// doesn't exist on disk yet (e.g. fresh clone/fresh migration, since wwwroot is runtime-generated
+// content and not committed to git), it caches a NullFileProvider and static files are never served
+// afterwards -- even if the folder is created later (e.g. lazily on first image upload).
+Directory.CreateDirectory(Path.Combine(builder.Environment.ContentRootPath, "wwwroot"));
+
 var app = builder.Build();
 
 if (app.Environment.IsDevelopment())
@@ -73,6 +84,7 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+app.UseStaticFiles();
 app.UseCors("AllowAngularApp");
 app.UseAuthentication();
 app.UseAuthorization();

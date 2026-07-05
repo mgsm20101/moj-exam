@@ -1,4 +1,5 @@
 using ExamSystem.Application.Common.Interfaces;
+using ExamSystem.Infrastructure.Files;
 using ExamSystem.Infrastructure.Identity;
 using ExamSystem.Infrastructure.Persistence;
 using Microsoft.AspNetCore.Identity;
@@ -14,6 +15,7 @@ public static class DependencyInjection
     {
         services.AddDbContext<ApplicationDbContext>(options =>
             options.UseSqlServer(configuration.GetConnectionString("DefaultConnection")));
+        services.AddScoped<IApplicationDbContext>(provider => provider.GetRequiredService<ApplicationDbContext>());
 
         services.AddIdentity<ApplicationUser, IdentityRole>(options =>
             {
@@ -32,6 +34,8 @@ public static class DependencyInjection
         services.Configure<JwtSettings>(configuration.GetSection(JwtSettings.SectionName));
         services.AddScoped<IIdentityService, IdentityService>();
         services.AddScoped<IJwtTokenGenerator, JwtTokenGenerator>();
+        services.AddScoped<IImageStorageService, LocalImageStorageService>();
+        services.AddScoped<IExcelQuestionParser, ClosedXmlQuestionParser>();
 
         return services;
     }

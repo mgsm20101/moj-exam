@@ -1,0 +1,41 @@
+<div class="bulk-import-page">
+  <h1>استيراد أسئلة بالجملة</h1>
+
+  <input type="file" accept=".xlsx" (change)="onFileSelected($event)" />
+  <button (click)="upload()" [disabled]="!selectedFile || uploading">
+    {{ uploading ? 'جارِ الاستيراد...' : 'استيراد' }}
+  </button>
+
+  <p class="error" *ngIf="errorMessage">{{ errorMessage }}</p>
+
+  <div class="import-report" *ngIf="report() as r">
+    <p>الإجمالي: {{ r.totalRows }} — نجح: {{ r.successCount }} — فشل: {{ r.failureCount }}</p>
+    <table *ngIf="r.errors.length > 0">
+      <thead>
+        <tr><th>الشيت</th><th>الصف</th><th>السبب</th></tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let error of r.errors">
+          <td>{{ error.sheet }}</td>
+          <td>{{ error.rowNumber }}</td>
+          <td>{{ error.message }}</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h2>تغطية البنك الحالية (Topic × Difficulty)</h2>
+  <table>
+    <thead>
+      <tr><th>الموضوع</th><th>الصعوبة</th><th>اختيار من متعدد</th><th>أكمل</th></tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let row of summary()">
+        <td>{{ row.topicName }}</td>
+        <td>{{ row.difficulty }}</td>
+        <td>{{ row.mcqCount }}</td>
+        <td>{{ row.fillBlankCount }}</td>
+      </tr>
+    </tbody>
+  </table>
+</div>

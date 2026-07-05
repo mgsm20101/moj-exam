@@ -1,0 +1,32 @@
+<div class="topics-page">
+  <h1>الموضوعات</h1>
+
+  <form class="new-topic-form" (ngSubmit)="createTopic()">
+    <input type="text" placeholder="اسم الموضوع" [(ngModel)]="newTopicName" name="newTopicName" />
+    <input type="number" placeholder="ترتيب العرض" [(ngModel)]="newTopicDisplayOrder" name="newTopicDisplayOrder" />
+    <button type="submit" [disabled]="isSubmitting()">إضافة موضوع</button>
+  </form>
+
+  <p class="error" *ngIf="errorMessage">{{ errorMessage }}</p>
+
+  <table>
+    <thead>
+      <tr>
+        <th>الاسم</th>
+        <th>الترتيب</th>
+        <th>عدد الأسئلة</th>
+        <th>الحالة</th>
+        <th></th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let topic of topics()">
+        <td>{{ topic.name }}</td>
+        <td>{{ topic.displayOrder }}</td>
+        <td>{{ topic.questionCount }}</td>
+        <td>{{ topic.isActive ? 'نشط' : 'معطّل' }}</td>
+        <td><button (click)="deleteTopic(topic.id)" [disabled]="isSubmitting()">حذف</button></td>
+      </tr>
+    </tbody>
+  </table>
+</div>

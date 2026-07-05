@@ -26,4 +26,8 @@
     <ProjectReference Include="..\..\src\ExamSystem.Api\ExamSystem.Api.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <None Include="..\..\docs\question-bank\questions_ready_for_import.xlsx" Link="TestData\questions_ready_for_import.xlsx" CopyToOutputDirectory="PreserveNewest" />
+  </ItemGroup>
+
 </Project>

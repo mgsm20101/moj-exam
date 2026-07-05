@@ -18,3 +18,6 @@ frontend/.angular/
 ## Secrets
 *.env
 appsettings.*.local.json
+
+## Runtime-generated content
+src/ExamSystem.Api/wwwroot/
