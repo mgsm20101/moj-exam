@@ -4,7 +4,7 @@
   <form class="new-topic-form" (ngSubmit)="createTopic()">
     <input type="text" placeholder="اسم الموضوع" [(ngModel)]="newTopicName" name="newTopicName" />
     <input type="number" placeholder="ترتيب العرض" [(ngModel)]="newTopicDisplayOrder" name="newTopicDisplayOrder" />
-    <button type="submit">إضافة موضوع</button>
+    <button type="submit" [disabled]="isSubmitting()">إضافة موضوع</button>
   </form>
 
   <p class="error" *ngIf="errorMessage">{{ errorMessage }}</p>
@@ -25,7 +25,7 @@
         <td>{{ topic.displayOrder }}</td>
         <td>{{ topic.questionCount }}</td>
         <td>{{ topic.isActive ? 'نشط' : 'معطّل' }}</td>
-        <td><button (click)="deleteTopic(topic.id)">حذف</button></td>
+        <td><button (click)="deleteTopic(topic.id)" [disabled]="isSubmitting()">حذف</button></td>
       </tr>
     </tbody>
   </table>
