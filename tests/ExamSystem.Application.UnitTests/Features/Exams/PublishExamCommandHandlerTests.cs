@@ -82,4 +82,23 @@ public class PublishExamCommandHandlerTests
         Assert.False(result.IsSuccess);
         Assert.Contains("End date must be in the future.", result.Errors);
     }
+
+    [Fact]
+    public async Task Handle_ExpiredEndDateAndInsufficientBank_ReturnsBothErrorsAccumulated()
+    {
+        var (db, exam) = await SeedDraftExamAsync(mcqNeeded: 10, mcqAvailable: 3);
+        // Keep StartAtUtc < EndAtUtc (both in the past) so only the "end date must be in the
+        // future" rule trips here, isolating this test to exactly the two errors under test.
+        exam.StartAtUtc = DateTime.UtcNow.AddDays(-2);
+        exam.EndAtUtc = DateTime.UtcNow.AddDays(-1);
+        await db.SaveChangesAsync(CancellationToken.None);
+        var handler = new PublishExamCommandHandler(db);
+
+        var result = await handler.Handle(new PublishExamCommand(exam.Id), CancellationToken.None);
+
+        Assert.False(result.IsSuccess);
+        Assert.Contains(result.Errors, e => e.Contains("End date must be in the future."));
+        Assert.Contains(result.Errors, e => e.Contains("only 3 are available"));
+        Assert.Equal(2, result.Errors.Count);
+    }
 }
