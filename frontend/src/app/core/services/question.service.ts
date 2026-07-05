@@ -44,6 +44,26 @@ export interface QuestionFilters {
   isActive?: boolean;
 }
 
+export interface BulkImportRowError {
+  sheet: string;
+  rowNumber: number;
+  message: string;
+}
+
+export interface BulkImportReport {
+  totalRows: number;
+  successCount: number;
+  failureCount: number;
+  errors: BulkImportRowError[];
+}
+
+export interface QuestionBankSummaryRow {
+  topicName: string;
+  difficulty: Difficulty;
+  mcqCount: number;
+  fillBlankCount: number;
+}
+
 @Injectable({ providedIn: 'root' })
 export class QuestionService {
   private readonly baseUrl = `${environment.apiBaseUrl}/admin/questions`;
@@ -75,5 +95,15 @@ export class QuestionService {
     const formData = new FormData();
     formData.append('file', file);
     return this.http.post<{ url: string }>(`${this.baseUrl}/image`, formData);
+  }
+
+  bulkImport(file: File): Observable<BulkImportReport> {
+    const formData = new FormData();
+    formData.append('file', file);
+    return this.http.post<BulkImportReport>(`${this.baseUrl}/import`, formData);
+  }
+
+  getSummary(): Observable<QuestionBankSummaryRow[]> {
+    return this.http.get<QuestionBankSummaryRow[]>(`${this.baseUrl}/summary`);
   }
 }

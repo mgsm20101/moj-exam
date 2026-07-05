@@ -27,6 +27,11 @@ export const routes: Routes = [
         path: 'questions',
         loadComponent: () =>
           import('./features/admin/questions/questions-list.component').then(m => m.QuestionsListComponent)
+      },
+      {
+        path: 'questions/import',
+        loadComponent: () =>
+          import('./features/admin/questions/bulk-import.component').then(m => m.BulkImportComponent)
       }
     ]
   }
