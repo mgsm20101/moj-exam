@@ -6,6 +6,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using System.Net.Http.Json;
 
 namespace ExamSystem.Api.IntegrationTests;
 
@@ -53,4 +54,21 @@ public class TestWebApplicationFactory : WebApplicationFactory<Program>, IAsyncL
     {
         await _connection.DisposeAsync();
     }
+
+    public async Task<HttpClient> CreateAuthenticatedAdminClientAsync()
+    {
+        var client = CreateClient();
+        var loginResponse = await client.PostAsJsonAsync("/api/auth/login", new
+        {
+            userName = "admin",
+            password = SeedAdminPassword
+        });
+        loginResponse.EnsureSuccessStatusCode();
+
+        var body = await loginResponse.Content.ReadFromJsonAsync<LoginResponseDto>();
+        client.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", body!.Token);
+        return client;
+    }
+
+    private record LoginResponseDto(string Token, string UserName, IReadOnlyList<string> Roles);
 }
