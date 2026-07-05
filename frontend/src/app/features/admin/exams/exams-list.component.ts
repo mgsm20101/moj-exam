@@ -1,7 +1,7 @@
 import { Component, OnInit, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Observable } from 'rxjs';
-import { ExamDetail, ExamService, ExamSummary } from '../../../core/services/exam.service';
+import { ExamDetail, ExamInput, ExamService, ExamSummary } from '../../../core/services/exam.service';
 import { Topic, TopicService } from '../../../core/services/topic.service';
 import { ExamFormComponent } from './exam-form.component';
 
@@ -49,7 +49,7 @@ export class ExamsListComponent implements OnInit {
     this.editingExam.set(null);
   }
 
-  onSave(input: import('../../../core/services/exam.service').ExamInput): void {
+  onSave(input: ExamInput): void {
     this.errorMessage = null;
     const editing = this.editingExam();
     const request: Observable<unknown> = editing
