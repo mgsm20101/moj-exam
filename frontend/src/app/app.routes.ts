@@ -22,6 +22,11 @@ export const routes: Routes = [
         path: 'topics',
         loadComponent: () =>
           import('./features/admin/topics/topics-list.component').then(m => m.TopicsListComponent)
+      },
+      {
+        path: 'questions',
+        loadComponent: () =>
+          import('./features/admin/questions/questions-list.component').then(m => m.QuestionsListComponent)
       }
     ]
   }
