@@ -1,3 +1,4 @@
+using ExamSystem.Domain.Exams;
 using ExamSystem.Domain.Questions;
 using ExamSystem.Domain.Topics;
 using Microsoft.EntityFrameworkCore;
@@ -9,6 +10,8 @@ public interface IApplicationDbContext
     DbSet<Topic> Topics { get; }
     DbSet<Question> Questions { get; }
     DbSet<QuestionOption> QuestionOptions { get; }
+    DbSet<Exam> Exams { get; }
+    DbSet<ExamTopicSelection> ExamTopicSelections { get; }
 
     Task<int> SaveChangesAsync(CancellationToken cancellationToken);
 }

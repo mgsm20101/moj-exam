@@ -1,4 +1,5 @@
 using ExamSystem.Application.Common.Interfaces;
+using ExamSystem.Domain.Exams;
 using ExamSystem.Domain.Questions;
 using ExamSystem.Domain.Topics;
 using ExamSystem.Infrastructure.Identity;
@@ -16,6 +17,8 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser>, IApplica
     public DbSet<Topic> Topics => Set<Topic>();
     public DbSet<Question> Questions => Set<Question>();
     public DbSet<QuestionOption> QuestionOptions => Set<QuestionOption>();
+    public DbSet<Exam> Exams => Set<Exam>();
+    public DbSet<ExamTopicSelection> ExamTopicSelections => Set<ExamTopicSelection>();
 
     protected override void OnModelCreating(ModelBuilder builder)
     {
