@@ -90,4 +90,8 @@ export class ExamService {
   archive(id: string): Observable<void> {
     return this.http.post<void>(`${this.baseUrl}/${id}/archive`, null);
   }
+
+  clone(id: string): Observable<{ id: string }> {
+    return this.http.post<{ id: string }>(`${this.baseUrl}/${id}/clone`, null);
+  }
 }

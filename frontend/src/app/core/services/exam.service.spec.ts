@@ -113,4 +113,12 @@ describe('ExamService', () => {
     expect(req.request.method).toBe('POST');
     req.flush(null);
   });
+
+  it('clone() posts to the clone action', () => {
+    service.clone('1').subscribe(res => expect(res.id).toBe('2'));
+
+    const req = httpMock.expectOne(`${environment.apiBaseUrl}/admin/exams/1/clone`);
+    expect(req.request.method).toBe('POST');
+    req.flush({ id: '2' });
+  });
 });

@@ -31,6 +31,7 @@
           <button type="button" (click)="publishExam(exam.id)" *ngIf="exam.status === 'Draft'">نشر</button>
           <button type="button" (click)="closeExam(exam.id)" *ngIf="exam.status === 'Published'">إغلاق</button>
           <button type="button" (click)="archiveExam(exam.id)" *ngIf="exam.status === 'Closed'">أرشفة</button>
+          <button type="button" (click)="cloneExam(exam.id)">استنساخ</button>
           <button type="button" (click)="deleteExam(exam.id)" [disabled]="exam.status !== 'Draft'">حذف</button>
         </td>
       </tr>

@@ -96,4 +96,12 @@ export class ExamsListComponent implements OnInit {
       error: () => (this.errorMessage = 'تعذّر أرشفة الامتحان.')
     });
   }
+
+  cloneExam(id: string): void {
+    this.errorMessage = null;
+    this.examService.clone(id).subscribe({
+      next: () => this.load(),
+      error: () => (this.errorMessage = 'تعذّر استنساخ الامتحان.')
+    });
+  }
 }

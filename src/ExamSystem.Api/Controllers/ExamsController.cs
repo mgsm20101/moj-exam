@@ -1,5 +1,6 @@
 using ExamSystem.Application.Features.Exams;
 using ExamSystem.Application.Features.Exams.ArchiveExam;
+using ExamSystem.Application.Features.Exams.CloneExam;
 using ExamSystem.Application.Features.Exams.CloseExam;
 using ExamSystem.Application.Features.Exams.CreateExam;
 using ExamSystem.Application.Features.Exams.DeleteExam;
@@ -111,6 +112,17 @@ public class ExamsController : ControllerBase
             return BadRequest(new { errors = result.Errors });
         }
         return NoContent();
+    }
+
+    [HttpPost("{id:guid}/clone")]
+    public async Task<IActionResult> Clone(Guid id, CancellationToken cancellationToken)
+    {
+        var result = await _sender.Send(new CloneExamCommand(id), cancellationToken);
+        if (!result.IsSuccess)
+        {
+            return BadRequest(new { errors = result.Errors });
+        }
+        return Ok(new { id = result.Value });
     }
 
     public record UpdateExamRequest(
