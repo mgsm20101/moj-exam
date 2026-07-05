@@ -17,6 +17,11 @@ export const routes: Routes = [
         path: 'dashboard',
         loadComponent: () =>
           import('./features/admin/dashboard/dashboard-placeholder.component').then(m => m.DashboardPlaceholderComponent)
+      },
+      {
+        path: 'topics',
+        loadComponent: () =>
+          import('./features/admin/topics/topics-list.component').then(m => m.TopicsListComponent)
       }
     ]
   }
