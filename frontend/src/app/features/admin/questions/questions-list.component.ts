@@ -1,4 +1,4 @@
-import { Component, OnInit, signal } from '@angular/core';
+import { Component, OnInit, signal, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Difficulty, Question, QuestionInput, QuestionService } from '../../../core/services/question.service';
@@ -12,6 +12,8 @@ import { QuestionFormComponent } from './question-form.component';
   templateUrl: './questions-list.component.html'
 })
 export class QuestionsListComponent implements OnInit {
+  @ViewChild(QuestionFormComponent) questionForm?: QuestionFormComponent;
+
   topics = signal<Topic[]>([]);
   questions = signal<Question[]>([]);
   selectedTopicId = '';
@@ -40,8 +42,19 @@ export class QuestionsListComponent implements OnInit {
   onQuestionSave(input: QuestionInput): void {
     this.errorMessage = null;
     this.questionService.create(input).subscribe({
-      next: () => this.applyFilters(),
+      next: () => {
+        this.applyFilters();
+        this.questionForm?.resetForm();
+      },
       error: () => (this.errorMessage = 'تعذّر حفظ السؤال — تحقق من صيغة الإجابة أو الاختيارات.')
+    });
+  }
+
+  onImageFileSelected(file: File): void {
+    this.errorMessage = null;
+    this.questionService.uploadImage(file).subscribe({
+      next: res => this.questionForm?.setImageUrl(res.url),
+      error: () => (this.errorMessage = 'تعذّر رفع الصورة.')
     });
   }
 

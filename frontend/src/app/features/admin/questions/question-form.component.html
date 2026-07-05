@@ -45,5 +45,6 @@
     </div>
   </ng-container>
 
+  <p class="error" *ngIf="validationError()">{{ validationError() }}</p>
   <button type="submit">حفظ السؤال</button>
 </form>

@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, Output } from '@angular/core';
+import { Component, EventEmitter, Input, Output, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormArray, FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Topic } from '../../../core/services/topic.service';
@@ -14,6 +14,8 @@ export class QuestionFormComponent {
   @Input() topics: Topic[] = [];
   @Output() save = new EventEmitter<QuestionInput>();
   @Output() imageFileSelected = new EventEmitter<File>();
+
+  readonly validationError = signal<string | null>(null);
 
   readonly form: FormGroup = this.fb.group({
     topicId: ['', Validators.required],
@@ -61,13 +63,16 @@ export class QuestionFormComponent {
     const type: QuestionType = value.type;
 
     if (!value.topicId || !value.text) {
+      this.validationError.set('اختر الموضوع واكتب نص السؤال.');
       return;
     }
 
     if (type === 'FillBlank') {
       if (!value.correctAnswerText || !/^[a-z0-9]+$/.test(value.correctAnswerText)) {
+        this.validationError.set('الإجابة يجب أن تكون كلمة واحدة بحروف إنجليزية صغيرة وأرقام فقط.');
         return;
       }
+      this.validationError.set(null);
       this.save.emit({
         topicId: value.topicId,
         type,
@@ -84,9 +89,11 @@ export class QuestionFormComponent {
     const correctCount = filledOptions.filter(o => o.isCorrect).length;
 
     if (filledOptions.length < 2 || correctCount !== 1) {
+      this.validationError.set('أدخل اختيارين على الأقل وحدد إجابة صحيحة واحدة.');
       return;
     }
 
+    this.validationError.set(null);
     this.save.emit({
       topicId: value.topicId,
       type,
@@ -95,5 +102,20 @@ export class QuestionFormComponent {
       imageUrl: value.imageUrl || null,
       options: filledOptions
     });
+  }
+
+  resetForm(): void {
+    this.form.reset({
+      topicId: '',
+      type: 'Mcq' as QuestionType,
+      difficulty: 'Medium' as Difficulty,
+      text: '',
+      imageUrl: '',
+      correctAnswerText: ''
+    });
+    this.options.clear();
+    this.options.push(this.buildOption());
+    this.options.push(this.buildOption());
+    this.validationError.set(null);
   }
 }

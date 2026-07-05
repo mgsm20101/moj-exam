@@ -1,5 +1,5 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { of } from 'rxjs';
+import { of, throwError } from 'rxjs';
 import { QuestionsListComponent } from './questions-list.component';
 import { QuestionService, Question } from '../../../core/services/question.service';
 import { TopicService, Topic } from '../../../core/services/topic.service';
@@ -71,5 +71,49 @@ describe('QuestionsListComponent', () => {
 
     expect(questionService.deactivate).toHaveBeenCalledWith('q1');
     expect(questionService.getAll).toHaveBeenCalled();
+  });
+
+  it('onImageFileSelected() uploads the file and sets the child form imageUrl on success', () => {
+    fixture.detectChanges();
+    const file = new File(['x'], 'photo.png', { type: 'image/png' });
+    questionService.uploadImage.and.returnValue(of({ url: 'https://cdn/photo.png' }));
+    const setImageUrlSpy = spyOn(component.questionForm!, 'setImageUrl');
+
+    component.onImageFileSelected(file);
+
+    expect(questionService.uploadImage).toHaveBeenCalledWith(file);
+    expect(setImageUrlSpy).toHaveBeenCalledWith('https://cdn/photo.png');
+  });
+
+  it('sets errorMessage when the image upload fails', () => {
+    fixture.detectChanges();
+    const file = new File(['x'], 'photo.png', { type: 'image/png' });
+    questionService.uploadImage.and.returnValue(throwError(() => new Error('fail')));
+
+    component.onImageFileSelected(file);
+
+    expect(component.errorMessage).toBe('تعذّر رفع الصورة.');
+  });
+
+  it('emitting imageFileSelected from the form template triggers the upload', () => {
+    fixture.detectChanges();
+    const file = new File(['x'], 'photo.png', { type: 'image/png' });
+    questionService.uploadImage.and.returnValue(of({ url: 'https://cdn/photo.png' }));
+    spyOn(component, 'onImageFileSelected').and.callThrough();
+
+    component.questionForm!.imageFileSelected.emit(file);
+
+    expect(component.onImageFileSelected).toHaveBeenCalledWith(file);
+    expect(questionService.uploadImage).toHaveBeenCalledWith(file);
+  });
+
+  it('onQuestionSave() resets the child form after a successful save', () => {
+    fixture.detectChanges();
+    questionService.create.and.returnValue(of({ id: 'q2' }));
+    const resetFormSpy = spyOn(component.questionForm!, 'resetForm');
+
+    component.onQuestionSave({ topicId: 't1', type: 'FillBlank', difficulty: 'Medium', text: 'Fill ___', correctAnswerText: 'server' });
+
+    expect(resetFormSpy).toHaveBeenCalled();
   });
 });

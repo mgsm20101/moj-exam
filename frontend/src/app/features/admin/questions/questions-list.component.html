@@ -41,5 +41,9 @@
   </table>
 
   <h2>إضافة سؤال جديد</h2>
-  <app-question-form [topics]="topics()" (save)="onQuestionSave($event)"></app-question-form>
+  <app-question-form
+    [topics]="topics()"
+    (save)="onQuestionSave($event)"
+    (imageFileSelected)="onImageFileSelected($event)"
+  ></app-question-form>
 </div>
