@@ -35,6 +35,7 @@ public static class DependencyInjection
         services.AddScoped<IIdentityService, IdentityService>();
         services.AddScoped<IJwtTokenGenerator, JwtTokenGenerator>();
         services.AddScoped<IImageStorageService, LocalImageStorageService>();
+        services.AddScoped<IExcelQuestionParser, ClosedXmlQuestionParser>();
 
         return services;
     }

@@ -1,4 +1,5 @@
 using ExamSystem.Application.Common.Interfaces;
+using ExamSystem.Application.Features.Questions.BulkImportQuestions;
 using ExamSystem.Application.Features.Questions.CreateQuestion;
 using ExamSystem.Application.Features.Questions.DeleteQuestion;
 using ExamSystem.Application.Features.Questions.GetQuestions;
@@ -96,6 +97,21 @@ public class QuestionsController : ControllerBase
         {
             return BadRequest(new { errors = new[] { ex.Message } });
         }
+    }
+
+    [HttpPost("import")]
+    [RequestSizeLimit(10 * 1024 * 1024)]
+    public async Task<IActionResult> Import(IFormFile file, CancellationToken cancellationToken)
+    {
+        if (file.Length == 0)
+        {
+            return BadRequest(new { errors = new[] { "No file was uploaded." } });
+        }
+
+        await using var stream = file.OpenReadStream();
+        var result = await _sender.Send(new BulkImportQuestionsCommand(stream), cancellationToken);
+
+        return Ok(result.Value);
     }
 
     public record UpdateQuestionRequest(
