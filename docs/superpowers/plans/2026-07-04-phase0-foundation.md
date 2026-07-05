@@ -12,19 +12,19 @@
 
 ## Prerequisites (verify before Task 1)
 
-- [ ] **Step 1: Verify .NET 8 SDK is installed**
+- [x] **Step 1: Verify .NET 8 SDK is installed**
 
 Run: `dotnet --list-sdks`
 Expected: output includes a line starting with `8.` (e.g. `8.0.4xx [C:\Program Files\dotnet\sdk]`)
 
 If missing, install it first: `winget install --id Microsoft.DotNet.SDK.8 -e --accept-package-agreements --accept-source-agreements`, then re-run the check.
 
-- [ ] **Step 2: Verify Angular CLI 17 is usable**
+- [x] **Step 2: Verify Angular CLI 17 is usable**
 
 Run: `npx -y @angular/cli@17 version`
 Expected: prints `Angular CLI: 17.3.x`
 
-- [ ] **Step 3: Confirm working directory and git**
+- [x] **Step 3: Confirm working directory and git**
 
 Run: `cd D:/os/ExamSystem && git status`
 Expected: `On branch master` (or `main`), repository already initialized, only `PRD-Exam-System_2.md` and `docs/` tracked/untracked so far.
@@ -117,7 +117,7 @@ D:/os/ExamSystem/
 - Create: `tests/ExamSystem.Application.UnitTests/ExamSystem.Application.UnitTests.csproj`
 - Create: `tests/ExamSystem.Api.IntegrationTests/ExamSystem.Api.IntegrationTests.csproj`
 
-- [ ] **Step 1: Create the solution and all projects**
+- [x] **Step 1: Create the solution and all projects**
 
 Run (from `D:/os/ExamSystem`):
 
@@ -142,7 +142,7 @@ dotnet sln add tests/ExamSystem.Api.IntegrationTests/ExamSystem.Api.IntegrationT
 
 Expected: each `dotnet new` prints "The template ... was created successfully", each `dotnet sln add` prints "Project ... added to the solution."
 
-- [ ] **Step 2: Delete template placeholder files**
+- [x] **Step 2: Delete template placeholder files**
 
 Run:
 ```bash
@@ -155,7 +155,7 @@ rm src/ExamSystem.Api/Controllers/WeatherForecastController.cs
 
 Expected: no error output.
 
-- [ ] **Step 3: Wire project references**
+- [x] **Step 3: Wire project references**
 
 Run:
 ```bash
@@ -169,7 +169,7 @@ dotnet add tests/ExamSystem.Api.IntegrationTests/ExamSystem.Api.IntegrationTests
 
 Expected: each prints "Reference ... added to the project."
 
-- [ ] **Step 4: Add NuGet packages**
+- [x] **Step 4: Add NuGet packages**
 
 Run:
 ```bash
@@ -193,7 +193,7 @@ dotnet add tests/ExamSystem.Api.IntegrationTests/ExamSystem.Api.IntegrationTests
 
 Expected: each prints "Restored ... " / no restore errors.
 
-- [ ] **Step 5: Enable nullable reference types + implicit usings in every csproj**
+- [x] **Step 5: Enable nullable reference types + implicit usings in every csproj**
 
 Open each of the 6 `.csproj` files and ensure the `<PropertyGroup>` contains:
 ```xml
@@ -204,7 +204,7 @@ Open each of the 6 `.csproj` files and ensure the `<PropertyGroup>` contains:
 
 Expected: no build errors after verifying.
 
-- [ ] **Step 6: Add root `.gitignore`**
+- [x] **Step 6: Add root `.gitignore`**
 
 Create `D:/os/ExamSystem/.gitignore`:
 ```gitignore
@@ -227,12 +227,12 @@ frontend/.angular/
 appsettings.*.local.json
 ```
 
-- [ ] **Step 7: Build the solution**
+- [x] **Step 7: Build the solution**
 
 Run: `dotnet build`
 Expected: `Build succeeded.` with 0 errors (warnings about unused usings are acceptable at this stage).
 
-- [ ] **Step 8: Commit**
+- [x] **Step 8: Commit**
 
 ```bash
 git add ExamSystem.sln .gitignore src tests
@@ -248,7 +248,7 @@ git commit -m "chore: scaffold Clean Architecture solution and test projects"
 - Create: `src/ExamSystem.Domain/Common/BaseAuditableEntity.cs`
 - Create: `src/ExamSystem.Domain/GlobalUsings.cs`
 
-- [ ] **Step 1: Write `BaseEntity`**
+- [x] **Step 1: Write `BaseEntity`**
 
 ```csharp
 namespace ExamSystem.Domain.Common;
@@ -260,7 +260,7 @@ public abstract class BaseEntity
 }
 ```
 
-- [ ] **Step 2: Write `BaseAuditableEntity`**
+- [x] **Step 2: Write `BaseAuditableEntity`**
 
 ```csharp
 namespace ExamSystem.Domain.Common;
@@ -272,18 +272,18 @@ public abstract class BaseAuditableEntity : BaseEntity
 }
 ```
 
-- [ ] **Step 3: Write `GlobalUsings.cs`**
+- [x] **Step 3: Write `GlobalUsings.cs`**
 
 ```csharp
 global using ExamSystem.Domain.Common;
 ```
 
-- [ ] **Step 4: Build the Domain project**
+- [x] **Step 4: Build the Domain project**
 
 Run: `dotnet build src/ExamSystem.Domain/ExamSystem.Domain.csproj`
 Expected: `Build succeeded.`
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 git add src/ExamSystem.Domain
@@ -300,7 +300,7 @@ git commit -m "feat(domain): add base entity abstractions"
 - Create: `src/ExamSystem.Application/GlobalUsings.cs`
 - Test: `tests/ExamSystem.Application.UnitTests/Behaviors/ValidationBehaviorTests.cs`
 
-- [ ] **Step 1: Write `Result<T>` (needed by the test below)**
+- [x] **Step 1: Write `Result<T>` (needed by the test below)**
 
 ```csharp
 namespace ExamSystem.Application.Common.Models;
@@ -327,7 +327,7 @@ public class Result<T>
 }
 ```
 
-- [ ] **Step 2: Write the failing tests for `ValidationBehavior`**
+- [x] **Step 2: Write the failing tests for `ValidationBehavior`**
 
 Create `tests/ExamSystem.Application.UnitTests/Behaviors/ValidationBehaviorTests.cs`:
 
@@ -400,12 +400,12 @@ public class ValidationBehaviorTests
 }
 ```
 
-- [ ] **Step 3: Run the test to verify it fails**
+- [x] **Step 3: Run the test to verify it fails**
 
 Run: `dotnet test tests/ExamSystem.Application.UnitTests --filter ValidationBehaviorTests`
 Expected: FAIL to compile — `ValidationBehavior<,>` does not exist yet.
 
-- [ ] **Step 4: Implement `ValidationBehavior`**
+- [x] **Step 4: Implement `ValidationBehavior`**
 
 ```csharp
 using FluentValidation.Results;
@@ -457,12 +457,12 @@ public class ValidationBehavior<TRequest, TResponse> : IPipelineBehavior<TReques
 }
 ```
 
-- [ ] **Step 5: Run the test to verify it passes**
+- [x] **Step 5: Run the test to verify it passes**
 
 Run: `dotnet test tests/ExamSystem.Application.UnitTests --filter ValidationBehaviorTests`
 Expected: `Passed! - Failed: 0, Passed: 3`
 
-- [ ] **Step 6: Write `GlobalUsings.cs`**
+- [x] **Step 6: Write `GlobalUsings.cs`**
 
 ```csharp
 global using MediatR;
@@ -471,7 +471,7 @@ global using Microsoft.Extensions.DependencyInjection;
 global using ExamSystem.Application.Common.Models;
 ```
 
-- [ ] **Step 7: Commit**
+- [x] **Step 7: Commit**
 
 ```bash
 git add src/ExamSystem.Application tests/ExamSystem.Application.UnitTests
@@ -490,7 +490,7 @@ git commit -m "feat(application): add Result<T> model and validation pipeline be
 - Create: `src/ExamSystem.Application/Features/Auth/Login/LoginCommandHandler.cs`
 - Test: `tests/ExamSystem.Application.UnitTests/Features/Auth/LoginCommandHandlerTests.cs`
 
-- [ ] **Step 1: Write the interfaces**
+- [x] **Step 1: Write the interfaces**
 
 `src/ExamSystem.Application/Common/Interfaces/IIdentityService.cs`:
 ```csharp
@@ -517,7 +517,7 @@ public interface IJwtTokenGenerator
 }
 ```
 
-- [ ] **Step 2: Write the failing test for `LoginCommandHandler`**
+- [x] **Step 2: Write the failing test for `LoginCommandHandler`**
 
 Create `tests/ExamSystem.Application.UnitTests/Features/Auth/LoginCommandHandlerTests.cs`:
 
@@ -574,12 +574,12 @@ public class LoginCommandHandlerTests
 }
 ```
 
-- [ ] **Step 3: Run the test to verify it fails**
+- [x] **Step 3: Run the test to verify it fails**
 
 Run: `dotnet test tests/ExamSystem.Application.UnitTests --filter LoginCommandHandlerTests`
 Expected: FAIL to compile — `LoginCommand`, `LoginCommandHandler` do not exist yet.
 
-- [ ] **Step 4: Implement `LoginCommand`, validator, and handler**
+- [x] **Step 4: Implement `LoginCommand`, validator, and handler**
 
 `src/ExamSystem.Application/Features/Auth/Login/LoginCommand.cs`:
 ```csharp
@@ -636,12 +636,12 @@ public class LoginCommandHandler : IRequestHandler<LoginCommand, Result<LoginRes
 }
 ```
 
-- [ ] **Step 5: Run the test to verify it passes**
+- [x] **Step 5: Run the test to verify it passes**
 
 Run: `dotnet test tests/ExamSystem.Application.UnitTests --filter LoginCommandHandlerTests`
 Expected: `Passed! - Failed: 0, Passed: 2`
 
-- [ ] **Step 6: Write `DependencyInjection.cs` for the Application layer**
+- [x] **Step 6: Write `DependencyInjection.cs` for the Application layer**
 
 ```csharp
 namespace ExamSystem.Application;
@@ -658,12 +658,12 @@ public static class DependencyInjection
 }
 ```
 
-- [ ] **Step 7: Run the full Application test suite**
+- [x] **Step 7: Run the full Application test suite**
 
 Run: `dotnet test tests/ExamSystem.Application.UnitTests`
 Expected: `Passed! - Failed: 0, Passed: 5`
 
-- [ ] **Step 8: Commit**
+- [x] **Step 8: Commit**
 
 ```bash
 git add src/ExamSystem.Application tests/ExamSystem.Application.UnitTests
@@ -684,7 +684,7 @@ git commit -m "feat(application): add Login CQRS command with handler tests"
 - Create: `src/ExamSystem.Infrastructure/DependencyInjection.cs`
 - Create: `src/ExamSystem.Infrastructure/GlobalUsings.cs`
 
-- [ ] **Step 1: Write `ApplicationUser`**
+- [x] **Step 1: Write `ApplicationUser`**
 
 ```csharp
 namespace ExamSystem.Infrastructure.Identity;
@@ -695,7 +695,7 @@ public class ApplicationUser : IdentityUser
 }
 ```
 
-- [ ] **Step 2: Write `JwtSettings`**
+- [x] **Step 2: Write `JwtSettings`**
 
 ```csharp
 namespace ExamSystem.Infrastructure.Identity;
@@ -711,7 +711,7 @@ public class JwtSettings
 }
 ```
 
-- [ ] **Step 3: Write `JwtTokenGenerator`**
+- [x] **Step 3: Write `JwtTokenGenerator`**
 
 ```csharp
 using System.IdentityModel.Tokens.Jwt;
@@ -757,7 +757,7 @@ public class JwtTokenGenerator : IJwtTokenGenerator
 }
 ```
 
-- [ ] **Step 4: Write `IdentityService`**
+- [x] **Step 4: Write `IdentityService`**
 
 ```csharp
 using ExamSystem.Application.Common.Interfaces;
@@ -796,7 +796,7 @@ public class IdentityService : IIdentityService
 }
 ```
 
-- [ ] **Step 5: Write `ApplicationDbContext`**
+- [x] **Step 5: Write `ApplicationDbContext`**
 
 ```csharp
 using ExamSystem.Infrastructure.Identity;
@@ -813,7 +813,7 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser>
 }
 ```
 
-- [ ] **Step 6: Write `DbInitializer`**
+- [x] **Step 6: Write `DbInitializer`**
 
 ```csharp
 using ExamSystem.Infrastructure.Identity;
@@ -869,7 +869,7 @@ public static class DbInitializer
 }
 ```
 
-- [ ] **Step 7: Write `DependencyInjection.cs`**
+- [x] **Step 7: Write `DependencyInjection.cs`**
 
 ```csharp
 using ExamSystem.Application.Common.Interfaces;
@@ -907,18 +907,18 @@ public static class DependencyInjection
 }
 ```
 
-- [ ] **Step 8: Write `GlobalUsings.cs`**
+- [x] **Step 8: Write `GlobalUsings.cs`**
 
 ```csharp
 global using Microsoft.Extensions.DependencyInjection;
 ```
 
-- [ ] **Step 9: Build the Infrastructure project**
+- [x] **Step 9: Build the Infrastructure project**
 
 Run: `dotnet build src/ExamSystem.Infrastructure/ExamSystem.Infrastructure.csproj`
 Expected: `Build succeeded.`
 
-- [ ] **Step 10: Commit**
+- [x] **Step 10: Commit**
 
 ```bash
 git add src/ExamSystem.Infrastructure
@@ -935,7 +935,7 @@ git commit -m "feat(infrastructure): add Identity, EF Core DbContext, JWT genera
 - Modify: `src/ExamSystem.Api/appsettings.json`
 - Modify: `src/ExamSystem.Api/appsettings.Development.json`
 
-- [ ] **Step 1: Replace `Program.cs`**
+- [x] **Step 1: Replace `Program.cs`**
 
 ```csharp
 using System.Text;
@@ -1016,7 +1016,7 @@ app.Run();
 public partial class Program { }
 ```
 
-- [ ] **Step 2: Write `AuthController`**
+- [x] **Step 2: Write `AuthController`**
 
 ```csharp
 using ExamSystem.Application.Features.Auth.Login;
@@ -1055,7 +1055,7 @@ public class AuthController : ControllerBase
 }
 ```
 
-- [ ] **Step 3: Replace `appsettings.json` (no secrets committed)**
+- [x] **Step 3: Replace `appsettings.json` (no secrets committed)**
 
 ```json
 {
@@ -1082,7 +1082,7 @@ public class AuthController : ControllerBase
 }
 ```
 
-- [ ] **Step 4: Leave `appsettings.Development.json` empty of secrets**
+- [x] **Step 4: Leave `appsettings.Development.json` empty of secrets**
 
 ```json
 {
@@ -1094,7 +1094,7 @@ public class AuthController : ControllerBase
 }
 ```
 
-- [ ] **Step 5: Configure local secrets (never commit these)**
+- [x] **Step 5: Configure local secrets (never commit these)**
 
 Run:
 ```bash
@@ -1105,12 +1105,12 @@ dotnet user-secrets set "SeedAdmin:Password" "ChangeMe!2026" --project src/ExamS
 ```
 Expected: each prints "Successfully saved ... to the secret store."
 
-- [ ] **Step 6: Build the API project**
+- [x] **Step 6: Build the API project**
 
 Run: `dotnet build src/ExamSystem.Api/ExamSystem.Api.csproj`
 Expected: `Build succeeded.`
 
-- [ ] **Step 7: Commit**
+- [x] **Step 7: Commit**
 
 ```bash
 git add src/ExamSystem.Api
@@ -1126,12 +1126,12 @@ git commit -m "feat(api): wire composition root, JWT auth, auth controller, heal
 **Files:**
 - Create: `src/ExamSystem.Infrastructure/Migrations/*` (generated)
 
-- [ ] **Step 1: Install/verify the `dotnet-ef` tool**
+- [x] **Step 1: Install/verify the `dotnet-ef` tool**
 
 Run: `dotnet tool install -g dotnet-ef` (if already installed, run `dotnet tool update -g dotnet-ef` instead)
 Expected: prints the installed/updated version.
 
-- [ ] **Step 2: Generate the initial migration**
+- [x] **Step 2: Generate the initial migration**
 
 Run (from repo root):
 ```bash
@@ -1139,7 +1139,7 @@ dotnet ef migrations add InitialIdentitySchema --project src/ExamSystem.Infrastr
 ```
 Expected: "Done." and new files under `src/ExamSystem.Infrastructure/Migrations/`.
 
-- [ ] **Step 3: Apply the migration to LocalDB**
+- [x] **Step 3: Apply the migration to LocalDB**
 
 Run:
 ```bash
@@ -1147,7 +1147,7 @@ dotnet ef database update --project src/ExamSystem.Infrastructure --startup-proj
 ```
 Expected: "Done." — `ExamSystemDb` created on `(localdb)\mssqllocaldb`.
 
-- [ ] **Step 4: Run the API and verify seeding + health check**
+- [x] **Step 4: Run the API and verify seeding + health check**
 
 Run: `dotnet run --project src/ExamSystem.Api` (leave running)
 In a second terminal: `curl http://localhost:5000/health` (adjust port to whatever `dotnet run` printed)
@@ -1155,7 +1155,7 @@ Expected: `{"status":"healthy","timestampUtc":"..."}`
 
 Stop the API (Ctrl+C) once confirmed.
 
-- [ ] **Step 5: Commit the migration**
+- [x] **Step 5: Commit the migration**
 
 ```bash
 git add src/ExamSystem.Infrastructure/Migrations
@@ -1170,7 +1170,7 @@ git commit -m "chore(db): add initial Identity schema migration"
 - Create: `tests/ExamSystem.Api.IntegrationTests/TestWebApplicationFactory.cs`
 - Create: `tests/ExamSystem.Api.IntegrationTests/Controllers/AuthControllerTests.cs`
 
-- [ ] **Step 1: Write the failing integration test**
+- [x] **Step 1: Write the failing integration test**
 
 Create `tests/ExamSystem.Api.IntegrationTests/Controllers/AuthControllerTests.cs`:
 
@@ -1217,7 +1217,7 @@ public class AuthControllerTests : IClassFixture<TestWebApplicationFactory>
 }
 ```
 
-- [ ] **Step 2: Write `TestWebApplicationFactory`**
+- [x] **Step 2: Write `TestWebApplicationFactory`**
 
 Create `tests/ExamSystem.Api.IntegrationTests/TestWebApplicationFactory.cs`:
 
@@ -1280,7 +1280,7 @@ public class TestWebApplicationFactory : WebApplicationFactory<Program>, IAsyncL
 }
 ```
 
-- [ ] **Step 3: Ensure the test host creates the SQLite schema on startup**
+- [x] **Step 3: Ensure the test host creates the SQLite schema on startup**
 
 Modify `src/ExamSystem.Api/Program.cs` migrate/seed block so it also works against SQLite in tests — replace:
 ```csharp
@@ -1299,22 +1299,22 @@ with:
 ```
 (SQLite is used only in the integration-test host; production/dev continues to run real migrations against SQL Server.)
 
-- [ ] **Step 4: Run the test to verify it fails**
+- [x] **Step 4: Run the test to verify it fails**
 
 Run: `dotnet test tests/ExamSystem.Api.IntegrationTests`
 Expected: FAIL — either compile error (before Step 2/3 land) or a runtime failure if the SQLite branch isn't wired yet. Confirm the specific failure is about missing schema/DB wiring, not an unrelated error.
 
-- [ ] **Step 5: Run the test to verify it passes**
+- [x] **Step 5: Run the test to verify it passes**
 
 Run: `dotnet test tests/ExamSystem.Api.IntegrationTests`
 Expected: `Passed! - Failed: 0, Passed: 2`
 
-- [ ] **Step 6: Run the entire backend test suite together**
+- [x] **Step 6: Run the entire backend test suite together**
 
 Run: `dotnet test`
 Expected: all projects report `Passed!`, 0 failures.
 
-- [ ] **Step 7: Commit**
+- [x] **Step 7: Commit**
 
 ```bash
 git add src/ExamSystem.Api/Program.cs tests/ExamSystem.Api.IntegrationTests
@@ -1331,7 +1331,7 @@ git commit -m "test(api): add SQLite-backed integration tests for the login endp
 - Modify: `frontend/src/index.html`
 - Modify: `frontend/src/styles.scss`
 
-- [ ] **Step 1: Generate the Angular workspace**
+- [x] **Step 1: Generate the Angular workspace**
 
 Run (from `D:/os/ExamSystem`):
 ```bash
@@ -1339,7 +1339,7 @@ npx -y @angular/cli@17 new frontend --directory frontend --standalone --routing 
 ```
 Expected: "✔ Packages installed successfully." and a `frontend/` folder created.
 
-- [ ] **Step 2: Install PrimeNG + CDK**
+- [x] **Step 2: Install PrimeNG + CDK**
 
 Run:
 ```bash
@@ -1349,7 +1349,7 @@ cd ..
 ```
 Expected: `added N packages` with no vulnerabilities marked `critical`.
 
-- [ ] **Step 3: Create design tokens file**
+- [x] **Step 3: Create design tokens file**
 
 Create `frontend/src/styles/variables.scss`:
 ```scss
@@ -1373,7 +1373,7 @@ Create `frontend/src/styles/variables.scss`:
 }
 ```
 
-- [ ] **Step 4: Wire global styles (RTL-ready) and PrimeNG theme**
+- [x] **Step 4: Wire global styles (RTL-ready) and PrimeNG theme**
 
 Replace `frontend/src/styles.scss`:
 ```scss
@@ -1391,19 +1391,19 @@ html, body {
 }
 ```
 
-- [ ] **Step 5: Set the document direction to RTL**
+- [x] **Step 5: Set the document direction to RTL**
 
 Modify `frontend/src/index.html` `<html>` tag:
 ```html
 <html lang="ar" dir="rtl">
 ```
 
-- [ ] **Step 6: Verify the workspace builds**
+- [x] **Step 6: Verify the workspace builds**
 
 Run: `cd frontend && npm run build -- --configuration development && cd ..`
 Expected: `Application bundle generation complete.` with no errors.
 
-- [ ] **Step 7: Commit**
+- [x] **Step 7: Commit**
 
 ```bash
 git add frontend
@@ -1428,7 +1428,7 @@ git commit -m "chore(frontend): scaffold Angular 17 standalone workspace with RT
 - Test: `frontend/src/app/core/guards/auth.guard.spec.ts`
 - Modify: `frontend/src/environments/environment.ts` (create if template didn't generate it)
 
-- [ ] **Step 1: Add environment config**
+- [x] **Step 1: Add environment config**
 
 Create `frontend/src/environments/environment.ts`:
 ```typescript
@@ -1438,7 +1438,7 @@ export const environment = {
 };
 ```
 
-- [ ] **Step 2: Write the failing test for `AuthService`**
+- [x] **Step 2: Write the failing test for `AuthService`**
 
 Create `frontend/src/app/core/services/auth.service.spec.ts`:
 ```typescript
@@ -1492,12 +1492,12 @@ describe('AuthService', () => {
 });
 ```
 
-- [ ] **Step 3: Run the test to verify it fails**
+- [x] **Step 3: Run the test to verify it fails**
 
 Run: `cd frontend && npx ng test --watch=false --browsers=ChromeHeadless --include='**/auth.service.spec.ts'`
 Expected: FAIL — `auth.service.ts` does not exist yet.
 
-- [ ] **Step 4: Implement `AuthService`**
+- [x] **Step 4: Implement `AuthService`**
 
 Create `frontend/src/app/core/services/auth.service.ts`:
 ```typescript
@@ -1538,12 +1538,12 @@ export class AuthService {
 }
 ```
 
-- [ ] **Step 5: Run the test to verify it passes**
+- [x] **Step 5: Run the test to verify it passes**
 
 Run: `cd frontend && npx ng test --watch=false --browsers=ChromeHeadless --include='**/auth.service.spec.ts'`
 Expected: `TOTAL: 3 SUCCESS`
 
-- [ ] **Step 6: Write the failing test for the auth interceptor**
+- [x] **Step 6: Write the failing test for the auth interceptor**
 
 Create `frontend/src/app/core/interceptors/auth.interceptor.spec.ts`:
 ```typescript
@@ -1594,12 +1594,12 @@ describe('authInterceptor', () => {
 });
 ```
 
-- [ ] **Step 7: Run the test to verify it fails**
+- [x] **Step 7: Run the test to verify it fails**
 
 Run: `cd frontend && npx ng test --watch=false --browsers=ChromeHeadless --include='**/auth.interceptor.spec.ts'`
 Expected: FAIL — `auth.interceptor.ts` does not exist yet.
 
-- [ ] **Step 8: Implement `authInterceptor`**
+- [x] **Step 8: Implement `authInterceptor`**
 
 Create `frontend/src/app/core/interceptors/auth.interceptor.ts`:
 ```typescript
@@ -1619,12 +1619,12 @@ export const authInterceptor: HttpInterceptorFn = (req, next) => {
 };
 ```
 
-- [ ] **Step 9: Run the test to verify it passes**
+- [x] **Step 9: Run the test to verify it passes**
 
 Run: `cd frontend && npx ng test --watch=false --browsers=ChromeHeadless --include='**/auth.interceptor.spec.ts'`
 Expected: `TOTAL: 2 SUCCESS`
 
-- [ ] **Step 10: Write the failing test for `authGuard`**
+- [x] **Step 10: Write the failing test for `authGuard`**
 
 Create `frontend/src/app/core/guards/auth.guard.spec.ts`:
 ```typescript
@@ -1670,12 +1670,12 @@ describe('authGuard', () => {
 });
 ```
 
-- [ ] **Step 11: Run the test to verify it fails**
+- [x] **Step 11: Run the test to verify it fails**
 
 Run: `cd frontend && npx ng test --watch=false --browsers=ChromeHeadless --include='**/auth.guard.spec.ts'`
 Expected: FAIL — `auth.guard.ts` does not exist yet.
 
-- [ ] **Step 12: Implement `authGuard`**
+- [x] **Step 12: Implement `authGuard`**
 
 Create `frontend/src/app/core/guards/auth.guard.ts`:
 ```typescript
@@ -1695,12 +1695,12 @@ export const authGuard: CanActivateFn = () => {
 };
 ```
 
-- [ ] **Step 13: Run the test to verify it passes**
+- [x] **Step 13: Run the test to verify it passes**
 
 Run: `cd frontend && npx ng test --watch=false --browsers=ChromeHeadless --include='**/auth.guard.spec.ts'`
 Expected: `TOTAL: 2 SUCCESS`
 
-- [ ] **Step 14: Commit**
+- [x] **Step 14: Commit**
 
 ```bash
 git add frontend/src/app/core frontend/src/environments
@@ -1719,7 +1719,7 @@ git commit -m "feat(frontend): add auth service, interceptor, and guard with tes
 - Modify: `frontend/src/app/app.routes.ts`
 - Modify: `frontend/src/app/app.config.ts`
 
-- [ ] **Step 1: Write the failing test for `LoginComponent`**
+- [x] **Step 1: Write the failing test for `LoginComponent`**
 
 Create `frontend/src/app/features/auth/login/login.component.spec.ts`:
 ```typescript
@@ -1776,12 +1776,12 @@ describe('LoginComponent', () => {
 });
 ```
 
-- [ ] **Step 2: Run the test to verify it fails**
+- [x] **Step 2: Run the test to verify it fails**
 
 Run: `cd frontend && npx ng test --watch=false --browsers=ChromeHeadless --include='**/login.component.spec.ts'`
 Expected: FAIL — `login.component.ts` does not exist yet.
 
-- [ ] **Step 3: Implement `LoginComponent`**
+- [x] **Step 3: Implement `LoginComponent`**
 
 Create `frontend/src/app/features/auth/login/login.component.ts`:
 ```typescript
@@ -1857,7 +1857,7 @@ Create `frontend/src/app/features/auth/login/login.component.html`:
 
 *(Note: `*ngIf` requires `CommonModule` in the standalone `imports` array — add it.)*
 
-- [ ] **Step 4: Add `CommonModule` to the component imports**
+- [x] **Step 4: Add `CommonModule` to the component imports**
 
 Modify `frontend/src/app/features/auth/login/login.component.ts` imports array:
 ```typescript
@@ -1871,12 +1871,12 @@ import { CommonModule } from '@angular/common';
 })
 ```
 
-- [ ] **Step 5: Run the test to verify it passes**
+- [x] **Step 5: Run the test to verify it passes**
 
 Run: `cd frontend && npx ng test --watch=false --browsers=ChromeHeadless --include='**/login.component.spec.ts'`
 Expected: `TOTAL: 2 SUCCESS`
 
-- [ ] **Step 6: Create a minimal Admin layout shell**
+- [x] **Step 6: Create a minimal Admin layout shell**
 
 Create `frontend/src/app/layouts/admin-layout/admin-layout.component.ts`:
 ```typescript
@@ -1899,7 +1899,7 @@ import { RouterOutlet } from '@angular/router';
 export class AdminLayoutComponent {}
 ```
 
-- [ ] **Step 7: Wire routes**
+- [x] **Step 7: Wire routes**
 
 Replace `frontend/src/app/app.routes.ts`:
 ```typescript
@@ -1928,7 +1928,7 @@ export const routes: Routes = [
 ];
 ```
 
-- [ ] **Step 8: Add the dashboard placeholder referenced above**
+- [x] **Step 8: Add the dashboard placeholder referenced above**
 
 Create `frontend/src/app/features/admin/dashboard/dashboard-placeholder.component.ts`:
 ```typescript
@@ -1942,7 +1942,7 @@ import { Component } from '@angular/core';
 export class DashboardPlaceholderComponent {}
 ```
 
-- [ ] **Step 9: Register the HTTP client with the auth interceptor**
+- [x] **Step 9: Register the HTTP client with the auth interceptor**
 
 Modify `frontend/src/app/app.config.ts` to include:
 ```typescript
@@ -1960,17 +1960,17 @@ export const appConfig: ApplicationConfig = {
 };
 ```
 
-- [ ] **Step 10: Run the full frontend test suite**
+- [x] **Step 10: Run the full frontend test suite**
 
 Run: `cd frontend && npx ng test --watch=false --browsers=ChromeHeadless`
 Expected: all suites `SUCCESS`, 0 failures.
 
-- [ ] **Step 11: Verify the production build still compiles**
+- [x] **Step 11: Verify the production build still compiles**
 
 Run: `cd frontend && npm run build -- --configuration production && cd ..`
 Expected: `Application bundle generation complete.`
 
-- [ ] **Step 12: Commit**
+- [x] **Step 12: Commit**
 
 ```bash
 git add frontend/src/app
@@ -1983,40 +1983,40 @@ git commit -m "feat(frontend): add login page, admin layout shell, and routing"
 
 **Files:** none (manual verification only)
 
-- [ ] **Step 1: Start the backend API**
+- [x] **Step 1: Start the backend API**
 
 Run: `dotnet run --project src/ExamSystem.Api`
 Expected: log line `Now listening on: http://localhost:5000` (or similar) with no unhandled startup exceptions; admin user seeded on first run (verify via Step 3 login).
 
-- [ ] **Step 2: Start the Angular dev server**
+- [x] **Step 2: Start the Angular dev server**
 
 In a second terminal: `cd frontend && npx ng serve --port 4200`
 Expected: `✔ Compiled successfully.`
 
-- [ ] **Step 3: Log in as the seeded Admin through the browser**
+- [x] **Step 3: Log in as the seeded Admin through the browser**
 
 Open `http://localhost:4200/login`, enter username `admin` and the password set in Task 6 Step 5 (`ChangeMe!2026` if unchanged), submit.
 Expected: redirect to `/admin/dashboard` showing "تم تسجيل الدخول بنجاح..."; `localStorage` contains a Bearer JWT under key `auth_token` (verify via browser DevTools → Application → Local Storage).
 
-- [ ] **Step 4: Verify a bad login is rejected**
+- [x] **Step 4: Verify a bad login is rejected**
 
 Log out (clear `auth_token` from Local Storage or reload after clearing), try logging in with a wrong password.
 Expected: inline error "اسم المستخدم أو كلمة المرور غير صحيحة." and no navigation away from `/login`.
 
-- [ ] **Step 5: Verify the health endpoint**
+- [x] **Step 5: Verify the health endpoint**
 
 Run: `curl http://localhost:5000/health`
 Expected: `{"status":"healthy","timestampUtc":"..."}`
 
-- [ ] **Step 6: Stop both dev servers**
+- [x] **Step 6: Stop both dev servers**
 
 Ctrl+C in both terminals.
 
-- [ ] **Step 7: Record the checkpoint**
+- [x] **Step 7: Record the checkpoint**
 
 Update this plan file: check off Task 12's steps and add a one-line note at the bottom of the file: `Phase 0 completed on <date> — backend + frontend tests green, manual E2E login verified.`
 
-- [ ] **Step 8: Commit**
+- [x] **Step 8: Commit**
 
 ```bash
 git add docs/superpowers/plans/2026-07-04-phase0-foundation.md
@@ -2027,13 +2027,13 @@ git commit -m "docs: mark Phase 0 foundation plan complete"
 
 ## Definition of Done (Phase 0)
 
-- [ ] `dotnet build` succeeds for the whole solution.
-- [ ] `dotnet test` passes for both backend test projects (unit + integration).
-- [ ] `ng test` passes for the Angular workspace.
-- [ ] `ng build --configuration production` succeeds.
-- [ ] A seeded Admin can log in through the real UI and land on `/admin/dashboard` with a JWT stored client-side.
-- [ ] No secrets (connection strings, JWT key, seed password) are present in any committed file — only in `dotnet user-secrets` / local environment.
-- [ ] `/health` returns 200 with a JSON payload.
+- [x] `dotnet build` succeeds for the whole solution.
+- [x] `dotnet test` passes for both backend test projects (unit + integration).
+- [x] `ng test` passes for the Angular workspace.
+- [x] `ng build --configuration production` succeeds.
+- [x] A seeded Admin can log in through the real UI and land on `/admin/dashboard` with a JWT stored client-side.
+- [x] No secrets (connection strings, JWT key, seed password) are present in any committed file — only in `dotnet user-secrets` / local environment.
+- [x] `/health` returns 200 with a JSON payload.
 
 ## Out of Scope for This Plan (deferred to later phases per PRD §7)
 
