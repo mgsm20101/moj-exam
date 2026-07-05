@@ -43,10 +43,7 @@ public class UpdateExamCommandHandler : IRequestHandler<UpdateExamCommand, Resul
         // as well: mutating the same tracked navigation collection for both the removal and the
         // re-add makes EF Core's change tracker misclassify the new rows as Modified instead of
         // Added (confirmed with EF Core 8 InMemory -- throws DbUpdateConcurrencyException on save).
-        foreach (var old in exam.TopicSelections.ToList())
-        {
-            _db.ExamTopicSelections.Remove(old);
-        }
+        _db.ExamTopicSelections.RemoveRange(exam.TopicSelections);
 
         foreach (var selection in request.TopicSelections)
         {
