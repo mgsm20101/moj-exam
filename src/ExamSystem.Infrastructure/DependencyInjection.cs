@@ -2,6 +2,7 @@ using ExamSystem.Application.Common.Interfaces;
 using ExamSystem.Infrastructure.Files;
 using ExamSystem.Infrastructure.Identity;
 using ExamSystem.Infrastructure.Persistence;
+using ExamSystem.Infrastructure.Selection;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -36,6 +37,7 @@ public static class DependencyInjection
         services.AddScoped<IJwtTokenGenerator, JwtTokenGenerator>();
         services.AddScoped<IImageStorageService, LocalImageStorageService>();
         services.AddScoped<IExcelQuestionParser, ClosedXmlQuestionParser>();
+        services.AddScoped<IQuestionSelectionService, QuestionSelectionService>();
 
         return services;
     }
