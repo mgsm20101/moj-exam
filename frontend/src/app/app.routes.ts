@@ -8,6 +8,10 @@ export const routes: Routes = [
     loadComponent: () => import('./features/auth/login/login.component').then(m => m.LoginComponent)
   },
   {
+    path: 'exam/:examId',
+    loadChildren: () => import('./features/candidate/candidate.routes').then(m => m.candidateRoutes)
+  },
+  {
     path: 'admin',
     canActivate: [authGuard],
     loadComponent: () => import('./layouts/admin-layout/admin-layout.component').then(m => m.AdminLayoutComponent),
