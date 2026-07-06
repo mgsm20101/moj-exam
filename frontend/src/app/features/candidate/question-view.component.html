@@ -1,0 +1,21 @@
+<div class="q-view">
+  <p class="q-text">{{ question.displayOrder }}. {{ question.text }}</p>
+  <img *ngIf="question.imageUrl" [src]="question.imageUrl" alt="" class="q-image" />
+
+  <ng-container *ngIf="question.type !== 'FillBlank'; else fillBlank">
+    <label class="q-option" *ngFor="let opt of question.options"
+           [class.selected]="question.selectedOptionId === opt.id">
+      <input type="radio" [name]="question.attemptQuestionId" [value]="opt.id"
+             [checked]="question.selectedOptionId === opt.id"
+             (change)="optionSelected.emit(opt.id)" />
+      <span>{{ opt.text }}</span>
+    </label>
+  </ng-container>
+
+  <ng-template #fillBlank>
+    <input class="q-fill" type="text" inputmode="text" maxlength="50"
+           [value]="question.answerText || ''"
+           (input)="onText($any($event.target).value)"
+           placeholder="اكتب الإجابة بكلمة واحدة" />
+  </ng-template>
+</div>
