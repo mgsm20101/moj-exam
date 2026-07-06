@@ -1,6 +1,7 @@
 using ExamSystem.Application.Common.Interfaces;
 using ExamSystem.Infrastructure.Files;
 using ExamSystem.Infrastructure.Identity;
+using ExamSystem.Infrastructure.Grading;
 using ExamSystem.Infrastructure.Persistence;
 using ExamSystem.Infrastructure.Selection;
 using Microsoft.AspNetCore.Identity;
@@ -40,6 +41,7 @@ public static class DependencyInjection
         services.AddScoped<IImageStorageService, LocalImageStorageService>();
         services.AddScoped<IExcelQuestionParser, ClosedXmlQuestionParser>();
         services.AddScoped<IQuestionSelectionService, QuestionSelectionService>();
+        services.AddScoped<IAttemptGradingService, AttemptGradingService>();
 
         return services;
     }
