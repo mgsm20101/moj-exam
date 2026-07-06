@@ -4,7 +4,7 @@
     <button type="button" (click)="openCreateForm()">امتحان جديد</button>
   </div>
 
-  <p class="error" *ngIf="errorMessage">{{ errorMessage }}</p>
+  <div class="banner-error" *ngIf="errorMessage" role="alert">{{ errorMessage }}</div>
 
   <table class="exams-table">
     <thead>
@@ -25,24 +25,34 @@
         <td>{{ exam.endAtUtc | date: 'short' }}</td>
         <td>{{ exam.totalQuestionCount }}</td>
         <td>{{ exam.totalPoints }}</td>
-        <td>{{ exam.status }}</td>
+        <td>
+          <span class="badge" [ngClass]="statusBadge(exam.status)">
+            {{ statusLabel(exam.status) }}
+          </span>
+        </td>
         <td class="actions">
           <button type="button" (click)="openEditForm(exam.id)" [disabled]="exam.status !== 'Draft'">تعديل</button>
           <button type="button" (click)="publishExam(exam.id)" *ngIf="exam.status === 'Draft'">نشر</button>
           <button type="button" (click)="closeExam(exam.id)" *ngIf="exam.status === 'Published'">إغلاق</button>
           <button type="button" (click)="archiveExam(exam.id)" *ngIf="exam.status === 'Closed'">أرشفة</button>
           <button type="button" (click)="cloneExam(exam.id)">استنساخ</button>
-          <button type="button" (click)="deleteExam(exam.id)" [disabled]="exam.status !== 'Draft'">حذف</button>
+          <button type="button" class="danger" (click)="deleteExam(exam.id)" [disabled]="exam.status !== 'Draft'">حذف</button>
         </td>
+      </tr>
+      <tr *ngIf="exams().length === 0">
+        <td colspan="7" class="table-empty">لا توجد امتحانات بعد — ابدأ بإنشاء امتحان جديد.</td>
       </tr>
     </tbody>
   </table>
 
-  <div class="form-panel" *ngIf="isFormOpen()">
-    <div class="form-panel-header">
-      <h3>{{ editingExam() ? 'تعديل امتحان' : 'امتحان جديد' }}</h3>
-      <button type="button" (click)="closeForm()" aria-label="إغلاق لوحة النموذج">إغلاق</button>
+  <ng-container *ngIf="isFormOpen()">
+    <div class="overlay-backdrop" (click)="closeForm()"></div>
+    <div class="form-panel" role="dialog" aria-modal="true">
+      <div class="form-panel-header">
+        <h3>{{ editingExam() ? 'تعديل امتحان' : 'امتحان جديد' }}</h3>
+        <button type="button" class="secondary" (click)="closeForm()" aria-label="إغلاق لوحة النموذج">إغلاق</button>
+      </div>
+      <app-exam-form [topics]="topics()" [initialValue]="editingExam()" (save)="onSave($event)"></app-exam-form>
     </div>
-    <app-exam-form [topics]="topics()" [initialValue]="editingExam()" (save)="onSave($event)"></app-exam-form>
-  </div>
+  </ng-container>
 </div>

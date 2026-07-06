@@ -1,0 +1,96 @@
+// ============================================================================
+// Layout — admin shell (header + nav) and the page container all surfaces sit in
+// RTL-native: nav reads right-to-left in document order, not a mirrored list.
+// ============================================================================
+
+.admin-shell {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background: var(--paper-mist);
+}
+
+// --- Header: flat, hairline rule beneath (the one place a border beats a shadow)
+.admin-header {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  padding: 0 var(--space-xl);
+  height: 56px;
+  background: var(--pure-white);
+  color: var(--ink-black);
+  font-size: var(--fs-title);
+  font-weight: var(--fw-semibold);
+  border-bottom: 1px solid var(--hairline-grey);
+}
+
+.admin-header::before {
+  content: "";
+  width: 4px;
+  height: 20px;
+  border-radius: 999px;
+  background: var(--authority-blue);
+}
+
+// --- Nav: active route gets blue text + a 2px blue underline --------------
+.admin-nav {
+  display: flex;
+  align-items: stretch;
+  gap: var(--space-lg);
+  padding: 0 var(--space-xl);
+  height: 48px;
+  background: var(--pure-white);
+  border-bottom: 1px solid var(--hairline-grey);
+}
+
+.admin-nav a {
+  display: inline-flex;
+  align-items: center;
+  color: var(--slate-grey);
+  font-weight: var(--fw-regular);
+  border-bottom: 2px solid transparent;
+  margin-bottom: -1px;
+  transition: color var(--dur-fast) var(--ease-out),
+    border-color var(--dur-fast) var(--ease-out);
+}
+
+.admin-nav a:hover {
+  color: var(--ink-black);
+}
+
+.admin-nav a.active,
+.admin-nav a[aria-current="page"] {
+  color: var(--authority-blue);
+  font-weight: var(--fw-semibold);
+  border-bottom-color: var(--authority-blue);
+}
+
+// --- Content region ------------------------------------------------------
+.admin-content {
+  flex: 1;
+  padding: var(--space-xl);
+  max-width: 1280px;
+  width: 100%;
+  margin-inline: auto;
+}
+
+// --- Page scaffold shared by every admin surface -------------------------
+.topics-page,
+.questions-page,
+.exams-page,
+.page {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-lg);
+  animation: ledger-fade-in var(--dur-base) var(--ease-out);
+}
+
+// Page header: title on the start edge, primary action on the end edge
+.page-head,
+.exams-page > .header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-md);
+  flex-wrap: wrap;
+}

@@ -1,13 +1,21 @@
 <div class="topics-page">
-  <h1>الموضوعات</h1>
+  <div class="page-head">
+    <h1>الموضوعات</h1>
+  </div>
 
   <form class="new-topic-form" (ngSubmit)="createTopic()">
-    <input type="text" placeholder="اسم الموضوع" [(ngModel)]="newTopicName" name="newTopicName" />
-    <input type="number" placeholder="ترتيب العرض" [(ngModel)]="newTopicDisplayOrder" name="newTopicDisplayOrder" />
+    <div class="field">
+      <label for="newTopicName">اسم الموضوع</label>
+      <input id="newTopicName" type="text" placeholder="مثال: القانون المدني" [(ngModel)]="newTopicName" name="newTopicName" />
+    </div>
+    <div class="field">
+      <label for="newTopicDisplayOrder">ترتيب العرض</label>
+      <input id="newTopicDisplayOrder" type="number" min="1" [(ngModel)]="newTopicDisplayOrder" name="newTopicDisplayOrder" />
+    </div>
     <button type="submit" [disabled]="isSubmitting()">إضافة موضوع</button>
   </form>
 
-  <p class="error" *ngIf="errorMessage">{{ errorMessage }}</p>
+  <div class="banner-error" *ngIf="errorMessage" role="alert">{{ errorMessage }}</div>
 
   <table>
     <thead>
@@ -24,8 +32,17 @@
         <td>{{ topic.name }}</td>
         <td>{{ topic.displayOrder }}</td>
         <td>{{ topic.questionCount }}</td>
-        <td>{{ topic.isActive ? 'نشط' : 'معطّل' }}</td>
-        <td><button (click)="deleteTopic(topic.id)" [disabled]="isSubmitting()">حذف</button></td>
+        <td>
+          <span class="badge" [ngClass]="topic.isActive ? 'badge-active' : 'badge-neutral'">
+            {{ topic.isActive ? 'نشط' : 'معطّل' }}
+          </span>
+        </td>
+        <td class="actions">
+          <button type="button" class="danger" (click)="deleteTopic(topic.id)" [disabled]="isSubmitting()">حذف</button>
+        </td>
+      </tr>
+      <tr *ngIf="topics().length === 0">
+        <td colspan="5" class="table-empty">لا توجد موضوعات بعد — أضِف أول موضوع من النموذج أعلاه.</td>
       </tr>
     </tbody>
   </table>

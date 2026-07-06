@@ -18,6 +18,21 @@ export class ExamsListComponent implements OnInit {
   isFormOpen = signal(false);
   errorMessage: string | null = null;
 
+  private readonly statusMeta: Record<string, { label: string; badge: string } | undefined> = {
+    Draft: { label: 'مسودة', badge: 'badge-neutral' },
+    Published: { label: 'منشور', badge: 'badge-published' },
+    Closed: { label: 'مغلق', badge: 'badge-closed' },
+    Archived: { label: 'مؤرشف', badge: 'badge-archived' }
+  };
+
+  statusLabel(status: string): string {
+    return this.statusMeta[status]?.label ?? status;
+  }
+
+  statusBadge(status: string): string {
+    return this.statusMeta[status]?.badge ?? 'badge-neutral';
+  }
+
   constructor(
     private readonly examService: ExamService,
     private readonly topicService: TopicService

@@ -20,6 +20,22 @@ export class QuestionsListComponent implements OnInit {
   selectedDifficulty: Difficulty | '' = '';
   errorMessage: string | null = null;
 
+  readonly typeLabels: Record<string, string> = {
+    Mcq: 'اختيار من متعدد',
+    FillBlank: 'أكمل الناقص',
+    TrueFalse: 'صح / خطأ'
+  };
+  readonly difficultyLabels: Record<string, string> = {
+    Easy: 'سهل',
+    Medium: 'متوسط',
+    Hard: 'متقدم'
+  };
+  readonly difficultyBadge: Record<string, string> = {
+    Easy: 'badge-active',
+    Medium: 'badge-info',
+    Hard: 'badge-warning'
+  };
+
   constructor(
     private readonly questionService: QuestionService,
     private readonly topicService: TopicService

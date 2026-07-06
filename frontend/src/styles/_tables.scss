@@ -1,0 +1,101 @@
+// ============================================================================
+// Data tables — the signature, most-repeated pattern (topics, questions, exams)
+// Header: Paper Mist + Slate label text + hairline rule (never a shadow).
+// Rows: white, hairline dividers, hover to Authority Blue Tint.
+// ============================================================================
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  background: var(--pure-white);
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  box-shadow: var(--shadow-resting);
+}
+
+thead th {
+  background: var(--paper-mist);
+  color: var(--slate-grey);
+  font-size: var(--fs-label);
+  font-weight: var(--fw-semibold);
+  line-height: var(--lh-label);
+  letter-spacing: 0.02em;
+  text-align: start;
+  padding: var(--space-sm) var(--space-md);
+  border-bottom: 1px solid var(--hairline-grey);
+  white-space: nowrap;
+}
+
+tbody td {
+  padding: var(--space-sm) var(--space-md);
+  border-bottom: 1px solid var(--hairline-grey);
+  color: var(--ink-black);
+  vertical-align: middle;
+}
+
+tbody tr:last-child td {
+  border-bottom: none;
+}
+
+// Row hover signals "this row is actionable" without a reveal-on-hover column
+tbody tr {
+  transition: background-color var(--dur-fast) var(--ease-out);
+}
+
+tbody tr:hover {
+  background: var(--authority-blue-tint);
+}
+
+// --- Action cells: buttons sit compact, delete always last in RTL order --
+td.actions,
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-xs);
+  justify-content: flex-start;
+}
+
+td.actions button,
+.actions button {
+  padding: 6px 12px;
+  font-size: var(--fs-label);
+}
+
+// Compact secondary look for in-row action buttons that aren't the primary
+td.actions button:not(.danger):not(.text) {
+  background-color: var(--pure-white);
+  color: var(--authority-blue);
+  border-color: var(--hairline-grey);
+}
+
+td.actions button:not(.danger):not(.text):hover:not(:disabled) {
+  border-color: var(--authority-blue);
+  background-color: var(--authority-blue-tint);
+}
+
+// --- Empty state: teach the interface, don't say "nothing here" ----------
+.table-empty {
+  padding: var(--space-2xl) var(--space-md);
+  text-align: center;
+  color: var(--slate-grey);
+}
+
+// --- Matrix table (exam form: Topic × Type distribution) -----------------
+.matrix-table th,
+.matrix-table td {
+  text-align: center;
+}
+
+.matrix-table th:first-child,
+.matrix-table td:first-child {
+  text-align: start;
+  font-weight: var(--fw-semibold);
+  color: var(--ink-black);
+}
+
+.matrix-table input[type="number"] {
+  width: 4.5rem;
+  text-align: center;
+  padding: 6px 8px;
+  margin: 0 auto;
+}

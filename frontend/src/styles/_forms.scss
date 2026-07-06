@@ -1,0 +1,115 @@
+// ============================================================================
+// Forms — inputs, selects, textareas, checkboxes, labels, errors.
+// One focus treatment shared with buttons (border shift + tint ring).
+// ============================================================================
+
+label {
+  display: block;
+  font-size: var(--fs-body);
+  font-weight: var(--fw-semibold);
+  color: var(--ink-black);
+  margin-bottom: var(--space-xs);
+}
+
+input,
+select,
+textarea {
+  width: 100%;
+  font-family: var(--font-family);
+  font-size: var(--fs-body);
+  line-height: var(--lh-body);
+  color: var(--ink-black);
+  background-color: var(--pure-white);
+  border: 1px solid var(--hairline-grey);
+  border-radius: var(--radius-md);
+  padding: 8px 12px;
+  transition: border-color var(--dur-fast) var(--ease-out),
+    box-shadow var(--dur-fast) var(--ease-out);
+}
+
+textarea {
+  min-height: 96px;
+  resize: vertical;
+}
+
+input::placeholder,
+textarea::placeholder {
+  color: var(--slate-grey);
+  opacity: 1;
+}
+
+input:focus,
+select:focus,
+textarea:focus {
+  outline: none;
+  border-color: var(--authority-blue);
+  box-shadow: var(--focus-ring);
+}
+
+input:disabled,
+select:disabled,
+textarea:disabled {
+  color: var(--slate-grey);
+  background-color: var(--paper-mist);
+  border-color: transparent;
+  cursor: not-allowed;
+}
+
+// --- Error state: red border + message beneath in Label typography -------
+input.is-invalid,
+select.is-invalid,
+textarea.is-invalid,
+.is-invalid input {
+  border-color: var(--alert-red);
+}
+
+.field-error,
+.error {
+  color: var(--alert-red);
+  font-size: var(--fs-label);
+  font-weight: var(--fw-semibold);
+  line-height: var(--lh-label);
+  margin: var(--space-xs) 0 0;
+}
+
+// --- Checkboxes: native control, tinted to Authority Blue ----------------
+input[type="checkbox"],
+input[type="radio"] {
+  width: 1.05rem;
+  height: 1.05rem;
+  accent-color: var(--authority-blue);
+  cursor: pointer;
+  vertical-align: middle;
+}
+
+// --- Field grouping ------------------------------------------------------
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xs);
+}
+
+.field-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-md);
+}
+
+.field-row > .field {
+  flex: 1 1 180px;
+  min-width: 0;
+}
+
+// Inline checkbox fields read: box then label, RTL-native
+.field-row.toggles .field,
+.field.inline {
+  flex-direction: row;
+  align-items: center;
+  gap: var(--space-sm);
+}
+
+.field-row.toggles label,
+.field.inline label {
+  margin-bottom: 0;
+  font-weight: var(--fw-regular);
+}

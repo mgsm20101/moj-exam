@@ -1,0 +1,233 @@
+// ============================================================================
+// Page-specific — login, filters, inline create forms, exam form scaffolding
+// ============================================================================
+
+// --- Utility -------------------------------------------------------------
+.muted {
+  color: var(--slate-grey);
+}
+
+// --- Dashboard (placeholder welcome) -------------------------------------
+.dashboard-welcome {
+  max-width: 640px;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+  padding: var(--space-lg);
+}
+
+// --- Login ---------------------------------------------------------------
+.login-page {
+  min-height: 100vh;
+  display: grid;
+  place-items: center;
+  padding: var(--space-xl);
+  background: var(--paper-mist);
+}
+
+.login-card {
+  width: min(400px, 100%);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md);
+  background: var(--pure-white);
+  border-radius: var(--radius-md);
+  padding: var(--space-2xl) var(--space-xl);
+  box-shadow: var(--shadow-resting);
+  animation: ledger-rise-in var(--dur-slow) var(--ease-out);
+}
+
+.login-card h1 {
+  margin-bottom: var(--space-sm);
+  text-align: center;
+}
+
+.login-card label {
+  margin-bottom: 0;
+}
+
+.login-card button {
+  margin-top: var(--space-sm);
+  width: 100%;
+}
+
+// --- Filters bar (questions) ---------------------------------------------
+.filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-md);
+  align-items: flex-end;
+}
+
+.filters .field {
+  flex: 0 1 240px;
+}
+
+// Long question text: cap the column so the table stays scannable
+.cell-text {
+  max-width: 34ch;
+  color: var(--slate-grey);
+}
+
+.add-question {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md);
+  margin-top: var(--space-sm);
+}
+
+// --- Inline create form (topics) -----------------------------------------
+.new-topic-form {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: var(--space-md);
+  background: var(--pure-white);
+  border-radius: var(--radius-md);
+  padding: var(--space-md);
+  box-shadow: var(--shadow-resting);
+}
+
+.new-topic-form .field {
+  flex: 0 1 160px;
+}
+
+.new-topic-form .field:first-of-type {
+  flex: 1 1 220px; // the topic-name field grows to fill the row
+}
+
+.new-topic-form button {
+  flex: 0 0 auto;
+}
+
+// --- Exam form -----------------------------------------------------------
+.exam-form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-lg);
+}
+
+.exam-form h3 {
+  margin-top: var(--space-sm);
+}
+
+.exam-form > button[type="submit"] {
+  align-self: flex-start;
+}
+
+// --- Question form (mirrors exam-form rhythm) ----------------------------
+.question-form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md);
+  background: var(--pure-white);
+  border-radius: var(--radius-md);
+  padding: var(--space-lg);
+  box-shadow: var(--shadow-resting);
+}
+
+.question-form label {
+  margin-bottom: 0;
+}
+
+.question-form > button[type="submit"] {
+  align-self: flex-start;
+  margin-top: var(--space-sm);
+}
+
+.option-row {
+  display: flex;
+  align-items: center;
+  gap: var(--space-md);
+}
+
+.option-row input[type="text"] {
+  flex: 1 1 auto;
+}
+
+.option-row label {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-xs);
+  white-space: nowrap;
+  font-weight: var(--fw-regular);
+  color: var(--slate-grey);
+}
+
+.question-image-preview {
+  max-width: 220px;
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-resting);
+}
+
+// --- Bulk import ---------------------------------------------------------
+.bulk-import-page {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-lg);
+  animation: ledger-fade-in var(--dur-base) var(--ease-out);
+}
+
+.import-controls {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-md);
+  background: var(--pure-white);
+  border-radius: var(--radius-md);
+  padding: var(--space-md) var(--space-lg);
+  box-shadow: var(--shadow-resting);
+}
+
+.import-controls input[type="file"] {
+  flex: 1 1 260px;
+}
+
+.import-summary {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-sm);
+}
+
+.bank-coverage {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md);
+}
+
+.import-report {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md);
+  background: var(--pure-white);
+  border-radius: var(--radius-md);
+  padding: var(--space-md) var(--space-lg);
+  box-shadow: var(--shadow-resting);
+}
+
+// Native file input: give it a calm, on-brand control chrome
+input[type="file"] {
+  font-size: var(--fs-body);
+  color: var(--slate-grey);
+  padding: 6px 0;
+}
+
+input[type="file"]::file-selector-button {
+  font-family: var(--font-family);
+  font-size: var(--fs-body);
+  font-weight: var(--fw-semibold);
+  color: var(--authority-blue);
+  background: var(--pure-white);
+  border: 1px solid var(--authority-blue);
+  border-radius: var(--radius-md);
+  padding: 8px 16px;
+  margin-inline-end: var(--space-md);
+  cursor: pointer;
+  transition: background-color var(--dur-fast) var(--ease-out),
+    color var(--dur-fast) var(--ease-out);
+}
+
+input[type="file"]::file-selector-button:hover {
+  background: var(--authority-blue-tint);
+  color: var(--authority-blue-deep);
+}

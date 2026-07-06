@@ -1,15 +1,23 @@
 <div class="bulk-import-page">
-  <h1>استيراد أسئلة بالجملة</h1>
+  <div class="page-head">
+    <h1>استيراد أسئلة بالجملة</h1>
+  </div>
 
-  <input type="file" accept=".xlsx" (change)="onFileSelected($event)" />
-  <button (click)="upload()" [disabled]="!selectedFile || uploading">
-    {{ uploading ? 'جارِ الاستيراد...' : 'استيراد' }}
-  </button>
+  <div class="import-controls">
+    <input type="file" accept=".xlsx" (change)="onFileSelected($event)" />
+    <button type="button" (click)="upload()" [disabled]="!selectedFile || uploading">
+      {{ uploading ? 'جارِ الاستيراد...' : 'استيراد' }}
+    </button>
+  </div>
 
-  <p class="error" *ngIf="errorMessage">{{ errorMessage }}</p>
+  <div class="banner-error" *ngIf="errorMessage" role="alert">{{ errorMessage }}</div>
 
   <div class="import-report" *ngIf="report() as r">
-    <p>الإجمالي: {{ r.totalRows }} — نجح: {{ r.successCount }} — فشل: {{ r.failureCount }}</p>
+    <div class="import-summary">
+      <span class="badge badge-neutral">الإجمالي {{ r.totalRows }}</span>
+      <span class="badge badge-active">نجح {{ r.successCount }}</span>
+      <span class="badge" [ngClass]="r.failureCount > 0 ? 'badge-danger' : 'badge-neutral'">فشل {{ r.failureCount }}</span>
+    </div>
     <table *ngIf="r.errors.length > 0">
       <thead>
         <tr><th>الشيت</th><th>الصف</th><th>السبب</th></tr>
@@ -24,18 +32,23 @@
     </table>
   </div>
 
-  <h2>تغطية البنك الحالية (Topic × Difficulty)</h2>
-  <table>
-    <thead>
-      <tr><th>الموضوع</th><th>الصعوبة</th><th>اختيار من متعدد</th><th>أكمل</th></tr>
-    </thead>
-    <tbody>
-      <tr *ngFor="let row of summary()">
-        <td>{{ row.topicName }}</td>
-        <td>{{ row.difficulty }}</td>
-        <td>{{ row.mcqCount }}</td>
-        <td>{{ row.fillBlankCount }}</td>
-      </tr>
-    </tbody>
-  </table>
+  <section class="bank-coverage">
+    <h2>تغطية البنك الحالية (الموضوع × الصعوبة)</h2>
+    <table>
+      <thead>
+        <tr><th>الموضوع</th><th>الصعوبة</th><th>اختيار من متعدد</th><th>أكمل</th></tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let row of summary()">
+          <td>{{ row.topicName }}</td>
+          <td>{{ row.difficulty }}</td>
+          <td>{{ row.mcqCount }}</td>
+          <td>{{ row.fillBlankCount }}</td>
+        </tr>
+        <tr *ngIf="summary().length === 0">
+          <td colspan="4" class="table-empty">لا توجد بيانات تغطية بعد.</td>
+        </tr>
+      </tbody>
+    </table>
+  </section>
 </div>

@@ -1,0 +1,86 @@
+// ============================================================================
+// Buttons — one radius, calm/breathable, motion on every interactive state.
+// Applies to bare <button> across the app plus intent modifier classes.
+// ============================================================================
+
+button,
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-sm);
+  font-family: var(--font-family);
+  font-size: var(--fs-body);
+  font-weight: var(--fw-semibold);
+  line-height: 1;
+  padding: 10px 20px;
+  border-radius: var(--radius-md);
+  border: 1px solid transparent;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background-color var(--dur-fast) var(--ease-out),
+    border-color var(--dur-fast) var(--ease-out),
+    box-shadow var(--dur-fast) var(--ease-out), transform var(--dur-fast) var(--ease-out);
+
+  // --- Primary is the default bare-button look (Authority Blue) ----------
+  background-color: var(--authority-blue);
+  color: var(--pure-white);
+}
+
+button:hover:not(:disabled),
+.btn:hover:not(:disabled) {
+  background-color: var(--authority-blue-deep);
+}
+
+button:active:not(:disabled),
+.btn:active:not(:disabled) {
+  transform: translateY(1px);
+}
+
+button:disabled,
+.btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+// --- Secondary / ghost: white with blue chrome, for cancel-side actions --
+.btn-secondary,
+button.secondary {
+  background-color: var(--pure-white);
+  color: var(--authority-blue);
+  border-color: var(--authority-blue);
+}
+
+.btn-secondary:hover:not(:disabled),
+button.secondary:hover:not(:disabled) {
+  background-color: var(--authority-blue-tint);
+  color: var(--authority-blue-deep);
+}
+
+// --- Text / no-chrome: reserved for already-confirmed destructive actions
+.btn-text,
+button.text {
+  background-color: transparent;
+  color: var(--slate-grey);
+  padding: 8px 12px;
+}
+
+.btn-text:hover:not(:disabled),
+button.text:hover:not(:disabled) {
+  background-color: var(--slate-tint);
+  color: var(--ink-black);
+}
+
+// --- Danger: destructive, low-chrome until hover -------------------------
+.btn-danger,
+button.danger {
+  background-color: transparent;
+  color: var(--alert-red);
+  padding: 8px 12px;
+}
+
+.btn-danger:hover:not(:disabled),
+button.danger:hover:not(:disabled) {
+  background-color: var(--alert-red-tint);
+  color: var(--alert-red);
+}

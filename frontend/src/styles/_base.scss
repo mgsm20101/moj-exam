@@ -1,0 +1,130 @@
+// ============================================================================
+// Base — reset, typographic scale, RTL-native defaults, focus, motion policy
+// ============================================================================
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  height: 100%;
+  margin: 0;
+}
+
+body {
+  font-family: var(--font-family);
+  font-size: var(--fs-body);
+  line-height: var(--lh-body);
+  color: var(--ink-black);
+  background: var(--paper-mist);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+// --- Headings: one family, hierarchy by weight + size --------------------
+h1,
+h2,
+h3,
+h4 {
+  margin: 0;
+  font-weight: var(--fw-semibold);
+  color: var(--ink-black);
+  text-wrap: balance;
+}
+
+h1 {
+  font-size: var(--fs-display);
+  line-height: var(--lh-display);
+  letter-spacing: -0.01em;
+}
+
+h2 {
+  font-size: var(--fs-headline);
+  line-height: var(--lh-headline);
+}
+
+h3 {
+  font-size: var(--fs-title);
+  line-height: var(--lh-title);
+}
+
+p {
+  margin: 0;
+}
+
+a {
+  color: var(--authority-blue);
+  text-decoration: none;
+  transition: color var(--dur-fast) var(--ease-out);
+}
+
+a:hover {
+  color: var(--authority-blue-deep);
+}
+
+// --- Focus: one consistent treatment across every control ----------------
+:focus-visible {
+  outline: none;
+  box-shadow: var(--focus-ring);
+  border-radius: var(--radius-sm);
+}
+
+// Reserve the mouse-drag text selection to the brand tint, not OS blue
+::selection {
+  background: var(--authority-blue-tint);
+  color: var(--ink-black);
+}
+
+// --- Scrollbars: restrained, never a custom flourish ---------------------
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--hairline-grey) transparent;
+}
+
+// --- Motion policy: reduced-motion is not optional -----------------------
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+// --- Shared motion primitives --------------------------------------------
+// RTL-native: overlays and panels settle in from the inline-start edge.
+@keyframes ledger-fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes ledger-rise-in {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes ledger-row-in {
+  from {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}

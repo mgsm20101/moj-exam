@@ -86,7 +86,7 @@
     </tbody>
   </table>
 
-  <p class="error" *ngIf="validationError()">{{ validationError() }}</p>
+  <div class="banner-error" *ngIf="validationError()" role="alert">{{ validationError() }}</div>
 
   <button type="submit">حفظ</button>
 </form>

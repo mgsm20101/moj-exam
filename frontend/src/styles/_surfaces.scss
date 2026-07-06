@@ -1,0 +1,131 @@
+// ============================================================================
+// Surfaces — cards, panels, overlays, status badges, toasts.
+// No-Ghost-Card: depth comes from shadow alone, never shadow + border.
+// ============================================================================
+
+.card {
+  background: var(--pure-white);
+  border-radius: var(--radius-md);
+  padding: var(--space-md);
+  box-shadow: var(--shadow-resting);
+  transition: box-shadow var(--dur-base) var(--ease-out);
+}
+
+.card:hover {
+  box-shadow: var(--shadow-raised);
+}
+
+// --- Overlay backdrop: dims the page behind a floating panel -------------
+.overlay-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(17, 24, 39, 0.32);
+  z-index: var(--z-overlay-backdrop);
+  animation: ledger-fade-in var(--dur-base) var(--ease-out);
+}
+
+// --- Overlay form panel (exam form, future modals) -----------------------
+// Floats above the page with the one elevation step that reads as lifted.
+.form-panel {
+  position: fixed;
+  inset-block: 0;
+  inset-inline-start: 0;   // RTL-native: settles in from the start edge (right)
+  width: min(560px, 100%);
+  background: var(--pure-white);
+  box-shadow: var(--shadow-overlay);
+  padding: var(--space-lg);
+  overflow-y: auto;
+  z-index: var(--z-overlay);
+  animation: ledger-rise-in var(--dur-slow) var(--ease-out);
+}
+
+.form-panel-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-md);
+  margin-bottom: var(--space-lg);
+  padding-bottom: var(--space-md);
+  border-bottom: 1px solid var(--hairline-grey);
+}
+
+.form-panel-header h3 {
+  margin: 0;
+}
+
+.form-panel-header button {
+  background-color: var(--pure-white);
+  color: var(--authority-blue);
+  border-color: var(--authority-blue);
+}
+
+.form-panel-header button:hover:not(:disabled) {
+  background-color: var(--authority-blue-tint);
+  color: var(--authority-blue-deep);
+}
+
+// --- Status badges -------------------------------------------------------
+// A dark shade of the badge's own hue on a pale wash of the same hue.
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-xs);
+  font-size: var(--fs-label);
+  font-weight: var(--fw-semibold);
+  line-height: var(--lh-label);
+  letter-spacing: 0.02em;
+  padding: 3px 10px;
+  border-radius: 999px;
+  white-space: nowrap;
+}
+
+.badge::before {
+  content: "";
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: currentColor;
+}
+
+.badge-neutral {
+  color: var(--slate-grey);
+  background: var(--slate-tint);
+}
+
+.badge-published,
+.badge-active,
+.badge-success {
+  color: #0a7d5a;               // darker shade of confirm-green for AA on tint
+  background: var(--confirm-green-tint);
+}
+
+.badge-info {
+  color: var(--authority-blue-deep);
+  background: var(--authority-blue-tint);
+}
+
+.badge-warning,
+.badge-closed {
+  color: #9a6200;               // darker shade of caution-amber for AA on tint
+  background: var(--caution-amber-tint);
+}
+
+.badge-danger,
+.badge-archived {
+  color: #b42318;               // darker shade of alert-red for AA on tint
+  background: var(--alert-red-tint);
+}
+
+// --- Page-level banner error (publish shortfall, save failures) ----------
+.banner-error {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-sm);
+  color: #b42318;
+  background: var(--alert-red-tint);
+  border-radius: var(--radius-md);
+  padding: var(--space-sm) var(--space-md);
+  font-size: var(--fs-body);
+  font-weight: var(--fw-semibold);
+  animation: ledger-rise-in var(--dur-base) var(--ease-out);
+}
