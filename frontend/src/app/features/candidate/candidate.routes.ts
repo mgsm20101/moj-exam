@@ -16,7 +16,7 @@ export const candidateRoutes: Routes = [
       },
       {
         path: 'attempt',
-        loadComponent: () => import('./attempt-shell.component').then(m => m.AttemptShellComponent)
+        loadComponent: () => import('./attempt-player.component').then(m => m.AttemptPlayerComponent)
       }
     ]
   }

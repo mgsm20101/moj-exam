@@ -1,0 +1,40 @@
+<app-result *ngIf="result" [result]="result"></app-result>
+
+<div class="candidate-card" *ngIf="!result">
+  <div class="candidate-state" *ngIf="loading">جارٍ التحميل…</div>
+
+  <ng-container *ngIf="!loading && state && current">
+    <div class="player-bar">
+      <span class="player-timer" [class.low]="remainingSeconds < 60">
+        {{ (remainingSeconds / 60) | number: '1.0-0' }}:{{ (remainingSeconds % 60) | number: '2.0-0' }}
+      </span>
+      <button type="button" class="btn-ghost" (click)="toggleFlag()">
+        {{ current.isFlagged ? 'إلغاء التعليم' : 'تعليم للمراجعة' }}
+      </button>
+    </div>
+
+    <app-question-view [question]="current"
+                       (optionSelected)="selectOption($event)"
+                       (textChanged)="changeText()"></app-question-view>
+
+    <div class="player-bar">
+      <div class="player-actions">
+        <button type="button" class="btn-ghost" (click)="prev()" [disabled]="currentIndex === 0">السابق</button>
+        <button type="button" class="btn-ghost" (click)="next()"
+                [disabled]="currentIndex === state.questions.length - 1">التالي</button>
+      </div>
+      <button type="button" class="btn-primary" style="width:auto" (click)="askConfirm()">تسليم</button>
+    </div>
+
+    <app-question-navigator [questions]="state.questions" [currentIndex]="currentIndex"
+                            (jump)="go($event)"></app-question-navigator>
+  </ng-container>
+
+  <div class="candidate-state" *ngIf="confirming">
+    <p>لديك <strong>{{ unansweredCount }}</strong> سؤالاً بدون إجابة. هل تريد التسليم النهائي؟</p>
+    <button type="button" class="btn-primary" (click)="doSubmit()" [disabled]="submitting">
+      {{ submitting ? 'جارٍ التسليم…' : 'تأكيد التسليم' }}
+    </button>
+    <button type="button" class="btn-ghost" (click)="cancelConfirm()">رجوع</button>
+  </div>
+</div>
