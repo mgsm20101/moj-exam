@@ -81,7 +81,8 @@ public class StartAttemptCommandHandler : IRequestHandler<StartAttemptCommand, R
             e => e.ExamId == exam.Id && e.CandidateId == candidate.Id && e.Status == WaitingQueueStatus.Called,
             cancellationToken);
 
-        if (called is not null || capacity.Available > 0)
+        // FR-8.7: in Manual mode only admin-Called candidates may enter; free capacity alone is not a ticket.
+        if (called is not null || (exam.QueueMode == QueueMode.Auto && capacity.Available > 0))
         {
             var created = await CreateAttemptAsync(exam, candidate.Id, now, cancellationToken);
             if (!created.IsSuccess)

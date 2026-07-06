@@ -93,4 +93,35 @@ public class StartAttemptQueueingTests
 
         Assert.Single(db.WaitingQueueEntries); // no duplicate queue entry
     }
+
+    [Fact]
+    public async Task Start_ManualMode_WithFreeCapacity_StillQueues()
+    {
+        var (db, exam) = await SeedAsync(max: 20);
+        exam.QueueMode = QueueMode.Manual;
+        await db.SaveChangesAsync(CancellationToken.None);
+
+        var result = await Handler(db).Handle(new StartAttemptCommand(exam.Id, "احمد محمد علي حسن", Nid, "01012345678"), CancellationToken.None);
+
+        Assert.Equal("Queued", result.Value!.Outcome);
+        Assert.Equal(1, result.Value.QueuePosition);
+        Assert.Empty(db.ExamAttempts);
+    }
+
+    [Fact]
+    public async Task Start_ManualMode_CalledCandidate_Starts()
+    {
+        var (db, exam) = await SeedAsync(max: 20);
+        exam.QueueMode = QueueMode.Manual;
+        await db.SaveChangesAsync(CancellationToken.None);
+
+        // enqueue, then the admin opens a batch of 1
+        await Handler(db).Handle(new StartAttemptCommand(exam.Id, "احمد محمد علي حسن", Nid, "01012345678"), CancellationToken.None);
+        await new QueueReconciler(db).CallNextBatchAsync(exam.Id, 1, CancellationToken.None);
+
+        var retry = await Handler(db).Handle(new StartAttemptCommand(exam.Id, "احمد محمد علي حسن", Nid, "01012345678"), CancellationToken.None);
+
+        Assert.Equal("Started", retry.Value!.Outcome);
+        Assert.Equal(WaitingQueueStatus.Started, db.WaitingQueueEntries.Single().Status);
+    }
 }
