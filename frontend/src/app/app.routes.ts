@@ -41,6 +41,11 @@ export const routes: Routes = [
         path: 'exams',
         loadComponent: () =>
           import('./features/admin/exams/exams-list.component').then(m => m.ExamsListComponent)
+      },
+      {
+        path: 'reports',
+        loadComponent: () =>
+          import('./features/admin/reports/exam-results-report.component').then(m => m.ExamResultsReportComponent)
       }
     ]
   }

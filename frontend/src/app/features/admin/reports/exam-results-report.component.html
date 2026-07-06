@@ -1,0 +1,103 @@
+<div class="reports-page">
+  <div class="header">
+    <h2>تقارير النتائج</h2>
+  </div>
+
+  <div class="banner-error" *ngIf="errorMessage" role="alert">{{ errorMessage }}</div>
+
+  <div class="report-controls">
+    <label class="field">
+      <span>الامتحان</span>
+      <select (change)="onExamChange($any($event.target).value)">
+        <option value="">— اختر امتحاناً —</option>
+        <option *ngFor="let exam of reportableExams()" [value]="exam.id" [selected]="exam.id === selectedExamId()">
+          {{ exam.name }}
+        </option>
+      </select>
+    </label>
+
+    <button
+      type="button"
+      class="export-button"
+      (click)="exportExcel()"
+      [disabled]="!report() || exporting() || report()!.summary.totalCandidates === 0">
+      {{ exporting() ? 'جارٍ التصدير…' : 'تصدير Excel' }}
+    </button>
+  </div>
+
+  <ng-container *ngIf="report() as r">
+    <div class="stat-cards">
+      <div class="stat-card">
+        <span class="stat-label">إجمالي المتقدمين</span>
+        <span class="stat-value">{{ r.summary.totalCandidates }}</span>
+      </div>
+      <div class="stat-card stat-pass">
+        <span class="stat-label">عدد الناجحين</span>
+        <span class="stat-value">{{ r.summary.passedCount }}</span>
+      </div>
+      <div class="stat-card stat-fail">
+        <span class="stat-label">عدد الراسبين</span>
+        <span class="stat-value">{{ r.summary.failedCount }}</span>
+      </div>
+      <div class="stat-card">
+        <span class="stat-label">نسبة النجاح</span>
+        <span class="stat-value">{{ r.summary.passRatePercentage }}%</span>
+      </div>
+    </div>
+
+    <p class="muted pass-mark-note">
+      النهاية العظمى {{ r.totalPoints }} — درجة النجاح {{ r.passMarkPoints }} ({{ r.passMarkPercentage }}%)
+    </p>
+
+    <div class="filter-chips" role="tablist" aria-label="تصفية النتائج">
+      <button
+        *ngFor="let f of filters"
+        type="button"
+        role="tab"
+        class="chip"
+        [class.chip-active]="filter() === f.value"
+        [attr.aria-selected]="filter() === f.value"
+        (click)="setFilter(f.value)">
+        {{ f.label }}
+      </button>
+    </div>
+
+    <table class="results-table">
+      <thead>
+        <tr>
+          <th>الاسم</th>
+          <th>الرقم القومي</th>
+          <th>رقم الجوال</th>
+          <th>الدرجة</th>
+          <th>النسبة</th>
+          <th>النتيجة</th>
+          <th>وقت التسليم</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let row of r.rows">
+          <td>{{ row.fullName }}</td>
+          <td>{{ row.nationalId }}</td>
+          <td>{{ row.mobileNumber }}</td>
+          <td>{{ row.score }} / {{ row.totalPoints }}</td>
+          <td>{{ row.scorePercentage }}%</td>
+          <td>
+            <span class="badge" [ngClass]="row.passed ? 'badge-success' : 'badge-danger'">
+              {{ row.passed ? 'ناجح' : 'راسب' }}
+            </span>
+          </td>
+          <td>{{ row.submittedAtUtc | date: 'short' }}</td>
+        </tr>
+        <tr *ngIf="r.rows.length === 0">
+          <td colspan="7" class="table-empty">
+            {{ r.summary.totalCandidates === 0 ? 'لا يوجد متقدمون لهذا الامتحان بعد.' : 'لا توجد نتائج مطابقة لهذا التصفية.' }}
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </ng-container>
+
+  <div class="table-empty select-prompt" *ngIf="!report() && !loading()">
+    اختر امتحاناً لعرض تقرير نتائجه.
+  </div>
+</div>
