@@ -3,6 +3,7 @@ using ExamSystem.Infrastructure.Files;
 using ExamSystem.Infrastructure.Identity;
 using ExamSystem.Infrastructure.Grading;
 using ExamSystem.Infrastructure.Persistence;
+using ExamSystem.Infrastructure.Queue;
 using ExamSystem.Infrastructure.Selection;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -42,6 +43,7 @@ public static class DependencyInjection
         services.AddScoped<IExcelQuestionParser, ClosedXmlQuestionParser>();
         services.AddScoped<IQuestionSelectionService, QuestionSelectionService>();
         services.AddScoped<IAttemptGradingService, AttemptGradingService>();
+        services.AddScoped<IQueueReconciler, QueueReconciler>();
 
         return services;
     }
