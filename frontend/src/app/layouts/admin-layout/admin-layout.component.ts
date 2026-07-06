@@ -13,6 +13,7 @@ import { RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
         <a routerLink="/admin/topics" routerLinkActive="active">الموضوعات</a>
         <a routerLink="/admin/questions" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }">بنك الأسئلة</a>
         <a routerLink="/admin/questions/import" routerLinkActive="active">استيراد بالجملة</a>
+        <a routerLink="/admin/exams" routerLinkActive="active">الامتحانات</a>
       </nav>
       <main class="admin-content">
         <router-outlet />
