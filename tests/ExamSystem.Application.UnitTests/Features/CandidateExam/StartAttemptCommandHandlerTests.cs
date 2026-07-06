@@ -27,6 +27,9 @@ public class StartAttemptCommandHandlerTests
         // No queue in these tests: capacity is always available.
         public Task<Common.Models.QueueCapacity> ReconcileAsync(Guid examId, CancellationToken ct)
             => Task.FromResult(new Common.Models.QueueCapacity(20, 0, 0));
+
+        public Task<int> CallNextBatchAsync(Guid examId, int maxToCall, CancellationToken ct)
+            => Task.FromResult(0);
     }
 
     private static Question Mcq(Guid topicId) => new()
