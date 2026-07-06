@@ -64,5 +64,13 @@ public class CandidateAttemptController : ControllerBase
         return result.IsSuccess ? Ok(result.Value) : NotFound(new { errors = result.Errors });
     }
 
+    [HttpPost("tab-switch")]
+    public async Task<IActionResult> TabSwitch(Guid examId, CancellationToken cancellationToken)
+    {
+        if (Resolve(examId, out var attemptId) is { } forbid) return forbid;
+        await _sender.Send(new RecordTabSwitchCommand(attemptId), cancellationToken);
+        return NoContent();
+    }
+
     public record SaveAnswerRequest(Guid AttemptQuestionId, Guid? SelectedOptionId, string? AnswerText, bool IsFlagged);
 }
