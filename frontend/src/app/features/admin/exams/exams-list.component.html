@@ -29,6 +29,13 @@
           <span class="badge" [ngClass]="statusBadge(exam.status)">
             {{ statusLabel(exam.status) }}
           </span>
+          <span
+            class="badge badge-live"
+            *ngIf="exam.status === 'Published' && liveFor(exam.id) as lc"
+            [title]="'محجوز (تم استدعاؤهم): ' + lc.reservedCalled"
+          >
+            نشطون {{ lc.activeAttempts }}/{{ lc.maxConcurrentAttempts }} · طابور {{ lc.waitingCount }}
+          </span>
         </td>
         <td class="actions">
           <button type="button" (click)="openEditForm(exam.id)" [disabled]="exam.status !== 'Draft'">تعديل</button>

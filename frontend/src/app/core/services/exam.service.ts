@@ -55,6 +55,14 @@ export interface ExamDetail extends ExamInput {
   topicSelections: ExamTopicSelectionDto[];
 }
 
+export interface ExamLiveCounts {
+  examId: string;
+  activeAttempts: number;
+  maxConcurrentAttempts: number;
+  reservedCalled: number;
+  waitingCount: number;
+}
+
 @Injectable({ providedIn: 'root' })
 export class ExamService {
   private readonly baseUrl = `${environment.apiBaseUrl}/admin/exams`;
@@ -95,5 +103,9 @@ export class ExamService {
 
   clone(id: string): Observable<{ id: string }> {
     return this.http.post<{ id: string }>(`${this.baseUrl}/${id}/clone`, null);
+  }
+
+  getLiveCounts(): Observable<ExamLiveCounts[]> {
+    return this.http.get<ExamLiveCounts[]>(`${this.baseUrl}/live-counts`);
   }
 }

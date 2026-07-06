@@ -1,7 +1,8 @@
-import { Component, OnInit, signal } from '@angular/core';
+import { Component, DestroyRef, OnInit, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { Observable } from 'rxjs';
-import { ExamDetail, ExamInput, ExamService, ExamSummary } from '../../../core/services/exam.service';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { EMPTY, Observable, catchError, switchMap, timer } from 'rxjs';
+import { ExamDetail, ExamInput, ExamLiveCounts, ExamService, ExamSummary } from '../../../core/services/exam.service';
 import { Topic, TopicService } from '../../../core/services/topic.service';
 import { ExamFormComponent } from './exam-form.component';
 
@@ -17,6 +18,16 @@ export class ExamsListComponent implements OnInit {
   editingExam = signal<ExamDetail | null>(null);
   isFormOpen = signal(false);
   errorMessage: string | null = null;
+
+  /** Live batch-gate counts per Published exam id (FR-8.8), refreshed by polling. */
+  liveCounts = signal<Map<string, ExamLiveCounts>>(new Map());
+
+  private static readonly LIVE_COUNTS_POLL_MS = 15_000;
+  private readonly destroyRef = inject(DestroyRef);
+
+  liveFor(examId: string): ExamLiveCounts | undefined {
+    return this.liveCounts().get(examId);
+  }
 
   private readonly statusMeta: Record<string, { label: string; badge: string } | undefined> = {
     Draft: { label: 'مسودة', badge: 'badge-neutral' },
@@ -75,6 +86,16 @@ export class ExamsListComponent implements OnInit {
   ngOnInit(): void {
     this.topicService.getAll().subscribe(topics => this.topics.set(topics));
     this.load();
+
+    // FR-8.8: poll live counts; on error keep last values — the next tick retries.
+    timer(0, ExamsListComponent.LIVE_COUNTS_POLL_MS)
+      .pipe(
+        switchMap(() => this.examService.getLiveCounts().pipe(catchError(() => EMPTY))),
+        takeUntilDestroyed(this.destroyRef)
+      )
+      .subscribe(counts =>
+        this.liveCounts.set(new Map(counts.map(c => [c.examId, c])))
+      );
   }
 
   load(): void {

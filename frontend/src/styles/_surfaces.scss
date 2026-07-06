@@ -116,6 +116,13 @@
   background: var(--alert-red-tint);
 }
 
+.badge-live {
+  margin-inline-start: var(--space-xs);
+  color: var(--authority-blue-deep);
+  background: var(--authority-blue-tint);
+  font-variant-numeric: tabular-nums;
+}
+
 // --- Page-level banner error (publish shortfall, save failures) ----------
 .banner-error {
   display: flex;
