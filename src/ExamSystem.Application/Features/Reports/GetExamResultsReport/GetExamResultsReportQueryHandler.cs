@@ -58,7 +58,10 @@ public class GetExamResultsReportQueryHandler
             {
                 candidates.TryGetValue(a.CandidateId, out var candidate);
                 var score = a.Score ?? 0m;
-                var percentage = totalPoints > 0m ? Math.Round(score / totalPoints * 100m, 2) : 0m;
+                // 'passed' uses the exact (unrounded) grading formula; the displayed percentage is
+                // floored to 2 decimals so it can never round UP across the pass line and show, say,
+                // "60%" next to a failed badge.
+                var percentage = totalPoints > 0m ? Math.Truncate(score / totalPoints * 10000m) / 100m : 0m;
                 var passed = totalPoints > 0m && score / totalPoints * 100m >= exam.PassMarkPercentage;
 
                 return new ExamResultRow(

@@ -32,7 +32,7 @@ public class ClosedXmlReportWriter : IExcelReportWriter
 
         var pairs = new (string Label, XLCellValue Value)[]
         {
-            ("الامتحان", report.ExamName),
+            ("الامتحان", Neutralize(report.ExamName)),
             ("النهاية العظمى", report.TotalPoints),
             ("نسبة النجاح %", report.PassMarkPercentage),
             ("درجة النجاح", report.PassMarkPoints),
@@ -69,9 +69,11 @@ public class ClosedXmlReportWriter : IExcelReportWriter
         var rowIndex = 2;
         foreach (var row in report.Rows)
         {
-            sheet.Cell(rowIndex, 1).Value = row.FullName;
-            sheet.Cell(rowIndex, 2).Value = row.NationalId;
-            sheet.Cell(rowIndex, 3).Value = row.MobileNumber;
+            // Neutralize any candidate-sourced text so a leading =,+,-,@ can't become a live formula
+            // if the admin re-saves/exports the sheet as CSV (OWASP CSV/formula injection).
+            sheet.Cell(rowIndex, 1).Value = Neutralize(row.FullName);
+            sheet.Cell(rowIndex, 2).Value = Neutralize(row.NationalId);
+            sheet.Cell(rowIndex, 3).Value = Neutralize(row.MobileNumber);
             sheet.Cell(rowIndex, 4).Value = row.Score;
             sheet.Cell(rowIndex, 5).Value = row.TotalPoints;
             sheet.Cell(rowIndex, 6).Value = row.ScorePercentage;
@@ -88,4 +90,13 @@ public class ClosedXmlReportWriter : IExcelReportWriter
 
         sheet.Columns().AdjustToContents();
     }
+
+    /// <summary>
+    /// Prefixes a single quote to any value starting with a spreadsheet formula trigger so it is always
+    /// treated as text, even after a downstream CSV re-export. See OWASP "CSV Injection".
+    /// </summary>
+    private static string Neutralize(string value) =>
+        !string.IsNullOrEmpty(value) && value[0] is '=' or '+' or '-' or '@' or '\t' or '\r'
+            ? "'" + value
+            : value;
 }

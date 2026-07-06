@@ -50,7 +50,7 @@ public class GetExamResultsReportQueryHandlerTests
     }
 
     private static ExamAttempt AddAttempt(ApplicationDbContext db, Exam exam, Candidate candidate, decimal score,
-        ExamAttemptStatus status = ExamAttemptStatus.Submitted, DateTime? submittedAt = null)
+        ExamAttemptStatus status = ExamAttemptStatus.Submitted, DateTime? submittedAt = null, int tabSwitchCount = 0)
     {
         var attempt = new ExamAttempt
         {
@@ -60,7 +60,8 @@ public class GetExamResultsReportQueryHandlerTests
             ExpiresAtUtc = DateTime.UtcNow.AddMinutes(30),
             SubmittedAtUtc = submittedAt ?? DateTime.UtcNow,
             Status = status,
-            Score = score
+            Score = score,
+            TabSwitchCount = tabSwitchCount
         };
         db.ExamAttempts.Add(attempt);
         return attempt;
@@ -161,6 +162,77 @@ public class GetExamResultsReportQueryHandlerTests
         var report = result.Value!;
         Assert.Equal(1, report.Summary.TotalCandidates); // only the AutoSubmitted attempt counts
         Assert.Equal("AutoSubmitted", Assert.Single(report.Rows).FullName);
+    }
+
+    [Fact]
+    public async Task Handle_TieOnScore_PicksTheLaterSubmittedAttempt()
+    {
+        var (db, exam) = SeedExam();
+        var candidate = AddCandidate(db, "Retaker", "29001010100011");
+        // Same best score, different submission times + a distinguishing TabSwitchCount.
+        AddAttempt(db, exam, candidate, score: 50m, submittedAt: DateTime.UtcNow.AddMinutes(-20), tabSwitchCount: 9);
+        AddAttempt(db, exam, candidate, score: 50m, submittedAt: DateTime.UtcNow.AddMinutes(-5), tabSwitchCount: 3);
+        await db.SaveChangesAsync(CancellationToken.None);
+
+        var handler = new GetExamResultsReportQueryHandler(db);
+        var result = await handler.Handle(new GetExamResultsReportQuery(exam.Id), CancellationToken.None);
+
+        var row = Assert.Single(result.Value!.Rows);
+        Assert.Equal(3, row.TabSwitchCount); // the later-submitted attempt won the tie
+    }
+
+    [Fact]
+    public async Task Handle_ExamWithNoCompletedAttempts_ReturnsEmptySuccessReport()
+    {
+        var (db, exam) = SeedExam();
+        // Only an in-progress attempt exists -> excluded -> zero completed candidates.
+        AddAttempt(db, exam, AddCandidate(db, "InProgress", "29001010100011"), score: 70m, status: ExamAttemptStatus.InProgress);
+        await db.SaveChangesAsync(CancellationToken.None);
+
+        var handler = new GetExamResultsReportQueryHandler(db);
+        var result = await handler.Handle(new GetExamResultsReportQuery(exam.Id), CancellationToken.None);
+
+        Assert.True(result.IsSuccess);
+        var report = result.Value!;
+        Assert.Equal(0, report.Summary.TotalCandidates);
+        Assert.Equal(0m, report.Summary.PassRatePercentage); // division-by-zero guard
+        Assert.Empty(report.Rows);
+    }
+
+    [Fact]
+    public async Task Handle_AllFailed_ReportsZeroPassRate()
+    {
+        var (db, exam) = SeedExam();
+        AddAttempt(db, exam, AddCandidate(db, "F1", "29001010100011"), score: 10m);
+        AddAttempt(db, exam, AddCandidate(db, "F2", "29001010100012"), score: 20m);
+        await db.SaveChangesAsync(CancellationToken.None);
+
+        var handler = new GetExamResultsReportQueryHandler(db);
+        var result = await handler.Handle(new GetExamResultsReportQuery(exam.Id), CancellationToken.None);
+
+        var summary = result.Value!.Summary;
+        Assert.Equal(2, summary.TotalCandidates);
+        Assert.Equal(0, summary.PassedCount);
+        Assert.Equal(2, summary.FailedCount);
+        Assert.Equal(0m, summary.PassRatePercentage);
+    }
+
+    [Fact]
+    public async Task Handle_PassRate_IsRoundedToTwoDecimals()
+    {
+        var (db, exam) = SeedExam();
+        AddAttempt(db, exam, AddCandidate(db, "P1", "29001010100011"), score: 60m); // pass
+        AddAttempt(db, exam, AddCandidate(db, "F1", "29001010100012"), score: 10m); // fail
+        AddAttempt(db, exam, AddCandidate(db, "F2", "29001010100013"), score: 20m); // fail
+        await db.SaveChangesAsync(CancellationToken.None);
+
+        var handler = new GetExamResultsReportQueryHandler(db);
+        var result = await handler.Handle(new GetExamResultsReportQuery(exam.Id), CancellationToken.None);
+
+        var summary = result.Value!.Summary;
+        Assert.Equal(1, summary.PassedCount);
+        Assert.Equal(2, summary.FailedCount);
+        Assert.Equal(33.33m, summary.PassRatePercentage); // 1/3 -> 33.33
     }
 
     [Fact]

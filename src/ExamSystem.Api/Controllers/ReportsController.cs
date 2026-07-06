@@ -1,3 +1,4 @@
+using System.Text.RegularExpressions;
 using ExamSystem.Application.Common.Interfaces;
 using ExamSystem.Application.Features.Reports.GetExamResultsReport;
 using MediatR;
@@ -54,9 +55,16 @@ public class ReportsController : ControllerBase
     private static ResultsFilter ParseFilter(string? filter) =>
         Enum.TryParse<ResultsFilter>(filter, ignoreCase: true, out var parsed) ? parsed : ResultsFilter.All;
 
+    // OS-independent deny-list (Path.GetInvalidFileNameChars() returns only { '\0', '/' } on Linux/containers).
+    private static readonly Regex UnsafeFileNameChars = new(@"[\\/:*?""<>|\x00-\x1F]", RegexOptions.Compiled);
+
     private static string Sanitize(string name)
     {
-        var cleaned = string.Join("_", name.Split(Path.GetInvalidFileNameChars(), StringSplitOptions.RemoveEmptyEntries));
-        return string.IsNullOrWhiteSpace(cleaned) ? "exam" : cleaned.Trim();
+        var cleaned = UnsafeFileNameChars.Replace(name, "_").Trim().Trim('.', ' ');
+        if (cleaned.Length > 100)
+        {
+            cleaned = cleaned[..100];
+        }
+        return string.IsNullOrWhiteSpace(cleaned) ? "exam" : cleaned;
     }
 }

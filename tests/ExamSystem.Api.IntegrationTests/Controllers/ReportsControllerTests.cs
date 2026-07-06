@@ -1,6 +1,7 @@
 using System.Net;
 using System.Net.Http.Headers;
 using System.Net.Http.Json;
+using ClosedXML.Excel;
 using Xunit;
 
 namespace ExamSystem.Api.IntegrationTests.Controllers;
@@ -99,6 +100,63 @@ public class ReportsControllerTests : IClassFixture<TestWebApplicationFactory>
         // .xlsx is a ZIP archive -> starts with "PK".
         Assert.Equal((byte)'P', bytes[0]);
         Assert.Equal((byte)'K', bytes[1]);
+    }
+
+    [Fact]
+    public async Task Results_Filter_ParsesCaseInsensitively_AndFallsBackToAllOnGarbage()
+    {
+        var admin = await _factory.CreateAuthenticatedAdminClientAsync();
+        var examId = await CreatePublishedExamAsync(admin);
+        await TakeAndPassAsync(examId); // one passer, zero failers
+
+        var passed = await (await admin.GetAsync($"/api/admin/reports/exams/{examId}/results?filter=PASSED"))
+            .Content.ReadFromJsonAsync<ReportResponse>();
+        Assert.Single(passed!.Rows);                       // case-insensitive parse -> Passed
+        Assert.Equal(1, passed.Summary.TotalCandidates);
+
+        var failed = await (await admin.GetAsync($"/api/admin/reports/exams/{examId}/results?filter=failed"))
+            .Content.ReadFromJsonAsync<ReportResponse>();
+        Assert.Empty(failed!.Rows);                        // no failers
+        Assert.Equal(1, failed.Summary.TotalCandidates);   // summary unchanged by the filter
+
+        var garbage = await admin.GetAsync($"/api/admin/reports/exams/{examId}/results?filter=not-a-filter");
+        Assert.Equal(HttpStatusCode.OK, garbage.StatusCode); // unparseable -> falls back to All (no 400/500)
+        var garbageBody = await garbage.Content.ReadFromJsonAsync<ReportResponse>();
+        Assert.Single(garbageBody!.Rows);
+    }
+
+    [Fact]
+    public async Task Export_WorkbookContainsTheCandidateRowAndPassLabel()
+    {
+        var admin = await _factory.CreateAuthenticatedAdminClientAsync();
+        var examId = await CreatePublishedExamAsync(admin);
+        await TakeAndPassAsync(examId);
+
+        var bytes = await (await admin.GetAsync($"/api/admin/reports/exams/{examId}/results/export")).Content.ReadAsByteArrayAsync();
+
+        using var stream = new MemoryStream(bytes);
+        using var workbook = new XLWorkbook(stream);
+        var results = workbook.Worksheet("النتائج");
+        var cells = results.RangeUsed()!.Cells().Select(c => c.GetString()).ToList();
+        Assert.Contains("29912310123404", cells); // the candidate's national ID
+        Assert.Contains("ناجح", cells);            // the pass label
+        Assert.NotNull(workbook.Worksheet("الملخص")); // summary sheet exists
+    }
+
+    [Fact]
+    public async Task Export_WithFailedFilter_WritesHeaderOnly_WhenThereAreNoFailers()
+    {
+        var admin = await _factory.CreateAuthenticatedAdminClientAsync();
+        var examId = await CreatePublishedExamAsync(admin);
+        await TakeAndPassAsync(examId); // one passer, zero failers
+
+        var bytes = await (await admin.GetAsync($"/api/admin/reports/exams/{examId}/results/export?filter=failed")).Content.ReadAsByteArrayAsync();
+
+        using var stream = new MemoryStream(bytes);
+        using var workbook = new XLWorkbook(stream);
+        var results = workbook.Worksheet("النتائج");
+        // Only the header row is present -> the failed filter reached the export.
+        Assert.Equal(1, results.RangeUsed()!.RowCount());
     }
 
     [Fact]
