@@ -1,6 +1,7 @@
 using ExamSystem.Application.Common.Interfaces;
 using ExamSystem.Infrastructure.Files;
 using ExamSystem.Infrastructure.Identity;
+using ExamSystem.Infrastructure.BackgroundJobs;
 using ExamSystem.Infrastructure.Grading;
 using ExamSystem.Infrastructure.Persistence;
 using ExamSystem.Infrastructure.Queue;
@@ -44,6 +45,7 @@ public static class DependencyInjection
         services.AddScoped<IQuestionSelectionService, QuestionSelectionService>();
         services.AddScoped<IAttemptGradingService, AttemptGradingService>();
         services.AddScoped<IQueueReconciler, QueueReconciler>();
+        services.AddScoped<IExpiredAttemptCloser, ExpiredAttemptCloser>();
 
         return services;
     }
