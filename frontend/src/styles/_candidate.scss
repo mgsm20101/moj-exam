@@ -1,0 +1,65 @@
+// Candidate surface — calm, focused, Ministry-of-Justice identity.
+// Distinct from the admin "Official Ledger"; layered on the shared base tokens.
+.candidate-surface {
+  --judicial-green: #0f5c4a;      // primary action (complements the emblem's gold/laurel)
+  --judicial-green-deep: #0b4438;
+  --judicial-gold: #b8912f;       // identity accent ONLY (hairline / emblem frame), never text/buttons
+  --candidate-bg: #f7f6f2;        // soft off-white canvas
+  --candidate-ink: #1a1a1a;
+
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background: var(--candidate-bg);
+  color: var(--candidate-ink);
+  padding: var(--space-xl) var(--space-md);
+}
+
+.candidate-card {
+  width: min(560px, 100%);
+  background: var(--pure-white);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-resting);
+  padding: var(--space-2xl) var(--space-xl);
+  animation: ledger-rise-in var(--dur-slow) var(--ease-out);
+}
+
+.candidate-header {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-sm);
+  text-align: center;
+  padding-bottom: var(--space-lg);
+  margin-bottom: var(--space-lg);
+  border-bottom: 2px solid var(--judicial-gold);
+}
+
+.candidate-header img { width: 96px; height: 96px; object-fit: contain; }
+.candidate-header .org { color: var(--slate-grey); font-size: var(--fs-body); line-height: 1.7; }
+.candidate-header .exam-title { font-size: var(--fs-headline); font-weight: var(--fw-bold); }
+
+.candidate-surface .btn-primary {
+  width: 100%;
+  background: var(--judicial-green);
+  color: var(--pure-white);
+  border: none;
+  border-radius: var(--radius-md);
+  padding: 14px 20px;
+  font-size: var(--fs-title);
+  font-weight: var(--fw-semibold);
+  cursor: pointer;
+  transition: background-color var(--dur-fast) var(--ease-out);
+}
+.candidate-surface .btn-primary:hover:not(:disabled) { background: var(--judicial-green-deep); }
+.candidate-surface .btn-primary:disabled { opacity: 0.5; cursor: not-allowed; }
+
+.candidate-state {
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md);
+  padding: var(--space-lg) 0;
+}
