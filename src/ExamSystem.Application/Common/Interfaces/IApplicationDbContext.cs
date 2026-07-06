@@ -1,3 +1,5 @@
+using ExamSystem.Domain.Attempts;
+using ExamSystem.Domain.Candidates;
 using ExamSystem.Domain.Exams;
 using ExamSystem.Domain.Questions;
 using ExamSystem.Domain.Topics;
@@ -12,6 +14,12 @@ public interface IApplicationDbContext
     DbSet<QuestionOption> QuestionOptions { get; }
     DbSet<Exam> Exams { get; }
     DbSet<ExamTopicSelection> ExamTopicSelections { get; }
+
+    DbSet<Candidate> Candidates { get; }
+    DbSet<CandidateExamAttemptGrant> CandidateExamAttemptGrants { get; }
+    DbSet<ExamAttempt> ExamAttempts { get; }
+    DbSet<AttemptQuestion> AttemptQuestions { get; }
+    DbSet<AttemptQuestionOption> AttemptQuestionOptions { get; }
 
     Task<int> SaveChangesAsync(CancellationToken cancellationToken);
 }

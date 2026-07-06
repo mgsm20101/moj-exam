@@ -1,4 +1,6 @@
 using ExamSystem.Application.Common.Interfaces;
+using ExamSystem.Domain.Attempts;
+using ExamSystem.Domain.Candidates;
 using ExamSystem.Domain.Common;
 using ExamSystem.Domain.Exams;
 using ExamSystem.Domain.Questions;
@@ -21,6 +23,12 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser>, IApplica
     public DbSet<QuestionOption> QuestionOptions => Set<QuestionOption>();
     public DbSet<Exam> Exams => Set<Exam>();
     public DbSet<ExamTopicSelection> ExamTopicSelections => Set<ExamTopicSelection>();
+
+    public DbSet<Candidate> Candidates => Set<Candidate>();
+    public DbSet<CandidateExamAttemptGrant> CandidateExamAttemptGrants => Set<CandidateExamAttemptGrant>();
+    public DbSet<ExamAttempt> ExamAttempts => Set<ExamAttempt>();
+    public DbSet<AttemptQuestion> AttemptQuestions => Set<AttemptQuestion>();
+    public DbSet<AttemptQuestionOption> AttemptQuestionOptions => Set<AttemptQuestionOption>();
 
     protected override void OnModelCreating(ModelBuilder builder)
     {
