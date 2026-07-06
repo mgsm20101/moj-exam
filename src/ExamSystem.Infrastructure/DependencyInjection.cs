@@ -33,8 +33,10 @@ public static class DependencyInjection
             .AddDefaultTokenProviders();
 
         services.Configure<JwtSettings>(configuration.GetSection(JwtSettings.SectionName));
+        services.Configure<AttemptTokenSettings>(configuration.GetSection(AttemptTokenSettings.SectionName));
         services.AddScoped<IIdentityService, IdentityService>();
         services.AddScoped<IJwtTokenGenerator, JwtTokenGenerator>();
+        services.AddScoped<IAttemptTokenGenerator, AttemptTokenGenerator>();
         services.AddScoped<IImageStorageService, LocalImageStorageService>();
         services.AddScoped<IExcelQuestionParser, ClosedXmlQuestionParser>();
         services.AddScoped<IQuestionSelectionService, QuestionSelectionService>();

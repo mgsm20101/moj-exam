@@ -26,7 +26,23 @@ builder.Services
         options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
         options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
     })
-    .AddJwtBearer();
+    .AddJwtBearer()
+    .AddJwtBearer("AttemptToken", options =>
+    {
+        var settings = builder.Configuration.GetSection(AttemptTokenSettings.SectionName).Get<AttemptTokenSettings>()
+                       ?? new AttemptTokenSettings();
+        options.TokenValidationParameters = new TokenValidationParameters
+        {
+            ValidateIssuer = true,
+            ValidateAudience = true,
+            ValidateLifetime = true,
+            ValidateIssuerSigningKey = true,
+            ValidIssuer = settings.Issuer,
+            ValidAudience = settings.Audience,
+            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(
+                string.IsNullOrWhiteSpace(settings.Key) ? new string('0', 32) : settings.Key))
+        };
+    });
 
 builder.Services.AddOptions<JwtBearerOptions>(JwtBearerDefaults.AuthenticationScheme)
     .Configure<IOptions<JwtSettings>>((bearerOptions, jwtSettingsOptions) =>

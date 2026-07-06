@@ -32,6 +32,9 @@ public class TestWebApplicationFactory : WebApplicationFactory<Program>, IAsyncL
                 ["Jwt:Key"] = "integration-test-signing-key-please-ignore-32chars",
                 ["Jwt:Issuer"] = "ExamSystem.Tests",
                 ["Jwt:Audience"] = "ExamSystem.Tests.Clients",
+                ["AttemptToken:Key"] = "integration-test-attempt-token-key-please-ignore-32chars",
+                ["AttemptToken:Issuer"] = "ExamSystem.Tests",
+                ["AttemptToken:Audience"] = "ExamSystem.Tests.Candidates",
                 ["SeedAdmin:UserName"] = "admin",
                 ["SeedAdmin:Password"] = SeedAdminPassword,
                 ["SeedAdmin:Email"] = "admin@examsystem.local"
