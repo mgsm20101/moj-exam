@@ -1,0 +1,22 @@
+<div class="candidate-card">
+  <div class="candidate-header">
+    <img src="assets/moj-logo.png" alt="شعار وزارة العدل" />
+    <div class="exam-title">تعليمات الامتحان</div>
+  </div>
+
+  <div class="candidate-state" *ngIf="landing">
+    <p>عدد الأسئلة: <strong>{{ landing.totalQuestionCount }}</strong></p>
+    <p>مدة الامتحان: <strong>{{ landing.durationMinutes }}</strong> دقيقة</p>
+    <ul style="text-align: start; line-height: 1.9;">
+      <li>يبدأ المؤقّت فور الضغط على «ابدأ الامتحان» ولا يتوقف.</li>
+      <li>تُحفظ إجاباتك تلقائياً؛ يمكنك استئناف الامتحان بنفس بياناتك إذا انقطع الاتصال.</li>
+      <li>عند انتهاء الوقت يُسلّم الامتحان تلقائياً.</li>
+    </ul>
+  </div>
+
+  <p class="field-error" *ngIf="error">{{ error }}</p>
+
+  <button class="btn-primary" type="button" (click)="start()" [disabled]="starting || !landing">
+    {{ starting ? 'جارٍ البدء…' : 'ابدأ الامتحان' }}
+  </button>
+</div>
