@@ -1,0 +1,45 @@
+<div class="candidate-card">
+  <div class="candidate-header">
+    <img src="assets/moj-logo.png" alt="شعار وزارة العدل" />
+    <div class="org">وزارة العدل — قطاع التطوير التقني ومركز المعلومات القضائي</div>
+    <div class="exam-title">{{ landing?.name || 'اختبار قياس المهارات الأساسية' }}</div>
+  </div>
+
+  <div class="candidate-state" *ngIf="loading">جارٍ التحميل…</div>
+
+  <div class="candidate-state" *ngIf="!loading && landing && !landing.isOpen">
+    هذا الامتحان غير متاح حالياً.
+  </div>
+
+  <div class="candidate-state" *ngIf="blockedMessage">{{ blockedMessage }}</div>
+
+  <form *ngIf="!loading && landing?.isOpen && !blockedMessage" [formGroup]="form" (ngSubmit)="submit()">
+    <div class="field">
+      <label for="fullName">الاسم رباعياً</label>
+      <input id="fullName" type="text" formControlName="fullName" autocomplete="name" />
+      <p class="field-error" *ngIf="form.controls.fullName.touched && form.controls.fullName.invalid">
+        ادخل الاسم رباعياً (٤ كلمات على الأقل).
+      </p>
+    </div>
+
+    <div class="field">
+      <label for="nationalId">الرقم القومي</label>
+      <input id="nationalId" type="text" inputmode="numeric" maxlength="14" formControlName="nationalId" />
+      <p class="field-error" *ngIf="form.controls.nationalId.touched && form.controls.nationalId.invalid">
+        الرقم القومي يجب أن يكون ١٤ رقماً صحيح البنية.
+      </p>
+    </div>
+
+    <div class="field">
+      <label for="mobileNumber">رقم الموبايل</label>
+      <input id="mobileNumber" type="text" inputmode="numeric" maxlength="11" formControlName="mobileNumber" />
+      <p class="field-error" *ngIf="form.controls.mobileNumber.touched && form.controls.mobileNumber.invalid">
+        رقم موبايل مصري صحيح (١١ رقماً يبدأ بـ 010/011/012/015).
+      </p>
+    </div>
+
+    <button class="btn-primary" type="submit" [disabled]="form.invalid || submitting">
+      {{ submitting ? 'جارٍ التحقّق…' : 'متابعة' }}
+    </button>
+  </form>
+</div>
