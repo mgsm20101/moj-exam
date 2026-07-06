@@ -3,7 +3,10 @@
     <h2>تقارير النتائج</h2>
   </div>
 
-  <div class="banner-error" *ngIf="errorMessage" role="alert">{{ errorMessage }}</div>
+  <div class="banner-error" *ngIf="errorMessage" role="alert">
+    <span>{{ errorMessage }}</span>
+    <button type="button" class="retry-link" *ngIf="selectedExamId()" (click)="retry()">إعادة المحاولة</button>
+  </div>
 
   <div class="report-controls">
     <label class="field">

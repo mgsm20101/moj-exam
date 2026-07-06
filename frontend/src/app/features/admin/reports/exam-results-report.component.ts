@@ -57,19 +57,33 @@ export class ExamResultsReportComponent implements OnInit {
     this.loadReport();
   }
 
+  /// Re-runs the current exam+filter load — used by the error banner's retry action, since
+  /// re-picking the same <option> does not re-fire (change).
+  retry(): void {
+    this.loadReport();
+  }
+
   private loadReport(): void {
-    const examId = this.selectedExamId();
-    if (!examId) {
+    const requestedExamId = this.selectedExamId();
+    const requestedFilter = this.filter();
+    if (!requestedExamId) {
       return;
     }
     this.loading.set(true);
     this.errorMessage = null;
-    this.reportService.getExamResults(examId, this.filter()).subscribe({
+    this.reportService.getExamResults(requestedExamId, requestedFilter).subscribe({
       next: report => {
+        // Ignore a stale response whose exam/filter was superseded by a newer selection.
+        if (this.selectedExamId() !== requestedExamId || this.filter() !== requestedFilter) {
+          return;
+        }
         this.report.set(report);
         this.loading.set(false);
       },
       error: () => {
+        if (this.selectedExamId() !== requestedExamId || this.filter() !== requestedFilter) {
+          return;
+        }
         this.loading.set(false);
         this.errorMessage = 'تعذّر تحميل التقرير.';
       }
