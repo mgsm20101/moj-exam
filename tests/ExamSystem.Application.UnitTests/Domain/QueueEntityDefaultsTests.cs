@@ -21,4 +21,11 @@ public class QueueEntityDefaultsTests
         Assert.Equal(WaitingQueueStatus.Waiting, entry.Status);
         Assert.NotEqual(System.Guid.Empty, entry.Id);
     }
+
+    [Fact]
+    public void ExamAttempt_Defaults_HaveZeroTabSwitches()
+    {
+        var attempt = new ExamSystem.Domain.Attempts.ExamAttempt();
+        Assert.Equal(0, attempt.TabSwitchCount);
+    }
 }
