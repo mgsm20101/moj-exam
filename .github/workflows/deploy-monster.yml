@@ -1,0 +1,75 @@
+name: Deploy to MonsterASP
+
+on:
+  push:
+    branches: [main]
+
+jobs:
+  deploy:
+    name: Build & Web Deploy (Angular + API)
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '8.0.x'
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+          cache-dependency-path: frontend/package-lock.json
+
+      - name: Restore .NET solution
+        run: dotnet restore ExamSystem.sln
+
+      - name: Install frontend dependencies
+        working-directory: frontend
+        run: npm ci
+
+      - name: Build Angular (production)
+        working-directory: frontend
+        run: npx ng build --configuration production
+
+      - name: Copy Angular build into API wwwroot
+        shell: pwsh
+        run: |
+          $dest = "src/ExamSystem.Api/wwwroot"
+          New-Item -ItemType Directory -Force -Path $dest | Out-Null
+          Copy-Item "frontend/dist/frontend/browser/*" $dest -Recurse -Force
+
+      - name: Publish & Web Deploy to MonsterASP
+        run: >
+          dotnet publish src/ExamSystem.Api/ExamSystem.Api.csproj
+          -c Release
+          /p:PublishProfile=Monster
+          /p:MSDeployServiceURL=${{ secrets.SERVER_COMPUTER_NAME }}
+          /p:DeployIisAppPath=${{ secrets.MONSTER_SITE_NAME }}
+          /p:UserName=${{ secrets.SERVER_USERNAME }}
+          /p:Password=${{ secrets.SERVER_PASSWORD }}
+
+  # Optional: apply pending EF Core migrations against the production database.
+  # Left as a separate, manually-triggered path on purpose — auto-running migrations
+  # on every push to main can be destructive if a migration ships with a mistake.
+  # Uncomment once you've verified migrations manually at least once.
+  #
+  # migrate-db:
+  #   name: Apply EF Core migrations
+  #   runs-on: ubuntu-latest
+  #   needs: deploy
+  #   steps:
+  #     - uses: actions/checkout@v4
+  #     - uses: actions/setup-dotnet@v4
+  #       with:
+  #         dotnet-version: '8.0.x'
+  #     - run: dotnet tool install --global dotnet-ef
+  #     - run: >
+  #         dotnet ef database update
+  #         --project src/ExamSystem.Infrastructure
+  #         --startup-project src/ExamSystem.Api
+  #         --connection "${{ secrets.MONSTER_DB_CONNECTION }}"
