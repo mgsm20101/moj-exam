@@ -4,6 +4,7 @@ using ExamSystem.Domain.Candidates;
 using ExamSystem.Domain.Common;
 using ExamSystem.Domain.Exams;
 using ExamSystem.Domain.Questions;
+using ExamSystem.Domain.Queue;
 using ExamSystem.Domain.Topics;
 using ExamSystem.Infrastructure.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
@@ -30,6 +31,7 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser>, IApplica
     public DbSet<AttemptQuestion> AttemptQuestions => Set<AttemptQuestion>();
     public DbSet<AttemptQuestionOption> AttemptQuestionOptions => Set<AttemptQuestionOption>();
     public DbSet<AttemptAnswer> AttemptAnswers => Set<AttemptAnswer>();
+    public DbSet<WaitingQueueEntry> WaitingQueueEntries => Set<WaitingQueueEntry>();
 
     protected override void OnModelCreating(ModelBuilder builder)
     {

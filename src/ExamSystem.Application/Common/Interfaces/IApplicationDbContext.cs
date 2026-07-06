@@ -2,6 +2,7 @@ using ExamSystem.Domain.Attempts;
 using ExamSystem.Domain.Candidates;
 using ExamSystem.Domain.Exams;
 using ExamSystem.Domain.Questions;
+using ExamSystem.Domain.Queue;
 using ExamSystem.Domain.Topics;
 using Microsoft.EntityFrameworkCore;
 
@@ -21,6 +22,7 @@ public interface IApplicationDbContext
     DbSet<AttemptQuestion> AttemptQuestions { get; }
     DbSet<AttemptQuestionOption> AttemptQuestionOptions { get; }
     DbSet<AttemptAnswer> AttemptAnswers { get; }
+    DbSet<WaitingQueueEntry> WaitingQueueEntries { get; }
 
     Task<int> SaveChangesAsync(CancellationToken cancellationToken);
 }
