@@ -29,6 +29,7 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser>, IApplica
     public DbSet<ExamAttempt> ExamAttempts => Set<ExamAttempt>();
     public DbSet<AttemptQuestion> AttemptQuestions => Set<AttemptQuestion>();
     public DbSet<AttemptQuestionOption> AttemptQuestionOptions => Set<AttemptQuestionOption>();
+    public DbSet<AttemptAnswer> AttemptAnswers => Set<AttemptAnswer>();
 
     protected override void OnModelCreating(ModelBuilder builder)
     {

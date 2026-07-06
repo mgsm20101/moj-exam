@@ -20,6 +20,7 @@ public interface IApplicationDbContext
     DbSet<ExamAttempt> ExamAttempts { get; }
     DbSet<AttemptQuestion> AttemptQuestions { get; }
     DbSet<AttemptQuestionOption> AttemptQuestionOptions { get; }
+    DbSet<AttemptAnswer> AttemptAnswers { get; }
 
     Task<int> SaveChangesAsync(CancellationToken cancellationToken);
 }
