@@ -9,6 +9,8 @@ public class CreateExamCommandValidator : AbstractValidator<CreateExamCommand>
         RuleFor(x => x.DurationMinutes).GreaterThan(0).WithMessage("Duration must be greater than zero.");
         RuleFor(x => x.PassMarkPercentage).InclusiveBetween(0, 100).WithMessage("Pass mark must be between 0 and 100.");
         RuleFor(x => x.MaxAttempts).GreaterThanOrEqualTo(1).WithMessage("Max attempts must be at least 1.");
+        RuleFor(x => x.MaxConcurrentAttempts).GreaterThanOrEqualTo(1).WithMessage("Max concurrent attempts must be at least 1.");
+        RuleFor(x => x.GraceWindowMinutes).GreaterThanOrEqualTo(1).WithMessage("Grace window must be at least 1 minute.");
 
         RuleFor(x => x.TopicSelections)
             .Must(selections => selections is { Count: > 0 })

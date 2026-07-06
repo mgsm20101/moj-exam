@@ -15,4 +15,6 @@ public record UpdateExamCommand(
     bool ShuffleAnswers,
     bool ShowResultImmediately,
     bool AllowBackNavigation,
+    int MaxConcurrentAttempts,
+    int GraceWindowMinutes,
     List<ExamTopicSelectionInput> TopicSelections) : IRequest<Result<Unit>>;

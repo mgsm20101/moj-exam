@@ -60,7 +60,7 @@ public class ExamsController : ControllerBase
             id, request.Name, request.Description, request.StartAtUtc, request.EndAtUtc, request.DurationMinutes,
             request.McqPoints, request.TrueFalsePoints, request.FillBlankPoints, request.PassMarkPercentage,
             request.MaxAttempts, request.ShuffleAnswers, request.ShowResultImmediately, request.AllowBackNavigation,
-            request.TopicSelections);
+            request.MaxConcurrentAttempts, request.GraceWindowMinutes, request.TopicSelections);
 
         var result = await _sender.Send(command, cancellationToken);
         if (!result.IsSuccess)
@@ -129,5 +129,6 @@ public class ExamsController : ControllerBase
         string Name, string? Description, DateTime StartAtUtc, DateTime EndAtUtc, int DurationMinutes,
         decimal McqPoints, decimal TrueFalsePoints, decimal FillBlankPoints, decimal PassMarkPercentage, int MaxAttempts,
         bool ShuffleAnswers, bool ShowResultImmediately, bool AllowBackNavigation,
+        int MaxConcurrentAttempts, int GraceWindowMinutes,
         List<ExamTopicSelectionInput> TopicSelections);
 }

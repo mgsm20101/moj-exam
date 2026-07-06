@@ -25,6 +25,8 @@ public class CreateExamCommandHandler : IRequestHandler<CreateExamCommand, Resul
             ShuffleAnswers = request.ShuffleAnswers,
             ShowResultImmediately = request.ShowResultImmediately,
             AllowBackNavigation = request.AllowBackNavigation,
+            MaxConcurrentAttempts = request.MaxConcurrentAttempts,
+            GraceWindowMinutes = request.GraceWindowMinutes,
             Status = ExamStatus.Draft
         };
 

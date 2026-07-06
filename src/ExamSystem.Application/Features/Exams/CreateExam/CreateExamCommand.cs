@@ -14,4 +14,6 @@ public record CreateExamCommand(
     bool ShuffleAnswers,
     bool ShowResultImmediately,
     bool AllowBackNavigation,
+    int MaxConcurrentAttempts,
+    int GraceWindowMinutes,
     List<ExamTopicSelectionInput> TopicSelections) : IRequest<Result<Guid>>;

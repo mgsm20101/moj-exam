@@ -47,6 +47,8 @@ public class ExamsControllerTests : IClassFixture<TestWebApplicationFactory>
         fillBlankPoints = 5m,
         passMarkPercentage = 60m,
         maxAttempts = 1,
+        maxConcurrentAttempts = 20,
+        graceWindowMinutes = 3,
         shuffleAnswers = true,
         showResultImmediately = true,
         allowBackNavigation = true,

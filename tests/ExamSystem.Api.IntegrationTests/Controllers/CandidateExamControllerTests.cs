@@ -36,7 +36,7 @@ public class CandidateExamControllerTests : IClassFixture<TestWebApplicationFact
             name = $"Exam {Guid.NewGuid():N}", description = (string?)null,
             startAtUtc = DateTime.UtcNow.AddMinutes(-5), endAtUtc = DateTime.UtcNow.AddHours(2),
             durationMinutes = 60, mcqPoints = 2m, trueFalsePoints = 1m, fillBlankPoints = 5m,
-            passMarkPercentage = 60m, maxAttempts = 1, shuffleAnswers = true,
+            passMarkPercentage = 60m, maxAttempts = 1, maxConcurrentAttempts = 20, graceWindowMinutes = 3, shuffleAnswers = true,
             showResultImmediately = true, allowBackNavigation = true,
             topicSelections = new[] { new { topicId, displayOrder = 1, difficulty = "Medium", type = "Mcq", count = 2 } }
         });

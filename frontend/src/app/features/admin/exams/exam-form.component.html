@@ -53,6 +53,17 @@
     </div>
   </div>
 
+  <div class="field-row">
+    <div class="field">
+      <label for="maxConcurrentAttempts">أقصى عدد متزامن</label>
+      <input id="maxConcurrentAttempts" type="number" min="1" formControlName="maxConcurrentAttempts" />
+    </div>
+    <div class="field">
+      <label for="graceWindowMinutes">مهلة الاستدعاء (دقيقة)</label>
+      <input id="graceWindowMinutes" type="number" min="1" formControlName="graceWindowMinutes" />
+    </div>
+  </div>
+
   <div class="field-row toggles">
     <div class="field">
       <input id="shuffleAnswers" type="checkbox" formControlName="shuffleAnswers" />

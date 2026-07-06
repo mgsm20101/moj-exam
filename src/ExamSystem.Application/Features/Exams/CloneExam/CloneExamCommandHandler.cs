@@ -34,6 +34,8 @@ public class CloneExamCommandHandler : IRequestHandler<CloneExamCommand, Result<
             ShuffleAnswers = source.ShuffleAnswers,
             ShowResultImmediately = source.ShowResultImmediately,
             AllowBackNavigation = source.AllowBackNavigation,
+            MaxConcurrentAttempts = source.MaxConcurrentAttempts,
+            GraceWindowMinutes = source.GraceWindowMinutes,
             Status = ExamStatus.Draft
         };
 

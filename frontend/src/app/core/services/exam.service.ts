@@ -30,6 +30,8 @@ export interface ExamInput {
   fillBlankPoints: number;
   passMarkPercentage: number;
   maxAttempts: number;
+  maxConcurrentAttempts: number;
+  graceWindowMinutes: number;
   shuffleAnswers: boolean;
   showResultImmediately: boolean;
   allowBackNavigation: boolean;

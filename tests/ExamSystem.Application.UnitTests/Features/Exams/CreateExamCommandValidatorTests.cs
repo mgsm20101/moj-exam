@@ -19,7 +19,7 @@ public class CreateExamCommandValidatorTests
     private static CreateExamCommand ValidCommand(Guid topicId, List<ExamTopicSelectionInput>? selections = null) =>
         new(
             "Excel Basics", null, DateTime.UtcNow, DateTime.UtcNow.AddDays(7), 60,
-            2m, 1m, 5m, 60m, 1, true, true, true,
+            2m, 1m, 5m, 60m, 1, true, true, true, 20, 3,
             selections ?? new List<ExamTopicSelectionInput> { new(topicId, 1, DifficultyLevel.Medium, QuestionType.Mcq, 25) });
 
     [Fact]

@@ -31,6 +31,8 @@ const DEFAULT_FORM_VALUES = {
   fillBlankPoints: 5,
   passMarkPercentage: 60,
   maxAttempts: 1,
+  maxConcurrentAttempts: 20,
+  graceWindowMinutes: 3,
   shuffleAnswers: true,
   showResultImmediately: true,
   allowBackNavigation: true
@@ -97,6 +99,8 @@ export class ExamFormComponent implements OnInit, OnChanges {
         fillBlankPoints: this.initialValue.fillBlankPoints,
         passMarkPercentage: this.initialValue.passMarkPercentage,
         maxAttempts: this.initialValue.maxAttempts,
+        maxConcurrentAttempts: this.initialValue.maxConcurrentAttempts,
+        graceWindowMinutes: this.initialValue.graceWindowMinutes,
         shuffleAnswers: this.initialValue.shuffleAnswers,
         showResultImmediately: this.initialValue.showResultImmediately,
         allowBackNavigation: this.initialValue.allowBackNavigation
@@ -156,6 +160,8 @@ export class ExamFormComponent implements OnInit, OnChanges {
       fillBlankPoints: Number(value.fillBlankPoints),
       passMarkPercentage: Number(value.passMarkPercentage),
       maxAttempts: Number(value.maxAttempts),
+      maxConcurrentAttempts: Number(value.maxConcurrentAttempts),
+      graceWindowMinutes: Number(value.graceWindowMinutes),
       shuffleAnswers: value.shuffleAnswers,
       showResultImmediately: value.showResultImmediately,
       allowBackNavigation: value.allowBackNavigation,
