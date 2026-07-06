@@ -22,6 +22,13 @@ public class StartAttemptCommandHandlerTests
             => $"token-{attemptId}";
     }
 
+    private sealed class FakeReconciler : IQueueReconciler
+    {
+        // No queue in these tests: capacity is always available.
+        public Task<Common.Models.QueueCapacity> ReconcileAsync(Guid examId, CancellationToken ct)
+            => Task.FromResult(new Common.Models.QueueCapacity(20, 0, 0));
+    }
+
     private static Question Mcq(Guid topicId) => new()
     {
         TopicId = topicId, Type = QuestionType.Mcq, Difficulty = DifficultyLevel.Medium, Text = "Q", IsActive = true,
@@ -50,7 +57,7 @@ public class StartAttemptCommandHandlerTests
     public async Task Handle_NewCandidate_CreatesAttemptWithSnapshotTimerAndToken()
     {
         var (db, exam) = await SeedAsync();
-        var handler = new StartAttemptCommandHandler(db, new QuestionSelectionService(db), new FakeTokenGenerator());
+        var handler = new StartAttemptCommandHandler(db, new QuestionSelectionService(db), new FakeTokenGenerator(), new FakeReconciler());
 
         var result = await handler.Handle(
             new StartAttemptCommand(exam.Id, "احمد محمد علي حسن", Nid, "01012345678"), CancellationToken.None);
@@ -61,13 +68,14 @@ public class StartAttemptCommandHandlerTests
         Assert.Equal(2, attempt.Questions.Count);
         Assert.Equal(attempt.StartedAtUtc.AddMinutes(60), attempt.ExpiresAtUtc);
         Assert.Equal($"token-{attempt.Id}", result.Value!.AttemptToken);
+        Assert.Equal("Started", result.Value!.Outcome);
     }
 
     [Fact]
     public async Task Handle_ExistingInProgressAttempt_IsIdempotent()
     {
         var (db, exam) = await SeedAsync();
-        var handler = new StartAttemptCommandHandler(db, new QuestionSelectionService(db), new FakeTokenGenerator());
+        var handler = new StartAttemptCommandHandler(db, new QuestionSelectionService(db), new FakeTokenGenerator(), new FakeReconciler());
         var cmd = new StartAttemptCommand(exam.Id, "احمد محمد علي حسن", Nid, "01012345678");
 
         var first = await handler.Handle(cmd, CancellationToken.None);
@@ -81,7 +89,7 @@ public class StartAttemptCommandHandlerTests
     public async Task Handle_AlreadyTakenNoGrant_Fails()
     {
         var (db, exam) = await SeedAsync();
-        var handler = new StartAttemptCommandHandler(db, new QuestionSelectionService(db), new FakeTokenGenerator());
+        var handler = new StartAttemptCommandHandler(db, new QuestionSelectionService(db), new FakeTokenGenerator(), new FakeReconciler());
         var cmd = new StartAttemptCommand(exam.Id, "احمد محمد علي حسن", Nid, "01012345678");
 
         var first = await handler.Handle(cmd, CancellationToken.None);

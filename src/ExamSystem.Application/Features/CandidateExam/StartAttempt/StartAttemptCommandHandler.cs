@@ -1,6 +1,7 @@
 using ExamSystem.Domain.Attempts;
 using ExamSystem.Domain.Candidates;
 using ExamSystem.Domain.Exams;
+using ExamSystem.Domain.Queue;
 
 namespace ExamSystem.Application.Features.CandidateExam.StartAttempt;
 
@@ -9,13 +10,16 @@ public class StartAttemptCommandHandler : IRequestHandler<StartAttemptCommand, R
     private readonly IApplicationDbContext _db;
     private readonly IQuestionSelectionService _selection;
     private readonly IAttemptTokenGenerator _tokens;
+    private readonly IQueueReconciler _reconciler;
 
     public StartAttemptCommandHandler(
-        IApplicationDbContext db, IQuestionSelectionService selection, IAttemptTokenGenerator tokens)
+        IApplicationDbContext db, IQuestionSelectionService selection,
+        IAttemptTokenGenerator tokens, IQueueReconciler reconciler)
     {
         _db = db;
         _selection = selection;
         _tokens = tokens;
+        _reconciler = reconciler;
     }
 
     public async Task<Result<StartAttemptDto>> Handle(StartAttemptCommand request, CancellationToken cancellationToken)
@@ -51,29 +55,77 @@ public class StartAttemptCommandHandler : IRequestHandler<StartAttemptCommand, R
             await _db.SaveChangesAsync(cancellationToken);
         }
 
-        // Resume: an in-progress attempt for this (candidate, exam) is returned as-is.
-        var existing = await _db.ExamAttempts
-            .FirstOrDefaultAsync(a => a.ExamId == exam.Id && a.CandidateId == candidate.Id
-                                      && a.Status == ExamAttemptStatus.InProgress, cancellationToken);
+        // Resume: an in-progress attempt is returned as-is.
+        var existing = await _db.ExamAttempts.FirstOrDefaultAsync(
+            a => a.ExamId == exam.Id && a.CandidateId == candidate.Id && a.Status == ExamAttemptStatus.InProgress,
+            cancellationToken);
         if (existing is not null)
         {
-            return Ok(existing, candidate.Id, exam.Id);
+            return Result<StartAttemptDto>.Success(Token(existing, candidate.Id, exam.Id));
         }
 
-        // Otherwise: any prior attempt (without an active grant) blocks a new one (FR-1.5.1).
-        var hasAnyAttempt = await _db.ExamAttempts
-            .AnyAsync(a => a.ExamId == exam.Id && a.CandidateId == candidate.Id, cancellationToken);
-        var hasActiveGrant = await _db.CandidateExamAttemptGrants
-            .AnyAsync(g => g.ExamId == exam.Id && g.CandidateId == candidate.Id && g.IsActive, cancellationToken);
+        // Already taken (no active grant) blocks before any queueing.
+        var hasAnyAttempt = await _db.ExamAttempts.AnyAsync(
+            a => a.ExamId == exam.Id && a.CandidateId == candidate.Id, cancellationToken);
+        var hasActiveGrant = await _db.CandidateExamAttemptGrants.AnyAsync(
+            g => g.ExamId == exam.Id && g.CandidateId == candidate.Id && g.IsActive, cancellationToken);
         if (hasAnyAttempt && !hasActiveGrant)
         {
             return Result<StartAttemptDto>.Failure("You have already taken this exam.");
         }
 
+        // Batch gate.
+        var capacity = await _reconciler.ReconcileAsync(exam.Id, cancellationToken);
+
+        var called = await _db.WaitingQueueEntries.FirstOrDefaultAsync(
+            e => e.ExamId == exam.Id && e.CandidateId == candidate.Id && e.Status == WaitingQueueStatus.Called,
+            cancellationToken);
+
+        if (called is not null || capacity.Available > 0)
+        {
+            var created = await CreateAttemptAsync(exam, candidate.Id, now, cancellationToken);
+            if (!created.IsSuccess)
+            {
+                return Result<StartAttemptDto>.Failure(created.Errors);
+            }
+
+            // Mark any queue entry for this candidate as Started.
+            var mine = await _db.WaitingQueueEntries.Where(
+                e => e.ExamId == exam.Id && e.CandidateId == candidate.Id
+                     && (e.Status == WaitingQueueStatus.Waiting || e.Status == WaitingQueueStatus.Called))
+                .ToListAsync(cancellationToken);
+            foreach (var entry in mine) { entry.Status = WaitingQueueStatus.Started; }
+            await _db.SaveChangesAsync(cancellationToken);
+
+            return Result<StartAttemptDto>.Success(Token(created.Value!, candidate.Id, exam.Id));
+        }
+
+        // Enqueue (idempotent).
+        var waiting = await _db.WaitingQueueEntries.FirstOrDefaultAsync(
+            e => e.ExamId == exam.Id && e.CandidateId == candidate.Id && e.Status == WaitingQueueStatus.Waiting,
+            cancellationToken);
+        if (waiting is null)
+        {
+            waiting = new WaitingQueueEntry
+            {
+                ExamId = exam.Id, CandidateId = candidate.Id, EnqueuedAtUtc = now,
+                Status = WaitingQueueStatus.Waiting
+            };
+            _db.WaitingQueueEntries.Add(waiting);
+            await _db.SaveChangesAsync(cancellationToken);
+            await _reconciler.ReconcileAsync(exam.Id, cancellationToken); // assign position
+            waiting = await _db.WaitingQueueEntries.FirstAsync(e => e.Id == waiting.Id, cancellationToken);
+        }
+
+        return Result<StartAttemptDto>.Success(StartAttemptDto.Queued(waiting.Position));
+    }
+
+    private async Task<Result<ExamAttempt>> CreateAttemptAsync(Exam exam, Guid candidateId, DateTime now, CancellationToken cancellationToken)
+    {
         var attempt = new ExamAttempt
         {
             ExamId = exam.Id,
-            CandidateId = candidate.Id,
+            CandidateId = candidateId,
             StartedAtUtc = now,
             ExpiresAtUtc = now.AddMinutes(exam.DurationMinutes),
             Status = ExamAttemptStatus.InProgress
@@ -83,22 +135,18 @@ public class StartAttemptCommandHandler : IRequestHandler<StartAttemptCommand, R
         var snapshot = await _selection.BuildSnapshotAsync(exam, attempt.Seed, cancellationToken);
         if (!snapshot.IsSuccess)
         {
-            return Result<StartAttemptDto>.Failure(snapshot.Errors);
+            return Result<ExamAttempt>.Failure(snapshot.Errors);
         }
-        foreach (var q in snapshot.Value!)
-        {
-            attempt.Questions.Add(q);
-        }
+        foreach (var q in snapshot.Value!) { attempt.Questions.Add(q); }
 
         _db.ExamAttempts.Add(attempt);
         await _db.SaveChangesAsync(cancellationToken);
-
-        return Ok(attempt, candidate.Id, exam.Id);
+        return Result<ExamAttempt>.Success(attempt);
     }
 
-    private Result<StartAttemptDto> Ok(ExamAttempt attempt, Guid candidateId, Guid examId)
+    private StartAttemptDto Token(ExamAttempt attempt, Guid candidateId, Guid examId)
     {
         var token = _tokens.GenerateToken(attempt.Id, candidateId, examId, attempt.ExpiresAtUtc);
-        return Result<StartAttemptDto>.Success(new StartAttemptDto(attempt.Id, token, attempt.ExpiresAtUtc));
+        return StartAttemptDto.Started(attempt.Id, token, attempt.ExpiresAtUtc);
     }
 }
