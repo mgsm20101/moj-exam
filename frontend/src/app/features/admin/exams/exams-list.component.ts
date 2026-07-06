@@ -33,6 +33,40 @@ export class ExamsListComponent implements OnInit {
     return this.statusMeta[status]?.badge ?? 'badge-neutral';
   }
 
+  copiedExamId = signal<string | null>(null);
+
+  /// Copies the public candidate link for an exam to the clipboard, with brief inline feedback.
+  /// Uses the async Clipboard API when available, and falls back to a temporary textarea so it
+  /// still works without clipboard permissions or in a non-secure context.
+  copyExamLink(examId: string): void {
+    const url = `${window.location.origin}/exam/${examId}`;
+    const done = () => {
+      this.copiedExamId.set(examId);
+      setTimeout(() => this.copiedExamId.set(null), 2000);
+    };
+
+    if (navigator.clipboard?.writeText) {
+      navigator.clipboard.writeText(url).then(done).catch(() => this.fallbackCopy(url, done));
+    } else {
+      this.fallbackCopy(url, done);
+    }
+  }
+
+  private fallbackCopy(text: string, done: () => void): void {
+    const textarea = document.createElement('textarea');
+    textarea.value = text;
+    textarea.style.position = 'fixed';
+    textarea.style.opacity = '0';
+    document.body.appendChild(textarea);
+    textarea.select();
+    try {
+      document.execCommand('copy');
+      done();
+    } finally {
+      document.body.removeChild(textarea);
+    }
+  }
+
   constructor(
     private readonly examService: ExamService,
     private readonly topicService: TopicService
