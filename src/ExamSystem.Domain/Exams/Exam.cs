@@ -23,6 +23,9 @@ public class Exam : BaseAuditableEntity
     /// <summary>Minutes a called candidate has to start before their reserved slot is released (FR-8.5).</summary>
     public int GraceWindowMinutes { get; set; } = 3;
 
+    /// <summary>Admission policy (FR-8.7): Auto promotes the queue automatically; Manual only via the admin batch button.</summary>
+    public QueueMode QueueMode { get; set; } = QueueMode.Auto;
+
     public bool ShuffleAnswers { get; set; } = true;
     public bool ShowResultImmediately { get; set; } = true;
     public bool AllowBackNavigation { get; set; } = true;
