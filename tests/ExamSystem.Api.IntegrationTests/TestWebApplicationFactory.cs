@@ -35,6 +35,8 @@ public class TestWebApplicationFactory : WebApplicationFactory<Program>, IAsyncL
                 ["AttemptToken:Key"] = "integration-test-attempt-token-key-please-ignore-32chars",
                 ["AttemptToken:Issuer"] = "ExamSystem.Tests",
                 ["AttemptToken:Audience"] = "ExamSystem.Tests.Candidates",
+                ["RateLimiting:Candidate:PermitLimit"] = "1000",
+                ["RateLimiting:Candidate:WindowSeconds"] = "60",
                 ["SeedAdmin:UserName"] = "admin",
                 ["SeedAdmin:Password"] = SeedAdminPassword,
                 ["SeedAdmin:Email"] = "admin@examsystem.local"

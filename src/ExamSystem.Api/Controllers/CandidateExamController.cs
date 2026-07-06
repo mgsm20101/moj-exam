@@ -4,6 +4,7 @@ using ExamSystem.Application.Features.CandidateExam.StartAttempt;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.RateLimiting;
 
 namespace ExamSystem.Api.Controllers;
 
@@ -11,6 +12,7 @@ namespace ExamSystem.Api.Controllers;
 [ApiController]
 [Route("api/exam")]
 [AllowAnonymous]
+[EnableRateLimiting("candidate")]
 public class CandidateExamController : ControllerBase
 {
     private readonly ISender _sender;

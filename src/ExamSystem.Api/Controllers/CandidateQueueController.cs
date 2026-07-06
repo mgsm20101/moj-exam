@@ -2,6 +2,7 @@ using ExamSystem.Application.Features.CandidateExam.Queue;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.RateLimiting;
 
 namespace ExamSystem.Api.Controllers;
 
@@ -9,6 +10,7 @@ namespace ExamSystem.Api.Controllers;
 [ApiController]
 [Route("api/exam/{examId:guid}/queue")]
 [AllowAnonymous]
+[EnableRateLimiting("candidate")]
 public class CandidateQueueController : ControllerBase
 {
     private readonly ISender _sender;

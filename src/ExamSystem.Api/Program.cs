@@ -1,5 +1,7 @@
 using System.Text;
 using System.Text.Json.Serialization;
+using System.Threading.RateLimiting;
+using Microsoft.AspNetCore.RateLimiting;
 using ExamSystem.Application;
 using ExamSystem.Infrastructure;
 using ExamSystem.Infrastructure.BackgroundJobs;
@@ -75,6 +77,26 @@ builder.Services.AddCors(options =>
     });
 });
 
+builder.Services.AddRateLimiter(options =>
+{
+    options.RejectionStatusCode = StatusCodes.Status429TooManyRequests;
+    options.AddPolicy("candidate", httpContext =>
+    {
+        // Partition by client IP; fall back to a constant key when the IP is unavailable
+        // (behind some proxies / in the test host) so the limit still applies deterministically.
+        var partitionKey = httpContext.Connection.RemoteIpAddress?.ToString() ?? "candidate-shared";
+        var config = httpContext.RequestServices.GetRequiredService<IConfiguration>();
+        var permitLimit = config.GetValue<int?>("RateLimiting:Candidate:PermitLimit") ?? 20;
+        var windowSeconds = config.GetValue<int?>("RateLimiting:Candidate:WindowSeconds") ?? 60;
+        return RateLimitPartition.GetFixedWindowLimiter(partitionKey, _ => new FixedWindowRateLimiterOptions
+        {
+            PermitLimit = permitLimit,
+            Window = TimeSpan.FromSeconds(windowSeconds),
+            QueueLimit = 0
+        });
+    });
+});
+
 var app = builder.Build();
 
 // ASP.NET Core resolves IWebHostEnvironment.WebRootFileProvider from whether wwwroot exists on disk
@@ -112,6 +134,7 @@ app.UseStaticFiles();
 app.UseCors("AllowAngularApp");
 app.UseAuthentication();
 app.UseAuthorization();
+app.UseRateLimiter();
 app.MapControllers();
 
 app.MapGet("/health", () => Results.Ok(new { status = "healthy", timestampUtc = DateTime.UtcNow }))
