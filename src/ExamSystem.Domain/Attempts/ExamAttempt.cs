@@ -16,4 +16,5 @@ public class ExamAttempt : BaseAuditableEntity
     public int Seed { get; set; }
 
     public ICollection<AttemptQuestion> Questions { get; set; } = new List<AttemptQuestion>();
+    public ICollection<AttemptAnswer> Answers { get; set; } = new List<AttemptAnswer>();
 }
