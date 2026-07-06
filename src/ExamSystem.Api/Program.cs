@@ -2,6 +2,7 @@ using System.Text;
 using System.Text.Json.Serialization;
 using ExamSystem.Application;
 using ExamSystem.Infrastructure;
+using ExamSystem.Infrastructure.BackgroundJobs;
 using ExamSystem.Infrastructure.Identity;
 using ExamSystem.Infrastructure.Persistence;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -14,6 +15,7 @@ var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddApplication();
 builder.Services.AddInfrastructure(builder.Configuration);
+builder.Services.AddHostedService<ExpiredAttemptSubmissionService>();
 
 builder.Services.AddControllers()
     .AddJsonOptions(options => options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter()));
