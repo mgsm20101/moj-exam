@@ -17,6 +17,12 @@ public class Exam : BaseAuditableEntity
     public decimal PassMarkPercentage { get; set; } = 60m;
     public int MaxAttempts { get; set; } = 1;
 
+    /// <summary>Batch-gate capacity (FR-8.1): max concurrent InProgress attempts before queueing.</summary>
+    public int MaxConcurrentAttempts { get; set; } = 20;
+
+    /// <summary>Minutes a called candidate has to start before their reserved slot is released (FR-8.5).</summary>
+    public int GraceWindowMinutes { get; set; } = 3;
+
     public bool ShuffleAnswers { get; set; } = true;
     public bool ShowResultImmediately { get; set; } = true;
     public bool AllowBackNavigation { get; set; } = true;
