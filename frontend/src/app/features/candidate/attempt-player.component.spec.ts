@@ -19,7 +19,8 @@ describe('AttemptPlayerComponent', () => {
     state: () => of(JSON.parse(JSON.stringify(state)) as AttemptState),
     saveAnswer: jasmine.createSpy('saveAnswer').and.returnValue(of(void 0)),
     submit: () => of({ shown: true, score: 2, totalPoints: 2, passMarkPercentage: 60, passed: true }),
-    result: () => of({ shown: true, score: 2, totalPoints: 2, passMarkPercentage: 60, passed: true })
+    result: () => of({ shown: true, score: 2, totalPoints: 2, passMarkPercentage: 60, passed: true }),
+    recordTabSwitch: jasmine.createSpy('recordTabSwitch').and.returnValue(of(void 0))
   };
   const tokenStub = { get: () => 'tok', set: () => {}, clear: () => {} };
 
@@ -55,5 +56,12 @@ describe('AttemptPlayerComponent', () => {
     expect(component.unansweredCount).toBe(1);
     component.selectOption('o1');
     expect(component.unansweredCount).toBe(0);
+  });
+
+  it('reports a tab switch when the document becomes hidden', () => {
+    Object.defineProperty(document, 'hidden', { configurable: true, get: () => true });
+    document.dispatchEvent(new Event('visibilitychange'));
+    expect(serviceStub.recordTabSwitch).toHaveBeenCalledWith('e1');
+    Object.defineProperty(document, 'hidden', { configurable: true, get: () => false });
   });
 });

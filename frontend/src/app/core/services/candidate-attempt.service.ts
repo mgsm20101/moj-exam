@@ -53,4 +53,8 @@ export class CandidateAttemptService {
   result(examId: string): Observable<AttemptResult> {
     return this.http.get<AttemptResult>(`${this.base(examId)}/result`);
   }
+
+  recordTabSwitch(examId: string): Observable<void> {
+    return this.http.post<void>(`${this.base(examId)}/tab-switch`, {});
+  }
 }

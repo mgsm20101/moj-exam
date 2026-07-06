@@ -30,6 +30,19 @@ export class AttemptPlayerComponent implements OnInit, OnDestroy {
   private timer?: ReturnType<typeof setInterval>;
   private readonly textSave$ = new Subject<AttemptQuestionState>();
 
+  // Best-effort anti-cheat (Slice 3): report tab-switches and block copy/paste/right-click.
+  private lastTabSwitchSentAt = 0;
+  private readonly onVisibility = () => {
+    if (document.hidden && this.state?.status === 'InProgress') {
+      const now = Date.now();
+      if (now - this.lastTabSwitchSentAt > 3000) {   // throttle a switch storm to one call / 3s
+        this.lastTabSwitchSentAt = now;
+        this.service.recordTabSwitch(this.examId).subscribe({ error: () => {} });
+      }
+    }
+  };
+  private readonly blockEvent = (e: Event) => e.preventDefault();
+
   constructor(
     private readonly route: ActivatedRoute,
     private readonly router: Router,
@@ -57,6 +70,11 @@ export class AttemptPlayerComponent implements OnInit, OnDestroy {
 
   ngOnDestroy(): void {
     if (this.timer) { clearInterval(this.timer); }
+    document.removeEventListener('visibilitychange', this.onVisibility);
+    document.removeEventListener('contextmenu', this.blockEvent);
+    document.removeEventListener('copy', this.blockEvent);
+    document.removeEventListener('cut', this.blockEvent);
+    document.removeEventListener('paste', this.blockEvent);
   }
 
   private applyState(s: AttemptState): void {
@@ -65,6 +83,12 @@ export class AttemptPlayerComponent implements OnInit, OnDestroy {
     if (s.status !== 'InProgress') { this.loadResult(); return; }
     this.remainingSeconds = s.remainingSeconds;
     this.startTimer();
+
+    document.addEventListener('visibilitychange', this.onVisibility);
+    document.addEventListener('contextmenu', this.blockEvent);
+    document.addEventListener('copy', this.blockEvent);
+    document.addEventListener('cut', this.blockEvent);
+    document.addEventListener('paste', this.blockEvent);
   }
 
   private startTimer(): void {
