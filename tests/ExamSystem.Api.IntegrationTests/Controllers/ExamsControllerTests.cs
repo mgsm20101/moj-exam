@@ -120,6 +120,42 @@ public class ExamsControllerTests : IClassFixture<TestWebApplicationFactory>
         Assert.Equal(HttpStatusCode.Unauthorized, response.StatusCode);
     }
 
+    private sealed record LiveCountsResponse(Guid ExamId, int ActiveAttempts, int MaxConcurrentAttempts, int ReservedCalled, int WaitingCount);
+
+    [Fact]
+    public async Task LiveCounts_Anonymous_ReturnsUnauthorized()
+    {
+        var client = _factory.CreateClient();
+
+        var response = await client.GetAsync("/api/admin/exams/live-counts");
+
+        Assert.Equal(HttpStatusCode.Unauthorized, response.StatusCode);
+    }
+
+    [Fact]
+    public async Task LiveCounts_Admin_ReturnsPublishedExamWithZeroActivity()
+    {
+        var client = await _factory.CreateAuthenticatedAdminClientAsync();
+        var topicId = await CreateTopicAsync(client, "Excel Skills - LiveCounts");
+        await CreateMcqQuestionAsync(client, topicId, "Medium");
+
+        var createResponse = await client.PostAsJsonAsync("/api/admin/exams", BuildExamPayload(topicId, 1));
+        createResponse.EnsureSuccessStatusCode();
+        var created = await createResponse.Content.ReadFromJsonAsync<IdResponse>();
+        var publishResponse = await client.PostAsync($"/api/admin/exams/{created!.Id}/publish", null);
+        publishResponse.EnsureSuccessStatusCode();
+
+        var response = await client.GetAsync("/api/admin/exams/live-counts");
+
+        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+        var counts = await response.Content.ReadFromJsonAsync<List<LiveCountsResponse>>();
+        var row = Assert.Single(counts!, c => c.ExamId == created.Id);
+        Assert.Equal(0, row.ActiveAttempts);
+        Assert.Equal(20, row.MaxConcurrentAttempts);
+        Assert.Equal(0, row.ReservedCalled);
+        Assert.Equal(0, row.WaitingCount);
+    }
+
     private record IdResponse(Guid Id);
     private record ExamDetailResponse(Guid Id, string Status, List<object> TopicSelections);
 }

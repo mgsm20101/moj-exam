@@ -5,6 +5,7 @@ using ExamSystem.Application.Features.Exams.CloseExam;
 using ExamSystem.Application.Features.Exams.CreateExam;
 using ExamSystem.Application.Features.Exams.DeleteExam;
 using ExamSystem.Application.Features.Exams.GetExamById;
+using ExamSystem.Application.Features.Exams.GetExamLiveCounts;
 using ExamSystem.Application.Features.Exams.GetExams;
 using ExamSystem.Application.Features.Exams.PublishExam;
 using ExamSystem.Application.Features.Exams.UpdateExam;
@@ -28,6 +29,14 @@ public class ExamsController : ControllerBase
     public async Task<IActionResult> GetAll(CancellationToken cancellationToken)
     {
         var result = await _sender.Send(new GetExamsQuery(), cancellationToken);
+        return Ok(result.Value);
+    }
+
+    /// <summary>Live batch-gate counts per Published exam (FR-8.8). Read-only; safe to poll.</summary>
+    [HttpGet("live-counts")]
+    public async Task<IActionResult> GetLiveCounts(CancellationToken cancellationToken)
+    {
+        var result = await _sender.Send(new GetExamLiveCountsQuery(), cancellationToken);
         return Ok(result.Value);
     }
 
