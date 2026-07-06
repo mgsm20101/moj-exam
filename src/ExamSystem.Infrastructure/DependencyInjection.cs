@@ -42,6 +42,7 @@ public static class DependencyInjection
         services.AddScoped<IAttemptTokenGenerator, AttemptTokenGenerator>();
         services.AddScoped<IImageStorageService, LocalImageStorageService>();
         services.AddScoped<IExcelQuestionParser, ClosedXmlQuestionParser>();
+        services.AddScoped<IExcelReportWriter, ClosedXmlReportWriter>();
         services.AddScoped<IQuestionSelectionService, QuestionSelectionService>();
         services.AddScoped<IAttemptGradingService, AttemptGradingService>();
         services.AddScoped<IQueueReconciler, QueueReconciler>();
