@@ -17,13 +17,13 @@ describe('CandidateExamService', () => {
 
   it('posts identity to the start endpoint and returns the attempt token', () => {
     const examId = 'abc';
-    let result: string | undefined;
+    let result: string | null | undefined;
     service.start(examId, { fullName: 'a b c d', nationalId: '29912310123404', mobileNumber: '01012345678' })
       .subscribe(r => (result = r.attemptToken));
 
     const req = httpMock.expectOne(`${environment.apiBaseUrl}/exam/${examId}/start`);
     expect(req.request.method).toBe('POST');
-    req.flush({ attemptId: 'id1', attemptToken: 'tok1', expiresAtUtc: '2026-07-10T10:00:00Z' });
+    req.flush({ outcome: 'Started', attemptId: 'id1', attemptToken: 'tok1', expiresAtUtc: '2026-07-10T10:00:00Z', queuePosition: null });
 
     expect(result).toBe('tok1');
   });

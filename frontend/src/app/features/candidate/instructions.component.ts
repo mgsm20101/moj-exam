@@ -40,8 +40,14 @@ export class InstructionsComponent implements OnInit {
     this.error = null;
     this.service.start(this.examId, this.identity).subscribe({
       next: res => {
-        this.tokenStore.set(this.examId, res.attemptToken);
-        this.router.navigate(['attempt'], { relativeTo: this.route.parent });
+        if (res.outcome === 'Started' && res.attemptToken) {
+          this.tokenStore.set(this.examId, res.attemptToken);
+          this.router.navigate(['attempt'], { relativeTo: this.route.parent });
+        } else {
+          // Queued: persist identity for polling, then show the waiting room.
+          localStorage.setItem('queue_' + this.examId, JSON.stringify(this.identity));
+          this.router.navigate(['waiting'], { relativeTo: this.route.parent });
+        }
       },
       error: () => { this.starting = false; this.error = 'تعذّر بدء الامتحان — حاول مرة أخرى.'; }
     });

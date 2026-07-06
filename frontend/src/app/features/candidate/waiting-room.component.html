@@ -1,0 +1,12 @@
+<div class="candidate-card">
+  <div class="candidate-header">
+    <img src="assets/moj-logo.png" alt="شعار وزارة العدل" />
+    <div class="exam-title">غرفة الانتظار</div>
+  </div>
+  <div class="candidate-state">
+    <p class="waiting-position">ترتيبك في الطابور: <strong>{{ position }}</strong></p>
+    <p class="muted" *ngIf="estimatedMinutes > 0">الوقت التقريبي للانتظار: {{ estimatedMinutes }} دقيقة</p>
+    <p class="muted">سيبدأ امتحانك تلقائياً فور توفّر مقعد. أبقِ هذه الصفحة مفتوحة.</p>
+    <p class="muted" *ngIf="starting">جارٍ بدء امتحانك…</p>
+  </div>
+</div>

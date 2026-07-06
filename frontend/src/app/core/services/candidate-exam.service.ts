@@ -21,7 +21,20 @@ export interface CandidateIdentity {
 }
 
 export interface RegisterResult { status: RegisterStatus; candidateId: string; }
-export interface StartAttemptResult { attemptId: string; attemptToken: string; expiresAtUtc: string; }
+
+export interface StartAttemptResult {
+  outcome: 'Started' | 'Queued';
+  attemptId: string | null;
+  attemptToken: string | null;
+  expiresAtUtc: string | null;
+  queuePosition: number | null;
+}
+
+export interface QueueStatus {
+  status: 'Waiting' | 'Called' | 'Started' | 'Expired' | 'Cancelled' | 'NotQueued';
+  position: number;
+  estimatedWaitSeconds: number;
+}
 
 @Injectable({ providedIn: 'root' })
 export class CandidateExamService {
@@ -39,5 +52,9 @@ export class CandidateExamService {
 
   start(examId: string, identity: CandidateIdentity): Observable<StartAttemptResult> {
     return this.http.post<StartAttemptResult>(`${this.baseUrl}/${examId}/start`, identity);
+  }
+
+  queueStatus(examId: string, nationalId: string): Observable<QueueStatus> {
+    return this.http.get<QueueStatus>(`${this.baseUrl}/${examId}/queue/status`, { params: { nationalId } });
   }
 }

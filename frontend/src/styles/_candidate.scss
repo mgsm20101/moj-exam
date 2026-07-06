@@ -104,6 +104,7 @@
   padding: 10px 18px; font-weight: var(--fw-semibold); cursor: pointer;
 }
 .btn-ghost:disabled { opacity: 0.5; cursor: not-allowed; }
+.waiting-position { font-size: var(--fs-headline); font-weight: var(--fw-bold); }
 .result-score { font-size: var(--fs-display); font-weight: var(--fw-bold); }
 .result-pass { color: var(--confirm-green); }
 .result-fail { color: var(--alert-red); }

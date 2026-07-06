@@ -18,6 +18,8 @@ describe('ExamService', () => {
     fillBlankPoints: 5,
     passMarkPercentage: 60,
     maxAttempts: 1,
+    maxConcurrentAttempts: 20,
+    graceWindowMinutes: 3,
     shuffleAnswers: true,
     showResultImmediately: true,
     allowBackNavigation: true,
