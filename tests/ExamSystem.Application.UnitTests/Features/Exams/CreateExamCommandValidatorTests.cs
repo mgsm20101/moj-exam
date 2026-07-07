@@ -1,6 +1,7 @@
 using ExamSystem.Application.Features.Exams;
 using ExamSystem.Application.Features.Exams.CreateExam;
 using ExamSystem.Domain.Questions;
+using ExamSystem.Domain.Queue;
 using ExamSystem.Domain.Topics;
 
 namespace ExamSystem.Application.UnitTests.Features.Exams;
@@ -19,7 +20,7 @@ public class CreateExamCommandValidatorTests
     private static CreateExamCommand ValidCommand(Guid topicId, List<ExamTopicSelectionInput>? selections = null) =>
         new(
             "Excel Basics", null, DateTime.UtcNow, DateTime.UtcNow.AddDays(7), 60,
-            2m, 1m, 5m, 60m, 1, true, true, true, 20, 3,
+            2m, 1m, 5m, 60m, 1, true, true, true, 20, 3, QueueMode.Auto,
             selections ?? new List<ExamTopicSelectionInput> { new(topicId, 1, DifficultyLevel.Medium, QuestionType.Mcq, 25) });
 
     [Fact]

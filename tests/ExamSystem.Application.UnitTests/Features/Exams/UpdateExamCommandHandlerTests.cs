@@ -2,6 +2,7 @@ using ExamSystem.Application.Features.Exams;
 using ExamSystem.Application.Features.Exams.UpdateExam;
 using ExamSystem.Domain.Exams;
 using ExamSystem.Domain.Questions;
+using ExamSystem.Domain.Queue;
 using ExamSystem.Domain.Topics;
 using ExamSystem.Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
@@ -30,7 +31,7 @@ public class UpdateExamCommandHandlerTests
         var newSelections = new List<ExamTopicSelectionInput> { new(topicId, 1, DifficultyLevel.Hard, QuestionType.FillBlank, 3) };
         var command = new UpdateExamCommand(
             exam.Id, "Renamed", "desc", DateTime.UtcNow, DateTime.UtcNow.AddDays(14), 45,
-            3m, 1m, 6m, 70m, 2, false, false, false, 20, 3, newSelections);
+            3m, 1m, 6m, 70m, 2, false, false, false, 20, 3, QueueMode.Auto, newSelections);
 
         var result = await handler.Handle(command, CancellationToken.None);
 
@@ -51,7 +52,7 @@ public class UpdateExamCommandHandlerTests
         var handler = new UpdateExamCommandHandler(db);
         var command = new UpdateExamCommand(
             exam.Id, "Renamed", null, DateTime.UtcNow, DateTime.UtcNow.AddDays(14), 45,
-            2m, 1m, 5m, 60m, 1, true, true, true, 20, 3,
+            2m, 1m, 5m, 60m, 1, true, true, true, 20, 3, QueueMode.Auto,
             new List<ExamTopicSelectionInput> { new(topicId, 1, DifficultyLevel.Medium, QuestionType.Mcq, 5) });
 
         var result = await handler.Handle(command, CancellationToken.None);
