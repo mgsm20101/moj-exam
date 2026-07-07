@@ -139,6 +139,7 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+app.UseDefaultFiles();
 app.UseStaticFiles();
 app.UseCors("AllowAngularApp");
 app.UseAuthentication();
@@ -148,6 +149,12 @@ app.MapControllers();
 
 app.MapGet("/health", () => Results.Ok(new { status = "healthy", timestampUtc = DateTime.UtcNow }))
    .AllowAnonymous();
+
+// SPA fallback: any request that isn't a real static file (":nonfile" -- no dot in the last
+// segment, so actual missing assets like a bad question-image URL still 404 normally) and didn't
+// match a controller route above (so /api/* 404s stay JSON) falls through to index.html, letting
+// Angular's client-side router handle deep links (e.g. /admin/exams, /exam/{id}) and page refreshes.
+app.MapFallbackToFile("/{*path:nonfile}", "index.html");
 
 app.Run();
 
