@@ -1,3 +1,4 @@
+using ExamSystem.Application.Features.Candidates.GrantRetake;
 using ExamSystem.Application.Features.Exams;
 using ExamSystem.Application.Features.Exams.ArchiveExam;
 using ExamSystem.Application.Features.Exams.CloneExam;
@@ -159,6 +160,18 @@ public class ExamsController : ControllerBase
             return BadRequest(new { errors = result.Errors });
         }
         return Ok(result.Value);
+    }
+
+    /// <summary>Admin re-activation (FR-5.4): lets a candidate who already took the exam start a new attempt.</summary>
+    [HttpPost("{id:guid}/candidates/{nationalId}/grant-retake")]
+    public async Task<IActionResult> GrantRetake(Guid id, string nationalId, CancellationToken cancellationToken)
+    {
+        var result = await _sender.Send(new GrantCandidateRetakeCommand(id, nationalId), cancellationToken);
+        if (!result.IsSuccess)
+        {
+            return BadRequest(new { errors = result.Errors });
+        }
+        return NoContent();
     }
 
     public record SetQueueModeRequest(QueueMode Mode);

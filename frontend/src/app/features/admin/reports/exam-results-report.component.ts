@@ -1,7 +1,7 @@
 import { ChangeDetectionStrategy, Component, OnInit, computed, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ExamService, ExamSummary } from '../../../core/services/exam.service';
-import { ExamResultsReport, ReportService, ResultsFilter } from '../../../core/services/report.service';
+import { ExamResultRow, ExamResultsReport, ReportService, ResultsFilter } from '../../../core/services/report.service';
 
 @Component({
   selector: 'app-exam-results-report',
@@ -20,6 +20,7 @@ export class ExamResultsReportComponent implements OnInit {
   filter = signal<ResultsFilter>('all');
   loading = signal(false);
   exporting = signal(false);
+  grantingNationalId = signal<string | null>(null);
   errorMessage: string | null = null;
 
   readonly filters: { value: ResultsFilter; label: string }[] = [
@@ -106,6 +107,34 @@ export class ExamResultsReportComponent implements OnInit {
       error: () => {
         this.exporting.set(false);
         this.errorMessage = 'تعذّر تصدير ملف Excel.';
+      }
+    });
+  }
+
+  grantRetake(row: ExamResultRow): void {
+    const examId = this.selectedExamId();
+    if (!examId || row.hasActiveRetakeGrant || this.grantingNationalId()) {
+      return;
+    }
+    this.grantingNationalId.set(row.nationalId);
+    this.errorMessage = null;
+    this.reportService.grantRetake(examId, row.nationalId).subscribe({
+      next: () => {
+        this.grantingNationalId.set(null);
+        const current = this.report();
+        if (!current) {
+          return;
+        }
+        this.report.set({
+          ...current,
+          rows: current.rows.map(r =>
+            r.nationalId === row.nationalId ? { ...r, hasActiveRetakeGrant: true } : r
+          )
+        });
+      },
+      error: () => {
+        this.grantingNationalId.set(null);
+        this.errorMessage = 'تعذّر منح إعادة الامتحان.';
       }
     });
   }

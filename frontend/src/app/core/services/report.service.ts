@@ -16,6 +16,7 @@ export interface ExamResultRow {
   submittedAtUtc: string | null;
   governorateCode: number;
   tabSwitchCount: number;
+  hasActiveRetakeGrant: boolean;
 }
 
 export interface ExamResultsSummary {
@@ -50,5 +51,12 @@ export class ReportService {
   exportExamResults(examId: string, filter: ResultsFilter = 'all'): Observable<Blob> {
     const params = new HttpParams().set('filter', filter);
     return this.http.get(`${this.baseUrl}/exams/${examId}/results/export`, { params, responseType: 'blob' });
+  }
+
+  grantRetake(examId: string, nationalId: string): Observable<void> {
+    return this.http.post<void>(
+      `${environment.apiBaseUrl}/admin/exams/${examId}/candidates/${nationalId}/grant-retake`,
+      {}
+    );
   }
 }

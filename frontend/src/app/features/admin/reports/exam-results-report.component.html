@@ -75,6 +75,7 @@
           <th>النسبة</th>
           <th>النتيجة</th>
           <th>وقت التسليم</th>
+          <th>إجراءات</th>
         </tr>
       </thead>
       <tbody>
@@ -90,9 +91,20 @@
             </span>
           </td>
           <td>{{ row.submittedAtUtc | date: 'short' }}</td>
+          <td>
+            <span class="badge badge-info" *ngIf="row.hasActiveRetakeGrant">تم المنح ✓</span>
+            <button
+              type="button"
+              class="btn-secondary"
+              *ngIf="!row.hasActiveRetakeGrant"
+              [disabled]="grantingNationalId() === row.nationalId"
+              (click)="grantRetake(row)">
+              {{ grantingNationalId() === row.nationalId ? 'جارٍ المنح…' : 'منح إعادة الامتحان' }}
+            </button>
+          </td>
         </tr>
         <tr *ngIf="r.rows.length === 0">
-          <td colspan="7" class="table-empty">
+          <td colspan="8" class="table-empty">
             {{ r.summary.totalCandidates === 0 ? 'لا يوجد متقدمون لهذا الامتحان بعد.' : 'لا توجد نتائج مطابقة لهذا التصفية.' }}
           </td>
         </tr>

@@ -11,4 +11,5 @@ public record ExamResultRow(
     bool Passed,
     DateTime? SubmittedAtUtc,
     int GovernorateCode,
-    int TabSwitchCount);
+    int TabSwitchCount,
+    bool HasActiveRetakeGrant);

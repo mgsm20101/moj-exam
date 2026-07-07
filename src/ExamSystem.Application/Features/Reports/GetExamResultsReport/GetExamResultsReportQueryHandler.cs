@@ -53,6 +53,12 @@ public class GetExamResultsReportQueryHandler
             .Where(c => candidateIds.Contains(c.Id))
             .ToDictionaryAsync(c => c.Id, cancellationToken);
 
+        var grantedCandidateIds = (await _db.CandidateExamAttemptGrants
+            .Where(g => g.ExamId == exam.Id && g.IsActive && candidateIds.Contains(g.CandidateId))
+            .Select(g => g.CandidateId)
+            .ToListAsync(cancellationToken))
+            .ToHashSet();
+
         var allRows = bestPerCandidate
             .Select(a =>
             {
@@ -74,7 +80,8 @@ public class GetExamResultsReportQueryHandler
                     passed,
                     a.SubmittedAtUtc,
                     candidate?.GovernorateCode ?? 0,
-                    a.TabSwitchCount);
+                    a.TabSwitchCount,
+                    grantedCandidateIds.Contains(a.CandidateId));
             })
             .OrderByDescending(r => r.Score)
             .ThenBy(r => r.FullName)
