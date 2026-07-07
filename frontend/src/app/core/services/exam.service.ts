@@ -4,6 +4,7 @@ import { Observable } from 'rxjs';
 import { environment } from '../../../environments/environment';
 
 export type ExamStatus = 'Draft' | 'Published' | 'Closed' | 'Archived';
+export type QueueMode = 'Auto' | 'Manual';
 export type Difficulty = 'Easy' | 'Medium' | 'Hard';
 export type QuestionType = 'Mcq' | 'TrueFalse' | 'FillBlank';
 
@@ -32,6 +33,7 @@ export interface ExamInput {
   maxAttempts: number;
   maxConcurrentAttempts: number;
   graceWindowMinutes: number;
+  queueMode: QueueMode;
   shuffleAnswers: boolean;
   showResultImmediately: boolean;
   allowBackNavigation: boolean;
@@ -45,6 +47,7 @@ export interface ExamSummary {
   endAtUtc: string;
   durationMinutes: number;
   status: ExamStatus;
+  queueMode: QueueMode;
   totalQuestionCount: number;
   totalPoints: number;
 }
@@ -61,6 +64,12 @@ export interface ExamLiveCounts {
   maxConcurrentAttempts: number;
   reservedCalled: number;
   waitingCount: number;
+}
+
+export interface OpenBatchResult {
+  calledCount: number;
+  remainingWaiting: number;
+  availableAfter: number;
 }
 
 @Injectable({ providedIn: 'root' })
@@ -107,5 +116,13 @@ export class ExamService {
 
   getLiveCounts(): Observable<ExamLiveCounts[]> {
     return this.http.get<ExamLiveCounts[]>(`${this.baseUrl}/live-counts`);
+  }
+
+  setQueueMode(id: string, mode: QueueMode): Observable<void> {
+    return this.http.post<void>(`${this.baseUrl}/${id}/queue-mode`, { mode });
+  }
+
+  openNextBatch(id: string, count: number): Observable<OpenBatchResult> {
+    return this.http.post<OpenBatchResult>(`${this.baseUrl}/${id}/queue/open-batch`, { count });
   }
 }

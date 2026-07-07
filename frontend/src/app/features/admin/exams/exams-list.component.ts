@@ -2,7 +2,7 @@ import { Component, DestroyRef, OnInit, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { EMPTY, Observable, catchError, switchMap, timer } from 'rxjs';
-import { ExamDetail, ExamInput, ExamLiveCounts, ExamService, ExamSummary } from '../../../core/services/exam.service';
+import { ExamDetail, ExamInput, ExamLiveCounts, ExamService, ExamSummary, QueueMode } from '../../../core/services/exam.service';
 import { Topic, TopicService } from '../../../core/services/topic.service';
 import { ExamFormComponent } from './exam-form.component';
 
@@ -45,6 +45,30 @@ export class ExamsListComponent implements OnInit {
   }
 
   copiedExamId = signal<string | null>(null);
+
+  /** Per-exam inline feedback after an "open batch" action (FR-8.7). */
+  batchMessage = signal<{ examId: string; text: string } | null>(null);
+
+  toggleQueueMode(exam: ExamSummary): void {
+    this.errorMessage = null;
+    const next: QueueMode = exam.queueMode === 'Manual' ? 'Auto' : 'Manual';
+    this.examService.setQueueMode(exam.id, next).subscribe({
+      next: () => this.load(),
+      error: err => (this.errorMessage = (err.error?.errors ?? ['تعذّر تغيير وضع الطابور.']).join(' ، '))
+    });
+  }
+
+  openBatch(examId: string, rawCount: string): void {
+    this.errorMessage = null;
+    const count = Math.max(1, Number(rawCount) || 1);
+    this.examService.openNextBatch(examId, count).subscribe({
+      next: result => {
+        this.batchMessage.set({ examId, text: `تم استدعاء ${result.calledCount}` });
+        setTimeout(() => this.batchMessage.set(null), 3000);
+      },
+      error: err => (this.errorMessage = (err.error?.errors ?? ['تعذّر فتح الدفعة.']).join(' ، '))
+    });
+  }
 
   /// Copies the public candidate link for an exam to the clipboard, with brief inline feedback.
   /// Uses the async Clipboard API when available, and falls back to a temporary textarea so it

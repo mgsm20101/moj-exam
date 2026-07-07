@@ -123,6 +123,17 @@
   font-variant-numeric: tabular-nums;
 }
 
+.batch-count-input {
+  width: 64px;
+  text-align: center;
+  font-variant-numeric: tabular-nums;
+}
+
+.batch-feedback {
+  color: var(--confirm-green, #0a7d5a);
+  font-size: 0.85em;
+}
+
 // --- Page-level banner error (publish shortfall, save failures) ----------
 .banner-error {
   display: flex;

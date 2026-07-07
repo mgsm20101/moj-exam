@@ -33,6 +33,7 @@ const DEFAULT_FORM_VALUES = {
   maxAttempts: 1,
   maxConcurrentAttempts: 20,
   graceWindowMinutes: 3,
+  queueMode: 'Auto' as const,
   shuffleAnswers: true,
   showResultImmediately: true,
   allowBackNavigation: true
@@ -101,6 +102,7 @@ export class ExamFormComponent implements OnInit, OnChanges {
         maxAttempts: this.initialValue.maxAttempts,
         maxConcurrentAttempts: this.initialValue.maxConcurrentAttempts,
         graceWindowMinutes: this.initialValue.graceWindowMinutes,
+        queueMode: this.initialValue.queueMode,
         shuffleAnswers: this.initialValue.shuffleAnswers,
         showResultImmediately: this.initialValue.showResultImmediately,
         allowBackNavigation: this.initialValue.allowBackNavigation
@@ -162,6 +164,7 @@ export class ExamFormComponent implements OnInit, OnChanges {
       maxAttempts: Number(value.maxAttempts),
       maxConcurrentAttempts: Number(value.maxConcurrentAttempts),
       graceWindowMinutes: Number(value.graceWindowMinutes),
+      queueMode: value.queueMode,
       shuffleAnswers: value.shuffleAnswers,
       showResultImmediately: value.showResultImmediately,
       allowBackNavigation: value.allowBackNavigation,

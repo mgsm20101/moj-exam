@@ -62,6 +62,13 @@
       <label for="graceWindowMinutes">مهلة الاستدعاء (دقيقة)</label>
       <input id="graceWindowMinutes" type="number" min="1" formControlName="graceWindowMinutes" />
     </div>
+    <div class="field">
+      <label for="queueMode">وضع الطابور</label>
+      <select id="queueMode" formControlName="queueMode">
+        <option value="Auto">تلقائي</option>
+        <option value="Manual">يدوي — فتح الدفعات من الأدمن</option>
+      </select>
+    </div>
   </div>
 
   <div class="field-row toggles">

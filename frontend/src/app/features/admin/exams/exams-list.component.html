@@ -36,6 +36,9 @@
           >
             نشطون {{ lc.activeAttempts }}/{{ lc.maxConcurrentAttempts }} · طابور {{ lc.waitingCount }}
           </span>
+          <span class="badge badge-neutral" *ngIf="exam.status === 'Published'">
+            {{ exam.queueMode === 'Manual' ? 'طابور يدوي' : 'طابور تلقائي' }}
+          </span>
         </td>
         <td class="actions">
           <button type="button" (click)="openEditForm(exam.id)" [disabled]="exam.status !== 'Draft'">تعديل</button>
@@ -44,6 +47,20 @@
           <button type="button" class="secondary" *ngIf="exam.status === 'Published'" (click)="copyExamLink(exam.id)">
             {{ copiedExamId() === exam.id ? 'تم النسخ ✓' : 'نسخ الرابط' }}
           </button>
+          <button type="button" class="secondary" *ngIf="exam.status === 'Published'" (click)="toggleQueueMode(exam)">
+            {{ exam.queueMode === 'Manual' ? 'تحويل لتلقائي' : 'تحويل ليدوي' }}
+          </button>
+          <ng-container *ngIf="exam.status === 'Published' && exam.queueMode === 'Manual'">
+            <input type="number" min="1" value="1" #batchCount class="batch-count-input" aria-label="عدد الدفعة" />
+            <button
+              type="button"
+              (click)="openBatch(exam.id, batchCount.value)"
+              [disabled]="(liveFor(exam.id)?.waitingCount ?? 0) === 0"
+            >
+              افتح الدفعة التالية
+            </button>
+            <span class="batch-feedback" *ngIf="batchMessage()?.examId === exam.id">{{ batchMessage()?.text }}</span>
+          </ng-container>
           <button type="button" (click)="archiveExam(exam.id)" *ngIf="exam.status === 'Closed'">أرشفة</button>
           <button type="button" (click)="cloneExam(exam.id)">استنساخ</button>
           <button type="button" class="danger" (click)="deleteExam(exam.id)" [disabled]="exam.status !== 'Draft'">حذف</button>
