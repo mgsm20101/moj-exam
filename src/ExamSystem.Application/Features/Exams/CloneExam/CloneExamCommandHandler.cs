@@ -36,6 +36,7 @@ public class CloneExamCommandHandler : IRequestHandler<CloneExamCommand, Result<
             AllowBackNavigation = source.AllowBackNavigation,
             MaxConcurrentAttempts = source.MaxConcurrentAttempts,
             GraceWindowMinutes = source.GraceWindowMinutes,
+            QueueMode = source.QueueMode,
             Status = ExamStatus.Draft
         };
 

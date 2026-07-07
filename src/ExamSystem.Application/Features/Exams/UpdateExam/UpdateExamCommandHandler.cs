@@ -39,6 +39,7 @@ public class UpdateExamCommandHandler : IRequestHandler<UpdateExamCommand, Resul
         exam.AllowBackNavigation = request.AllowBackNavigation;
         exam.MaxConcurrentAttempts = request.MaxConcurrentAttempts;
         exam.GraceWindowMinutes = request.GraceWindowMinutes;
+        exam.QueueMode = request.QueueMode;
 
         // Remove via the DbSet (not exam.TopicSelections.Clear()) and add replacements via the DbSet
         // as well: mutating the same tracked navigation collection for both the removal and the

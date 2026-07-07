@@ -158,4 +158,57 @@ public class ExamsControllerTests : IClassFixture<TestWebApplicationFactory>
 
     private record IdResponse(Guid Id);
     private record ExamDetailResponse(Guid Id, string Status, List<object> TopicSelections);
+
+    private sealed record OpenBatchResponse(int CalledCount, int RemainingWaiting, int AvailableAfter);
+
+    [Fact]
+    public async Task QueueEndpoints_Anonymous_ReturnUnauthorized()
+    {
+        var client = _factory.CreateClient();
+
+        var modeResponse = await client.PostAsJsonAsync($"/api/admin/exams/{Guid.NewGuid()}/queue-mode", new { mode = "Manual" });
+        var batchResponse = await client.PostAsJsonAsync($"/api/admin/exams/{Guid.NewGuid()}/queue/open-batch", new { count = 1 });
+
+        Assert.Equal(HttpStatusCode.Unauthorized, modeResponse.StatusCode);
+        Assert.Equal(HttpStatusCode.Unauthorized, batchResponse.StatusCode);
+    }
+
+    [Fact]
+    public async Task SetManualThenOpenBatch_OnPublishedExam_Succeeds()
+    {
+        var client = await _factory.CreateAuthenticatedAdminClientAsync();
+        var topicId = await CreateTopicAsync(client, "Excel Skills - ManualQueue");
+        await CreateMcqQuestionAsync(client, topicId, "Medium");
+
+        var createResponse = await client.PostAsJsonAsync("/api/admin/exams", BuildExamPayload(topicId, 1));
+        createResponse.EnsureSuccessStatusCode();
+        var created = await createResponse.Content.ReadFromJsonAsync<IdResponse>();
+        (await client.PostAsync($"/api/admin/exams/{created!.Id}/publish", null)).EnsureSuccessStatusCode();
+
+        var modeResponse = await client.PostAsJsonAsync($"/api/admin/exams/{created.Id}/queue-mode", new { mode = "Manual" });
+        Assert.Equal(HttpStatusCode.NoContent, modeResponse.StatusCode);
+
+        var batchResponse = await client.PostAsJsonAsync($"/api/admin/exams/{created.Id}/queue/open-batch", new { count = 3 });
+        Assert.Equal(HttpStatusCode.OK, batchResponse.StatusCode);
+        var body = await batchResponse.Content.ReadFromJsonAsync<OpenBatchResponse>();
+        Assert.Equal(0, body!.CalledCount); // queue is empty
+        Assert.Equal(20, body.AvailableAfter);
+    }
+
+    [Fact]
+    public async Task OpenBatch_OnAutoModeExam_ReturnsBadRequest()
+    {
+        var client = await _factory.CreateAuthenticatedAdminClientAsync();
+        var topicId = await CreateTopicAsync(client, "Excel Skills - AutoQueueBatch");
+        await CreateMcqQuestionAsync(client, topicId, "Medium");
+
+        var createResponse = await client.PostAsJsonAsync("/api/admin/exams", BuildExamPayload(topicId, 1));
+        createResponse.EnsureSuccessStatusCode();
+        var created = await createResponse.Content.ReadFromJsonAsync<IdResponse>();
+        (await client.PostAsync($"/api/admin/exams/{created!.Id}/publish", null)).EnsureSuccessStatusCode();
+
+        var batchResponse = await client.PostAsJsonAsync($"/api/admin/exams/{created.Id}/queue/open-batch", new { count = 1 });
+
+        Assert.Equal(HttpStatusCode.BadRequest, batchResponse.StatusCode);
+    }
 }

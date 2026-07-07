@@ -22,7 +22,7 @@ public class GetExamByIdQueryHandler : IRequestHandler<GetExamByIdQuery, Result<
             exam.Id, exam.Name, exam.Description, exam.StartAtUtc, exam.EndAtUtc, exam.DurationMinutes,
             exam.McqPoints, exam.TrueFalsePoints, exam.FillBlankPoints, exam.PassMarkPercentage, exam.MaxAttempts,
             exam.ShuffleAnswers, exam.ShowResultImmediately, exam.AllowBackNavigation,
-            exam.MaxConcurrentAttempts, exam.GraceWindowMinutes, exam.Status,
+            exam.MaxConcurrentAttempts, exam.GraceWindowMinutes, exam.QueueMode, exam.Status,
             exam.TopicSelections
                 .OrderBy(s => s.DisplayOrder)
                 .Select(s => new ExamTopicSelectionDto(s.TopicId, s.Topic!.Name, s.DisplayOrder, s.Difficulty, s.Type, s.Count))

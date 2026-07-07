@@ -1,0 +1,187 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-07-06T00:00:00Z",
+  "title": "Design System: ExamSystem Admin",
+  "extensions": {
+    "colorMeta": {
+      "authority-blue": {
+        "role": "primary",
+        "displayName": "Authority Blue",
+        "canonical": "oklch(48% 0.19 262)",
+        "tonalRamp": [
+          "oklch(20% 0.10 262)",
+          "oklch(30% 0.14 262)",
+          "oklch(38% 0.17 262)",
+          "oklch(48% 0.19 262)",
+          "oklch(58% 0.17 262)",
+          "oklch(70% 0.12 262)",
+          "oklch(85% 0.06 262)",
+          "oklch(95% 0.02 262)"
+        ]
+      },
+      "authority-blue-deep": {
+        "role": "primary-hover",
+        "displayName": "Authority Blue Deep",
+        "canonical": "oklch(38% 0.17 262)",
+        "tonalRamp": ["oklch(15% 0.08 262)", "oklch(24% 0.12 262)", "oklch(31% 0.15 262)", "oklch(38% 0.17 262)", "oklch(46% 0.18 262)", "oklch(58% 0.16 262)", "oklch(72% 0.10 262)", "oklch(88% 0.04 262)"]
+      },
+      "authority-blue-tint": {
+        "role": "primary-tint",
+        "displayName": "Authority Blue Tint",
+        "canonical": "oklch(94% 0.03 262)",
+        "tonalRamp": ["oklch(60% 0.12 262)", "oklch(70% 0.10 262)", "oklch(80% 0.07 262)", "oklch(87% 0.05 262)", "oklch(91% 0.04 262)", "oklch(94% 0.03 262)", "oklch(97% 0.015 262)", "oklch(99% 0.005 262)"]
+      },
+      "paper-mist": {
+        "role": "neutral-bg",
+        "displayName": "Paper Mist",
+        "canonical": "oklch(98% 0.004 250)",
+        "tonalRamp": ["oklch(20% 0.004 250)", "oklch(35% 0.004 250)", "oklch(50% 0.004 250)", "oklch(65% 0.004 250)", "oklch(80% 0.004 250)", "oklch(90% 0.004 250)", "oklch(95% 0.004 250)", "oklch(98% 0.004 250)"]
+      },
+      "pure-white": {
+        "role": "neutral-surface",
+        "displayName": "Pure White",
+        "canonical": "oklch(100% 0 0)",
+        "tonalRamp": ["oklch(20% 0 0)", "oklch(35% 0 0)", "oklch(50% 0 0)", "oklch(65% 0 0)", "oklch(80% 0 0)", "oklch(90% 0 0)", "oklch(97% 0 0)", "oklch(100% 0 0)"]
+      },
+      "hairline-grey": {
+        "role": "neutral-border",
+        "displayName": "Hairline Grey",
+        "canonical": "oklch(91% 0.004 250)",
+        "tonalRamp": ["oklch(20% 0.004 250)", "oklch(35% 0.004 250)", "oklch(50% 0.006 250)", "oklch(65% 0.006 250)", "oklch(78% 0.005 250)", "oklch(85% 0.005 250)", "oklch(91% 0.004 250)", "oklch(96% 0.003 250)"]
+      },
+      "ink-black": {
+        "role": "neutral-text",
+        "displayName": "Ink Black",
+        "canonical": "oklch(22% 0.02 265)",
+        "tonalRamp": ["oklch(10% 0.01 265)", "oklch(22% 0.02 265)", "oklch(35% 0.02 265)", "oklch(48% 0.02 265)", "oklch(60% 0.015 265)", "oklch(72% 0.01 265)", "oklch(85% 0.006 265)", "oklch(95% 0.003 265)"]
+      },
+      "slate-grey": {
+        "role": "neutral-text-muted",
+        "displayName": "Slate Grey",
+        "canonical": "oklch(55% 0.015 265)",
+        "tonalRamp": ["oklch(20% 0.01 265)", "oklch(32% 0.012 265)", "oklch(43% 0.014 265)", "oklch(55% 0.015 265)", "oklch(65% 0.013 265)", "oklch(76% 0.01 265)", "oklch(87% 0.006 265)", "oklch(95% 0.003 265)"]
+      },
+      "alert-red": {
+        "role": "status-error",
+        "displayName": "Alert Red",
+        "canonical": "oklch(62% 0.21 25)",
+        "tonalRamp": ["oklch(25% 0.10 25)", "oklch(38% 0.15 25)", "oklch(50% 0.19 25)", "oklch(62% 0.21 25)", "oklch(72% 0.17 25)", "oklch(82% 0.11 25)", "oklch(90% 0.06 25)", "oklch(96% 0.02 25)"]
+      },
+      "confirm-green": {
+        "role": "status-success",
+        "displayName": "Confirm Green",
+        "canonical": "oklch(65% 0.14 165)",
+        "tonalRamp": ["oklch(25% 0.06 165)", "oklch(38% 0.09 165)", "oklch(52% 0.12 165)", "oklch(65% 0.14 165)", "oklch(74% 0.12 165)", "oklch(83% 0.08 165)", "oklch(90% 0.05 165)", "oklch(96% 0.02 165)"]
+      },
+      "caution-amber": {
+        "role": "status-warning",
+        "displayName": "Caution Amber",
+        "canonical": "oklch(78% 0.16 75)",
+        "tonalRamp": ["oklch(30% 0.08 75)", "oklch(45% 0.12 75)", "oklch(60% 0.15 75)", "oklch(78% 0.16 75)", "oklch(84% 0.13 75)", "oklch(89% 0.09 75)", "oklch(94% 0.05 75)", "oklch(97% 0.02 75)"]
+      }
+    },
+    "typographyMeta": {
+      "display": { "displayName": "Display", "purpose": "Page-level titles that appear once per screen (e.g. the login card title)." },
+      "headline": { "displayName": "Headline", "purpose": "Section titles, e.g. the exams-list page header." },
+      "title": { "displayName": "Title", "purpose": "Panel/card headers nested within a page, e.g. the exam-form overlay title." },
+      "body": { "displayName": "Body", "purpose": "Table cells, form inputs and labels, all default running text." },
+      "label": { "displayName": "Label", "purpose": "Table column headers, status badges, small metadata tags." }
+    },
+    "shadows": [
+      { "name": "resting-card", "value": "0 2px 12px 0 rgba(17, 24, 39, 0.08)", "purpose": "Default at-rest depth for every card, panel, and table surface." },
+      { "name": "raised-hover", "value": "0 6px 20px 0 rgba(17, 24, 39, 0.12)", "purpose": "Row hover in dense tables; momentary focus/drag state on cards." },
+      { "name": "overlay", "value": "0 16px 40px 0 rgba(17, 24, 39, 0.18)", "purpose": "The exams-list form-panel and any future modal — the single floating elevation step." }
+    ],
+    "motion": [
+      { "name": "ease-standard", "value": "cubic-bezier(0.4, 0, 0.2, 1)", "purpose": "Default easing for hover/focus/background transitions." },
+      { "name": "ease-out-expo", "value": "cubic-bezier(0.16, 1, 0.3, 1)", "purpose": "Entrances: form-panel opening, row insertion after create." },
+      { "name": "duration-fast", "value": "150ms", "purpose": "Button/input hover and focus-ring transitions." },
+      { "name": "duration-standard", "value": "220ms", "purpose": "Panel open/close, status-change acknowledgments." }
+    ],
+    "breakpoints": [
+      { "name": "sm", "value": "640px" },
+      { "name": "md", "value": "768px" },
+      { "name": "lg", "value": "1024px" }
+    ]
+  },
+  "components": [
+    {
+      "name": "Primary Button",
+      "kind": "button",
+      "refersTo": "button-primary",
+      "description": "The one action per screen the admin should take next (نشر / حفظ / إنشاء).",
+      "html": "<button class=\"ds-btn-primary\" dir=\"rtl\">نشر</button>",
+      "css": ".ds-btn-primary { background: #1a56db; color: #ffffff; font-family: Cairo, \"Segoe UI\", Tahoma, Arial, sans-serif; font-size: 0.875rem; font-weight: 600; padding: 10px 20px; border: none; border-radius: 6px; cursor: pointer; transition: background-color 0.15s cubic-bezier(0.4,0,0.2,1), box-shadow 0.15s cubic-bezier(0.4,0,0.2,1); } .ds-btn-primary:hover { background: #153f9e; } .ds-btn-primary:focus-visible { outline: none; box-shadow: 0 0 0 2px #ffffff, 0 0 0 4px #e8eefc, 0 0 0 5px #1a56db; } .ds-btn-primary:disabled { background: #e5e7eb; color: #6b7280; cursor: not-allowed; }"
+    },
+    {
+      "name": "Secondary Button",
+      "kind": "button",
+      "refersTo": "button-secondary",
+      "description": "A supporting action next to a primary button (إغلاق / إلغاء).",
+      "html": "<button class=\"ds-btn-secondary\" dir=\"rtl\">إغلاق</button>",
+      "css": ".ds-btn-secondary { background: #ffffff; color: #1a56db; font-family: Cairo, \"Segoe UI\", Tahoma, Arial, sans-serif; font-size: 0.875rem; font-weight: 600; padding: 9px 19px; border: 1px solid #1a56db; border-radius: 6px; cursor: pointer; transition: background-color 0.15s cubic-bezier(0.4,0,0.2,1); } .ds-btn-secondary:hover { background: #e8eefc; } .ds-btn-secondary:focus-visible { outline: none; box-shadow: 0 0 0 2px #ffffff, 0 0 0 4px #e8eefc, 0 0 0 5px #1a56db; }"
+    },
+    {
+      "name": "Text Input",
+      "kind": "input",
+      "refersTo": "input-default",
+      "description": "Default single-line field used across every form (login, question-form, exam-form).",
+      "html": "<div class=\"ds-field\" dir=\"rtl\"><label class=\"ds-label\" for=\"ds-demo-input\">اسم الامتحان</label><input id=\"ds-demo-input\" class=\"ds-input\" type=\"text\" placeholder=\"اكتب هنا\" /></div>",
+      "css": ".ds-field { display: flex; flex-direction: column; gap: 4px; font-family: Cairo, \"Segoe UI\", Tahoma, Arial, sans-serif; } .ds-label { font-size: 0.75rem; font-weight: 600; letter-spacing: 0.02em; color: #6b7280; } .ds-input { background: #ffffff; color: #111827; font-size: 0.875rem; padding: 8px 12px; border: 1px solid #e5e7eb; border-radius: 6px; transition: border-color 0.15s cubic-bezier(0.4,0,0.2,1), box-shadow 0.15s cubic-bezier(0.4,0,0.2,1); } .ds-input::placeholder { color: #6b7280; } .ds-input:focus { outline: none; border-color: #1a56db; box-shadow: 0 0 0 2px #e8eefc; } .ds-input.ds-input-error { border-color: #ef4444; }"
+    },
+    {
+      "name": "Card Surface",
+      "kind": "card",
+      "refersTo": "card-surface",
+      "description": "The lifted-surface treatment for panels, the login card, and the exam-form overlay — depth from shadow only, never a border.",
+      "html": "<div class=\"ds-card\" dir=\"rtl\"><h3 class=\"ds-card-title\">تعديل امتحان</h3><p class=\"ds-card-body\">تفاصيل الامتحان تظهر هنا.</p></div>",
+      "css": ".ds-card { background: #ffffff; border-radius: 6px; padding: 16px; box-shadow: 0 2px 12px 0 rgba(17, 24, 39, 0.08); font-family: Cairo, \"Segoe UI\", Tahoma, Arial, sans-serif; transition: box-shadow 0.22s cubic-bezier(0.16,1,0.3,1); } .ds-card:hover { box-shadow: 0 6px 20px 0 rgba(17, 24, 39, 0.12); } .ds-card-title { margin: 0 0 8px; font-size: 1.125rem; font-weight: 600; color: #111827; } .ds-card-body { margin: 0; font-size: 0.875rem; line-height: 1.6; color: #6b7280; }"
+    },
+    {
+      "name": "Data Table Row",
+      "kind": "custom",
+      "refersTo": "table-header",
+      "description": "The signature list pattern (question bank, topics, exams): flat header, hairline row dividers, tinted hover — no card chrome.",
+      "html": "<table class=\"ds-table\" dir=\"rtl\"><thead><tr><th>الاسم</th><th>الحالة</th><th>إجراءات</th></tr></thead><tbody><tr class=\"ds-row\"><td>Excel Basics</td><td>Draft</td><td><button class=\"ds-btn-primary\">نشر</button></td></tr></tbody></table>",
+      "css": ".ds-table { width: 100%; border-collapse: collapse; font-family: Cairo, \"Segoe UI\", Tahoma, Arial, sans-serif; font-size: 0.875rem; } .ds-table thead { background: #f9fafb; } .ds-table th { text-align: right; padding: 8px 16px; font-size: 0.75rem; font-weight: 600; letter-spacing: 0.02em; color: #6b7280; border-bottom: 1px solid #e5e7eb; } .ds-table td { padding: 12px 16px; color: #111827; border-bottom: 1px solid #e5e7eb; } .ds-row { background: #ffffff; transition: background-color 0.15s cubic-bezier(0.4,0,0.2,1); } .ds-row:hover { background: #e8eefc; } .ds-btn-primary { background: #1a56db; color: #fff; border: none; border-radius: 6px; padding: 6px 14px; font-size: 0.8125rem; font-weight: 600; cursor: pointer; }"
+    },
+    {
+      "name": "Nav Item",
+      "kind": "nav",
+      "refersTo": "button-secondary",
+      "description": "Admin-layout header link — flat, hairline rule beneath the whole header, Authority Blue underline marks the active route.",
+      "html": "<nav class=\"ds-nav\" dir=\"rtl\"><a href=\"#\" class=\"ds-nav-link ds-nav-link-active\">الامتحانات</a><a href=\"#\" class=\"ds-nav-link\">الأسئلة</a></nav>",
+      "css": ".ds-nav { display: flex; gap: 24px; padding: 0 0 1px; border-bottom: 1px solid #e5e7eb; font-family: Cairo, \"Segoe UI\", Tahoma, Arial, sans-serif; } .ds-nav-link { padding: 12px 4px; font-size: 0.875rem; font-weight: 400; color: #6b7280; text-decoration: none; border-bottom: 2px solid transparent; transition: color 0.15s cubic-bezier(0.4,0,0.2,1), border-color 0.15s cubic-bezier(0.4,0,0.2,1); } .ds-nav-link:hover { color: #111827; } .ds-nav-link-active { color: #1a56db; font-weight: 600; border-bottom-color: #1a56db; }"
+    }
+  ],
+  "narrative": {
+    "northStar": "The Official Ledger",
+    "overview": "This is the working console behind a Ministry of Justice exam system: an internal tool for admins who configure exams, curate question banks, and publish with confidence that the numbers add up. The Official Ledger treats every screen like a page in a well-kept register — dense with real data, laid out so the eye finds what it needs in one pass, and quietly authoritative rather than decorated. It is modern and professional, never sterile: motion and feedback are present and controlled, not suppressed in the name of looking \"official,\" and not performed in the name of looking \"modern.\"\n\nThe system explicitly rejects the loud, colorful commercial-SaaS marketing look (gradient-as-decoration, hero-metric tiles, kicker/eyebrow labels, generic AI-tool scaffolding) and it equally rejects the opposite failure mode — a purely static, robotic government form with no feedback at all. Every action an admin takes (publish, close, archive, delete, save) earns a clear, immediate, motion-backed acknowledgment. Arabic RTL is the native language of this interface, not a mirrored afterthought: type, iconography, and motion direction are built RTL-first.",
+    "keyCharacteristics": [
+      "Dense, scannable data tables and matrices over decorative cards",
+      "One accent color (Authority Blue), used deliberately and sparingly",
+      "Calm, breathable component spacing even in data-dense screens",
+      "Layered elevation: surfaces read their depth from a persistent, soft shadow, not from borders",
+      "RTL-native layout, motion, and iconography throughout"
+    ],
+    "rules": [
+      { "name": "The One Ledger Rule", "body": "Authority Blue appears on at most one primary action per view and on active/selected state — never as a decorative background wash, section divider, or illustrative color. Its rarity is what makes it read as \"the thing to do here.\"", "section": "colors" },
+      { "name": "The One-Family Rule", "body": "Every weight and size on screen comes from Cairo. If a second family shows up, it's a bug, not a design choice.", "section": "typography" },
+      { "name": "The No-Ghost-Card Rule", "body": "A surface gets a border or a shadow, never both. Cards and panels use the Shadow Vocabulary with no border; only true dividers (a table's header rule, a form's field separator) use Hairline Grey, and those never carry a shadow.", "section": "elevation" }
+    ],
+    "dos": [
+      "Do use Cairo as the only type family across the app; vary weight and size, never introduce a second family.",
+      "Do give every card, panel, and modal-style overlay the Resting-card shadow (0 2px 12px 0 rgba(17,24,39,0.08)) at rest — depth is always visible, not just on hover.",
+      "Do confirm every state-changing action (publish / close / archive / delete / save) with an immediate, motion-backed acknowledgment — a toast, an inline status change, or both.",
+      "Do build navigation, tables, and motion RTL-first: reading order, icon direction, and animation direction all flow right-to-left as the native case, not as a mirrored LTR default.",
+      "Do keep Authority Blue to primary actions, active/selected state, and focus rings only."
+    ],
+    "donts": [
+      "Don't combine a border and a shadow on the same surface — pick the shadow.",
+      "Don't reach for a loud, colorful commercial-SaaS marketing aesthetic: no gradient-as-decoration, no gradient text, no hero-metric tiles, no tiny uppercase eyebrow labels above sections, no generic AI-tool scaffolding.",
+      "Don't ship a purely static, feedback-free \"government form\" screen — motion on interaction is part of the brand, not optional polish.",
+      "Don't let PrimeNG's own default theme values (its --primary-color: #3B82F6 and \"Inter var\" font, both currently unused anywhere in the codebase) leak into a new component by accident.",
+      "Don't over-design for personality's sake — when trust/legibility and delight conflict, trust and legibility win."
+    ]
+  }
+}

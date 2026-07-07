@@ -1,3 +1,5 @@
+using ExamSystem.Domain.Queue;
+
 namespace ExamSystem.Application.Features.Exams.CreateExam;
 
 public record CreateExamCommand(
@@ -16,4 +18,5 @@ public record CreateExamCommand(
     bool AllowBackNavigation,
     int MaxConcurrentAttempts,
     int GraceWindowMinutes,
+    QueueMode QueueMode,
     List<ExamTopicSelectionInput> TopicSelections) : IRequest<Result<Guid>>;

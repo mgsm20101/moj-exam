@@ -15,7 +15,7 @@ public class GetExamsQueryHandler : IRequestHandler<GetExamsQuery, Result<List<E
 
         var dtos = exams
             .Select(e => new ExamSummaryDto(
-                e.Id, e.Name, e.StartAtUtc, e.EndAtUtc, e.DurationMinutes, e.Status,
+                e.Id, e.Name, e.StartAtUtc, e.EndAtUtc, e.DurationMinutes, e.Status, e.QueueMode,
                 e.TopicSelections.Sum(s => s.Count),
                 e.TopicSelections.Sum(s => s.Count * PointsFor(e, s.Type))))
             .OrderByDescending(d => d.StartAtUtc)

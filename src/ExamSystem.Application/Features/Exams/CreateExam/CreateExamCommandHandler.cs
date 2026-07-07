@@ -27,6 +27,7 @@ public class CreateExamCommandHandler : IRequestHandler<CreateExamCommand, Resul
             AllowBackNavigation = request.AllowBackNavigation,
             MaxConcurrentAttempts = request.MaxConcurrentAttempts,
             GraceWindowMinutes = request.GraceWindowMinutes,
+            QueueMode = request.QueueMode,
             Status = ExamStatus.Draft
         };
 

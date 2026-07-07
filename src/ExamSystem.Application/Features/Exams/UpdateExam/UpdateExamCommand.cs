@@ -1,3 +1,5 @@
+using ExamSystem.Domain.Queue;
+
 namespace ExamSystem.Application.Features.Exams.UpdateExam;
 
 public record UpdateExamCommand(
@@ -17,4 +19,5 @@ public record UpdateExamCommand(
     bool AllowBackNavigation,
     int MaxConcurrentAttempts,
     int GraceWindowMinutes,
+    QueueMode QueueMode,
     List<ExamTopicSelectionInput> TopicSelections) : IRequest<Result<Unit>>;
