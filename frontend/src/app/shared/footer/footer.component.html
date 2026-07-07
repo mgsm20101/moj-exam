@@ -1,0 +1,11 @@
+<footer class="app-footer">
+  <span class="app-footer-org">إدارة البحوث والتدريب</span>
+  <button
+    *ngIf="isAuthenticated"
+    type="button"
+    class="app-footer-logout"
+    (click)="logout()"
+  >
+    تسجيل الخروج
+  </button>
+</footer>

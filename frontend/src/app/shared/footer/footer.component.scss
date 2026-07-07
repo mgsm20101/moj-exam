@@ -1,0 +1,29 @@
+.app-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-md);
+  padding: var(--space-sm) var(--space-lg);
+  border-top: 1px solid var(--hairline-grey);
+  background: var(--pure-white);
+  color: var(--slate-grey);
+  font-size: var(--fs-label);
+}
+
+.app-footer-org {
+  font-weight: var(--fw-semibold);
+}
+
+.app-footer-logout {
+  background: none;
+  border: 1px solid var(--hairline-grey);
+  border-radius: var(--radius-md);
+  padding: var(--space-xs) var(--space-sm);
+  color: var(--authority-blue-deep);
+  cursor: pointer;
+  transition: background var(--dur-base) var(--ease-out);
+}
+
+.app-footer-logout:hover {
+  background: var(--authority-blue-tint);
+}

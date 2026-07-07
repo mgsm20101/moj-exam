@@ -114,7 +114,14 @@ if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
     app.UseSwaggerUI();
+}
 
+// Runs in every environment, not just Development: shared hosting (e.g. MonsterASP.NET) gives no
+// SSH/console access, so the app applying its own pending migrations on startup is the only
+// available path to a schema update short of a separate CI migration job. Safe to run on every
+// restart -- MigrateAsync only applies pending migrations (no-op otherwise) and both seed steps
+// are idempotent (guarded by AnyAsync checks), so this can't duplicate data or reapply anything.
+{
     using var scope = app.Services.CreateScope();
     var db = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
     // SQL Server uses real migrations; non-SQL-Server providers (e.g. SQLite in integration tests, Task 8) use EnsureCreatedAsync instead.
@@ -127,6 +134,8 @@ if (app.Environment.IsDevelopment())
         await db.Database.EnsureCreatedAsync();
     }
     await DbInitializer.SeedAdminAsync(scope.ServiceProvider);
+    await DbInitializer.SeedQuestionBankAsync(scope.ServiceProvider);
+    await DbInitializer.SeedDefaultExamAsync(scope.ServiceProvider);
 }
 
 app.UseHttpsRedirection();
