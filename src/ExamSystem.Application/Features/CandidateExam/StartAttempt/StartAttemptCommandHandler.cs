@@ -67,9 +67,9 @@ public class StartAttemptCommandHandler : IRequestHandler<StartAttemptCommand, R
         // Already taken (no active grant) blocks before any queueing.
         var hasAnyAttempt = await _db.ExamAttempts.AnyAsync(
             a => a.ExamId == exam.Id && a.CandidateId == candidate.Id, cancellationToken);
-        var hasActiveGrant = await _db.CandidateExamAttemptGrants.AnyAsync(
+        var activeGrant = await _db.CandidateExamAttemptGrants.FirstOrDefaultAsync(
             g => g.ExamId == exam.Id && g.CandidateId == candidate.Id && g.IsActive, cancellationToken);
-        if (hasAnyAttempt && !hasActiveGrant)
+        if (hasAnyAttempt && activeGrant is null)
         {
             return Result<StartAttemptDto>.Failure("You have already taken this exam.");
         }
@@ -88,6 +88,13 @@ public class StartAttemptCommandHandler : IRequestHandler<StartAttemptCommand, R
             if (!created.IsSuccess)
             {
                 return Result<StartAttemptDto>.Failure(created.Errors);
+            }
+
+            // A retake grant is single-use: consume it now that it has actually let the candidate
+            // start again, so it can't be reused for a third, fourth, ... attempt.
+            if (hasAnyAttempt && activeGrant is not null)
+            {
+                activeGrant.IsActive = false;
             }
 
             // Mark any queue entry for this candidate as Started.
