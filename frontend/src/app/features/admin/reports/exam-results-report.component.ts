@@ -1,12 +1,17 @@
 import { ChangeDetectionStrategy, Component, OnInit, computed, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
 import { ExamService, ExamSummary } from '../../../core/services/exam.service';
 import { ExamResultRow, ExamResultsReport, ReportService, ResultsFilter } from '../../../core/services/report.service';
+import { AttemptReview } from '../../../shared/attempt-review/attempt-review.model';
+import { AttemptReviewComponent } from '../../../shared/attempt-review/attempt-review.component';
+
+type SortColumn = 'fullName' | 'nationalId' | 'score';
 
 @Component({
   selector: 'app-exam-results-report',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, FormsModule, AttemptReviewComponent],
   templateUrl: './exam-results-report.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush
 })
@@ -22,6 +27,71 @@ export class ExamResultsReportComponent implements OnInit {
   exporting = signal(false);
   grantingNationalId = signal<string | null>(null);
   errorMessage: string | null = null;
+
+  // Feature: client-side name/id/mobile search layered on top of the server pass/fail filter.
+  nameQuery = signal('');
+  filteredRows = computed<ExamResultRow[]>(() => {
+    const current = this.report();
+    if (!current) {
+      return [];
+    }
+    const query = this.nameQuery().trim().toLowerCase();
+    if (!query) {
+      return current.rows;
+    }
+    return current.rows.filter(row =>
+      row.fullName.toLowerCase().includes(query) ||
+      row.nationalId.toLowerCase().includes(query) ||
+      row.mobileNumber.toLowerCase().includes(query));
+  });
+
+  // Feature: reorder the table by name / national id / score (defaults to score, high → low, which
+  // matches the server's default ordering). Sorting is layered on top of the search filter.
+  sortColumn = signal<SortColumn>('score');
+  sortDir = signal<'asc' | 'desc'>('desc');
+  sortedRows = computed<ExamResultRow[]>(() => {
+    const rows = [...this.filteredRows()];
+    const column = this.sortColumn();
+    const direction = this.sortDir() === 'asc' ? 1 : -1;
+    rows.sort((a, b) => {
+      let cmp: number;
+      if (column === 'score') {
+        cmp = a.score - b.score;
+      } else if (column === 'nationalId') {
+        cmp = a.nationalId.localeCompare(b.nationalId, undefined, { numeric: true });
+      } else {
+        cmp = a.fullName.localeCompare(b.fullName, 'ar');
+      }
+      // Stable, predictable tie-break by name so equal keys don't jump around between renders.
+      if (cmp === 0) {
+        cmp = a.fullName.localeCompare(b.fullName, 'ar');
+      }
+      return cmp * direction;
+    });
+    return rows;
+  });
+
+  setSort(column: SortColumn): void {
+    if (this.sortColumn() === column) {
+      this.sortDir.set(this.sortDir() === 'asc' ? 'desc' : 'asc');
+      return;
+    }
+    this.sortColumn.set(column);
+    // Names/ids read best ascending (A→Z, 0→9); scores read best descending (highest first).
+    this.sortDir.set(column === 'score' ? 'desc' : 'asc');
+  }
+
+  sortIndicator(column: SortColumn): string {
+    if (this.sortColumn() !== column) {
+      return '';
+    }
+    return this.sortDir() === 'asc' ? '▲' : '▼';
+  }
+
+  // Per-attempt review overlay state.
+  review = signal<AttemptReview | null>(null);
+  reviewLoading = signal(false);
+  reviewError: string | null = null;
 
   readonly filters: { value: ResultsFilter; label: string }[] = [
     { value: 'all', label: 'الكل' },
@@ -44,10 +114,35 @@ export class ExamResultsReportComponent implements OnInit {
   onExamChange(examId: string): void {
     this.selectedExamId.set(examId || null);
     this.filter.set('all');
+    this.nameQuery.set('');
+    this.sortColumn.set('score');
+    this.sortDir.set('desc');
     this.report.set(null);
     if (examId) {
       this.loadReport();
     }
+  }
+
+  openReview(row: ExamResultRow): void {
+    this.reviewError = null;
+    this.review.set(null);
+    this.reviewLoading.set(true);
+    this.reportService.getAttemptReview(row.attemptId).subscribe({
+      next: review => {
+        this.review.set(review);
+        this.reviewLoading.set(false);
+      },
+      error: () => {
+        this.reviewLoading.set(false);
+        this.reviewError = 'تعذّر تحميل تفاصيل المحاولة.';
+      }
+    });
+  }
+
+  closeReview(): void {
+    this.review.set(null);
+    this.reviewLoading.set(false);
+    this.reviewError = null;
   }
 
   setFilter(filter: ResultsFilter): void {

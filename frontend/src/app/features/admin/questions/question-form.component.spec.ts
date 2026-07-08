@@ -1,6 +1,7 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { QuestionFormComponent } from './question-form.component';
 import { Topic } from '../../../core/services/topic.service';
+import { Question } from '../../../core/services/question.service';
 
 describe('QuestionFormComponent', () => {
   let fixture: ComponentFixture<QuestionFormComponent>;
@@ -91,6 +92,37 @@ describe('QuestionFormComponent', () => {
     component.submit();
 
     expect(component.validationError()).toBeNull();
+  });
+
+  it('populates the form and rebuilds the options array in edit mode', () => {
+    const question: Question = {
+      id: 'q1', topicId: 't1', topicName: 'Excel', type: 'Mcq', difficulty: 'Hard',
+      text: 'Which cell?', imageUrl: null, correctAnswerText: null, pointsOverride: null, isActive: true,
+      options: [
+        { id: 'o2', text: 'B', isCorrect: true, displayOrder: 2 },
+        { id: 'o1', text: 'A', isCorrect: false, displayOrder: 1 }
+      ]
+    };
+
+    component.question = question;
+
+    expect(component.editing()).toBeTrue();
+    expect(component.form.value.topicId).toBe('t1');
+    expect(component.form.value.difficulty).toBe('Hard');
+    expect(component.form.value.text).toBe('Which cell?');
+    // Options are rebuilt sorted by displayOrder.
+    expect(component.options.length).toBe(2);
+    expect(component.options.at(0).value).toEqual({ text: 'A', isCorrect: false });
+    expect(component.options.at(1).value).toEqual({ text: 'B', isCorrect: true });
+  });
+
+  it('emits cancelEdit when cancel() is called', () => {
+    let cancelled = false;
+    component.cancelEdit.subscribe(() => (cancelled = true));
+
+    component.cancel();
+
+    expect(cancelled).toBeTrue();
   });
 
   it('resetForm() restores default values and a two-option FormArray', () => {

@@ -5,4 +5,4 @@ public record LoginCommand(string UserName, string Password) : IRequest<Result<L
     public override string ToString() => $"LoginCommand {{ UserName = {UserName} }}";
 }
 
-public record LoginResponse(string Token, string UserName, IReadOnlyList<string> Roles);
+public record LoginResponse(string Token, string RefreshToken, string UserName, IReadOnlyList<string> Roles);

@@ -1,6 +1,7 @@
 import { Component, OnInit, signal, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { Observable } from 'rxjs';
 import { Difficulty, Question, QuestionInput, QuestionService } from '../../../core/services/question.service';
 import { Topic, TopicService } from '../../../core/services/topic.service';
 import { QuestionFormComponent } from './question-form.component';
@@ -19,6 +20,11 @@ export class QuestionsListComponent implements OnInit {
   selectedTopicId = '';
   selectedDifficulty: Difficulty | '' = '';
   errorMessage: string | null = null;
+
+  /// The question currently being edited (null = the form is in "add" mode).
+  editingQuestion = signal<Question | null>(null);
+  /// Row whose answers/options detail is expanded.
+  expandedId = signal<string | null>(null);
 
   readonly typeLabels: Record<string, string> = {
     Mcq: 'اختيار من متعدد',
@@ -57,13 +63,36 @@ export class QuestionsListComponent implements OnInit {
 
   onQuestionSave(input: QuestionInput): void {
     this.errorMessage = null;
-    this.questionService.create(input).subscribe({
+    const editing = this.editingQuestion();
+
+    const request$: Observable<unknown> = editing
+      ? this.questionService.update(editing.id, { ...input, isActive: editing.isActive })
+      : this.questionService.create(input);
+
+    request$.subscribe({
       next: () => {
         this.applyFilters();
+        this.editingQuestion.set(null);
         this.questionForm?.resetForm();
       },
       error: () => (this.errorMessage = 'تعذّر حفظ السؤال — تحقق من صيغة الإجابة أو الاختيارات.')
     });
+  }
+
+  startEdit(question: Question): void {
+    this.errorMessage = null;
+    this.editingQuestion.set(question);
+    // Scroll the edit form into view so the admin sees the pre-filled fields.
+    setTimeout(() => document.querySelector('.add-question')?.scrollIntoView({ behavior: 'smooth' }));
+  }
+
+  cancelEdit(): void {
+    this.editingQuestion.set(null);
+    this.questionForm?.resetForm();
+  }
+
+  toggleExpand(id: string): void {
+    this.expandedId.set(this.expandedId() === id ? null : id);
   }
 
   onImageFileSelected(file: File): void {

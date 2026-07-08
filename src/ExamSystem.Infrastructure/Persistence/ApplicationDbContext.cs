@@ -33,6 +33,10 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser>, IApplica
     public DbSet<AttemptAnswer> AttemptAnswers => Set<AttemptAnswer>();
     public DbSet<WaitingQueueEntry> WaitingQueueEntries => Set<WaitingQueueEntry>();
 
+    // Refresh tokens are an Identity/Infrastructure concern (bound to ApplicationUser), so they live
+    // on the concrete context rather than the Application-layer IApplicationDbContext abstraction.
+    public DbSet<RefreshToken> RefreshTokens => Set<RefreshToken>();
+
     protected override void OnModelCreating(ModelBuilder builder)
     {
         base.OnModelCreating(builder);

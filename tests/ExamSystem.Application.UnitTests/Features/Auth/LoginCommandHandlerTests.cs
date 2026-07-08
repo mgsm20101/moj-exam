@@ -8,7 +8,7 @@ namespace ExamSystem.Application.UnitTests.Features.Auth;
 public class LoginCommandHandlerTests
 {
     [Fact]
-    public async Task Handle_ValidCredentials_ReturnsSuccessWithToken()
+    public async Task Handle_ValidCredentials_ReturnsSuccessWithTokenAndRefreshToken()
     {
         var identityService = new Mock<IIdentityService>();
         identityService
@@ -20,12 +20,18 @@ public class LoginCommandHandlerTests
             .Setup(g => g.GenerateToken("user-1", "admin", It.Is<IReadOnlyList<string>>(r => r.Contains("Admin"))))
             .Returns("fake-jwt-token");
 
-        var handler = new LoginCommandHandler(identityService.Object, tokenGenerator.Object);
+        var refreshTokens = new Mock<IRefreshTokenService>();
+        refreshTokens
+            .Setup(s => s.IssueAsync("user-1", It.IsAny<CancellationToken>()))
+            .ReturnsAsync("fake-refresh-token");
+
+        var handler = new LoginCommandHandler(identityService.Object, tokenGenerator.Object, refreshTokens.Object);
 
         var result = await handler.Handle(new LoginCommand("admin", "P@ssw0rd!"), CancellationToken.None);
 
         Assert.True(result.IsSuccess);
         Assert.Equal("fake-jwt-token", result.Value!.Token);
+        Assert.Equal("fake-refresh-token", result.Value.RefreshToken);
         Assert.Equal("admin", result.Value.UserName);
     }
 
@@ -38,13 +44,15 @@ public class LoginCommandHandlerTests
             .ReturnsAsync(IdentityValidationResult.Failure());
 
         var tokenGenerator = new Mock<IJwtTokenGenerator>();
+        var refreshTokens = new Mock<IRefreshTokenService>();
 
-        var handler = new LoginCommandHandler(identityService.Object, tokenGenerator.Object);
+        var handler = new LoginCommandHandler(identityService.Object, tokenGenerator.Object, refreshTokens.Object);
 
         var result = await handler.Handle(new LoginCommand("admin", "wrong"), CancellationToken.None);
 
         Assert.False(result.IsSuccess);
         Assert.Contains("Invalid username or password.", result.Errors);
         tokenGenerator.Verify(g => g.GenerateToken(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<IReadOnlyList<string>>()), Times.Never);
+        refreshTokens.Verify(s => s.IssueAsync(It.IsAny<string>(), It.IsAny<CancellationToken>()), Times.Never);
     }
 }

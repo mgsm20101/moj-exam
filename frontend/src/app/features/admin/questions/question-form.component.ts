@@ -2,7 +2,7 @@ import { Component, EventEmitter, Input, Output, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormArray, FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Topic } from '../../../core/services/topic.service';
-import { Difficulty, QuestionInput, QuestionType } from '../../../core/services/question.service';
+import { Difficulty, Question, QuestionInput, QuestionType } from '../../../core/services/question.service';
 
 @Component({
   selector: 'app-question-form',
@@ -14,8 +14,20 @@ export class QuestionFormComponent {
   @Input() topics: Topic[] = [];
   @Output() save = new EventEmitter<QuestionInput>();
   @Output() imageFileSelected = new EventEmitter<File>();
+  @Output() cancelEdit = new EventEmitter<void>();
 
   readonly validationError = signal<string | null>(null);
+  readonly editing = signal(false);
+
+  /// When a question is supplied the form switches to edit mode and pre-fills every field.
+  @Input() set question(value: Question | null | undefined) {
+    if (value) {
+      this.populate(value);
+      this.editing.set(true);
+    } else {
+      this.editing.set(false);
+    }
+  }
 
   readonly form: FormGroup = this.fb.group({
     topicId: ['', Validators.required],
@@ -34,8 +46,36 @@ export class QuestionFormComponent {
     return this.form.get('options') as FormArray;
   }
 
-  private buildOption() {
-    return this.fb.group({ text: [''], isCorrect: [false] });
+  private buildOption(text = '', isCorrect = false) {
+    return this.fb.group({ text: [text], isCorrect: [isCorrect] });
+  }
+
+  /// Pre-fills the form from an existing question (edit mode): scalar fields + a rebuilt options array.
+  private populate(q: Question): void {
+    this.form.patchValue({
+      topicId: q.topicId,
+      type: q.type,
+      difficulty: q.difficulty,
+      text: q.text,
+      imageUrl: q.imageUrl ?? '',
+      correctAnswerText: q.correctAnswerText ?? ''
+    });
+
+    this.options.clear();
+    const sorted = [...(q.options ?? [])].sort(
+      (a, b) => (a.displayOrder ?? 0) - (b.displayOrder ?? 0)
+    );
+    if (sorted.length === 0) {
+      this.options.push(this.buildOption());
+      this.options.push(this.buildOption());
+    } else {
+      sorted.forEach(o => this.options.push(this.buildOption(o.text, o.isCorrect)));
+    }
+    this.validationError.set(null);
+  }
+
+  cancel(): void {
+    this.cancelEdit.emit();
   }
 
   onCorrectAnswerInput(rawValue: string): void {
@@ -117,5 +157,6 @@ export class QuestionFormComponent {
     this.options.push(this.buildOption());
     this.options.push(this.buildOption());
     this.validationError.set(null);
+    this.editing.set(false);
   }
 }

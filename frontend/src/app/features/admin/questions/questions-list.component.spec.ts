@@ -17,7 +17,7 @@ describe('QuestionsListComponent', () => {
   }];
 
   beforeEach(async () => {
-    questionService = jasmine.createSpyObj('QuestionService', ['getAll', 'create', 'deactivate', 'uploadImage']);
+    questionService = jasmine.createSpyObj('QuestionService', ['getAll', 'create', 'update', 'deactivate', 'uploadImage']);
     topicService = jasmine.createSpyObj('TopicService', ['getAll']);
     questionService.getAll.and.returnValue(of(questions));
     topicService.getAll.and.returnValue(of(topics));
@@ -60,6 +60,37 @@ describe('QuestionsListComponent', () => {
 
     expect(questionService.create).toHaveBeenCalled();
     expect(questionService.getAll).toHaveBeenCalled();
+  });
+
+  it('startEdit() puts the form into edit mode with the selected question', () => {
+    fixture.detectChanges();
+
+    component.startEdit(questions[0]);
+
+    expect(component.editingQuestion()).toBe(questions[0]);
+  });
+
+  it('onQuestionSave() updates (not creates) when editing, then clears edit mode', () => {
+    fixture.detectChanges();
+    questionService.update.and.returnValue(of(undefined));
+    questionService.getAll.calls.reset();
+
+    component.startEdit(questions[0]);
+    component.onQuestionSave({ topicId: 't1', type: 'FillBlank', difficulty: 'Medium', text: 'Fill ___', correctAnswerText: 'client' });
+
+    expect(questionService.update).toHaveBeenCalledWith('q1', jasmine.objectContaining({ isActive: true, correctAnswerText: 'client' }));
+    expect(questionService.create).not.toHaveBeenCalled();
+    expect(component.editingQuestion()).toBeNull();
+    expect(questionService.getAll).toHaveBeenCalled();
+  });
+
+  it('toggleExpand() toggles the answers detail row for a question', () => {
+    fixture.detectChanges();
+
+    component.toggleExpand('q1');
+    expect(component.expandedId()).toBe('q1');
+    component.toggleExpand('q1');
+    expect(component.expandedId()).toBeNull();
   });
 
   it('deactivateQuestion() calls the service and reloads the list', () => {

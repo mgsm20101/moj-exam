@@ -10,8 +10,27 @@
   font-size: var(--fs-label);
 }
 
+.app-footer-info {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-xs) var(--space-md);
+}
+
 .app-footer-org {
   font-weight: var(--fw-semibold);
+}
+
+.app-footer-credits {
+  display: inline-flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-xs) var(--space-sm);
+  color: var(--slate-grey);
+}
+
+.app-footer-sep {
+  color: var(--hairline-grey);
 }
 
 .app-footer-logout {

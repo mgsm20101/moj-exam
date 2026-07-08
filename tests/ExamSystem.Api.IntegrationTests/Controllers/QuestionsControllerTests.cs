@@ -99,7 +99,58 @@ public class QuestionsControllerTests : IClassFixture<TestWebApplicationFactory>
         return Convert.FromBase64String(base64);
     }
 
+    [Fact]
+    public async Task UpdateMcqQuestion_ReplacesTextAndOptions()
+    {
+        // Regression test: updating a question rebuilds its option set. The handler must issue
+        // DELETE-then-INSERT for options; a naive Options.Clear()+navigation-add makes EF treat the
+        // new (Guid-keyed) options as existing rows and emit UPDATEs that affect 0 rows, throwing
+        // DbUpdateConcurrencyException. This test fails against that regression.
+        var client = await _factory.CreateAuthenticatedAdminClientAsync();
+        var topicId = await CreateTopicAsync(client, "Editing Topic");
+
+        var createResponse = await client.PostAsJsonAsync("/api/admin/questions", new
+        {
+            topicId,
+            type = "Mcq",
+            difficulty = "Easy",
+            text = "Original text?",
+            options = new[]
+            {
+                new { text = "A", isCorrect = true },
+                new { text = "B", isCorrect = false }
+            }
+        });
+        var created = await createResponse.Content.ReadFromJsonAsync<CreatedIdDto>();
+
+        var updateResponse = await client.PutAsJsonAsync($"/api/admin/questions/{created!.Id}", new
+        {
+            topicId,
+            type = "Mcq",
+            difficulty = "Easy",
+            text = "Edited text?",
+            isActive = true,
+            options = new[]
+            {
+                new { text = "New A", isCorrect = false },
+                new { text = "New B", isCorrect = true },
+                new { text = "New C", isCorrect = false }
+            }
+        });
+
+        Assert.Equal(HttpStatusCode.NoContent, updateResponse.StatusCode);
+
+        var list = await (await client.GetAsync($"/api/admin/questions?topicId={topicId}"))
+            .Content.ReadFromJsonAsync<List<QuestionDetailDto>>();
+        var edited = Assert.Single(list!, q => q.Id == created.Id);
+        Assert.Equal("Edited text?", edited.Text);
+        Assert.Equal(3, edited.Options.Count);
+        Assert.Single(edited.Options, o => o.IsCorrect && o.Text == "New B");
+    }
+
     private record CreatedIdDto(Guid Id);
     private record QuestionListItemDto(Guid Id, string Text);
+    private record QuestionDetailDto(Guid Id, string Text, List<QuestionOptionDto> Options);
+    private record QuestionOptionDto(string Text, bool IsCorrect);
     private record UploadedImageDto(string Url);
 }

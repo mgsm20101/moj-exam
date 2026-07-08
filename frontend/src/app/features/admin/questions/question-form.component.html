@@ -8,6 +8,7 @@
   <label for="type">نوع السؤال</label>
   <select id="type" formControlName="type">
     <option value="Mcq">اختيار من متعدد</option>
+    <option value="TrueFalse">صح / خطأ</option>
     <option value="FillBlank">أكمل الناقص</option>
   </select>
 
@@ -39,12 +40,19 @@
     <div *ngFor="let option of options.controls; let i = index" [formGroupName]="i" class="option-row">
       <input type="text" formControlName="text" placeholder="نص الاختيار {{ i + 1 }}" />
       <label>
-        <input type="radio" [name]="'correctOption'" (change)="selectCorrectOption(i)" />
+        <input
+          type="radio"
+          [name]="'correctOption'"
+          [checked]="option.value.isCorrect"
+          (change)="selectCorrectOption(i)" />
         صحيحة
       </label>
     </div>
   </ng-container>
 
   <p class="error" *ngIf="validationError()">{{ validationError() }}</p>
-  <button type="submit">حفظ السؤال</button>
+  <div class="form-actions">
+    <button type="submit">{{ editing() ? 'حفظ التعديل' : 'حفظ السؤال' }}</button>
+    <button type="button" class="text" *ngIf="editing()" (click)="cancel()">إلغاء</button>
+  </div>
 </form>

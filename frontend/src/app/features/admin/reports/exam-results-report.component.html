@@ -52,26 +52,54 @@
       النهاية العظمى {{ r.totalPoints }} — درجة النجاح {{ r.passMarkPoints }} ({{ r.passMarkPercentage }}%)
     </p>
 
-    <div class="filter-chips" role="tablist" aria-label="تصفية النتائج">
-      <button
-        *ngFor="let f of filters"
-        type="button"
-        role="tab"
-        class="chip"
-        [class.chip-active]="filter() === f.value"
-        [attr.aria-selected]="filter() === f.value"
-        (click)="setFilter(f.value)">
-        {{ f.label }}
-      </button>
+    <div class="results-toolbar">
+      <div class="filter-chips" role="tablist" aria-label="تصفية النتائج">
+        <button
+          *ngFor="let f of filters"
+          type="button"
+          role="tab"
+          class="chip"
+          [class.chip-active]="filter() === f.value"
+          [attr.aria-selected]="filter() === f.value"
+          (click)="setFilter(f.value)">
+          {{ f.label }}
+        </button>
+      </div>
+
+      <label class="field search-field">
+        <span>بحث بالاسم أو الرقم القومي أو الجوال</span>
+        <input
+          type="search"
+          [ngModel]="nameQuery()"
+          (ngModelChange)="nameQuery.set($event)"
+          placeholder="اكتب للبحث…"
+          autocomplete="off" />
+      </label>
     </div>
+
+    <p class="muted match-count" *ngIf="nameQuery().trim()">
+      {{ filteredRows().length }} نتيجة مطابقة من {{ r.rows.length }}
+    </p>
 
     <table class="results-table">
       <thead>
         <tr>
-          <th>الاسم</th>
-          <th>الرقم القومي</th>
+          <th class="sortable" [attr.aria-sort]="sortColumn() === 'fullName' ? (sortDir() === 'asc' ? 'ascending' : 'descending') : 'none'">
+            <button type="button" class="sort-header" (click)="setSort('fullName')">
+              الاسم <span class="sort-arrow">{{ sortIndicator('fullName') }}</span>
+            </button>
+          </th>
+          <th class="sortable" [attr.aria-sort]="sortColumn() === 'nationalId' ? (sortDir() === 'asc' ? 'ascending' : 'descending') : 'none'">
+            <button type="button" class="sort-header" (click)="setSort('nationalId')">
+              الرقم القومي <span class="sort-arrow">{{ sortIndicator('nationalId') }}</span>
+            </button>
+          </th>
           <th>رقم الجوال</th>
-          <th>الدرجة</th>
+          <th class="sortable" [attr.aria-sort]="sortColumn() === 'score' ? (sortDir() === 'asc' ? 'ascending' : 'descending') : 'none'">
+            <button type="button" class="sort-header" (click)="setSort('score')">
+              الدرجة <span class="sort-arrow">{{ sortIndicator('score') }}</span>
+            </button>
+          </th>
           <th>النسبة</th>
           <th>النتيجة</th>
           <th>وقت التسليم</th>
@@ -79,7 +107,7 @@
         </tr>
       </thead>
       <tbody>
-        <tr *ngFor="let row of r.rows">
+        <tr *ngFor="let row of sortedRows()">
           <td>{{ row.fullName }}</td>
           <td>{{ row.nationalId }}</td>
           <td>{{ row.mobileNumber }}</td>
@@ -92,25 +120,46 @@
           </td>
           <td>{{ row.submittedAtUtc | date: 'short' }}</td>
           <td>
-            <span class="badge badge-info" *ngIf="row.hasActiveRetakeGrant">تم المنح ✓</span>
-            <button
-              type="button"
-              class="btn-secondary"
-              *ngIf="!row.hasActiveRetakeGrant"
-              [disabled]="grantingNationalId() === row.nationalId"
-              (click)="grantRetake(row)">
-              {{ grantingNationalId() === row.nationalId ? 'جارٍ المنح…' : 'منح إعادة الامتحان' }}
-            </button>
+            <div class="row-actions">
+              <button type="button" class="btn-secondary" (click)="openReview(row)">عرض التفاصيل</button>
+              <span class="badge badge-info" *ngIf="row.hasActiveRetakeGrant">تم المنح ✓</span>
+              <button
+                type="button"
+                class="btn-secondary"
+                *ngIf="!row.hasActiveRetakeGrant"
+                [disabled]="grantingNationalId() === row.nationalId"
+                (click)="grantRetake(row)">
+                {{ grantingNationalId() === row.nationalId ? 'جارٍ المنح…' : 'منح إعادة الامتحان' }}
+              </button>
+            </div>
           </td>
         </tr>
-        <tr *ngIf="r.rows.length === 0">
+        <tr *ngIf="filteredRows().length === 0">
           <td colspan="8" class="table-empty">
-            {{ r.summary.totalCandidates === 0 ? 'لا يوجد متقدمون لهذا الامتحان بعد.' : 'لا توجد نتائج مطابقة لهذا التصفية.' }}
+            <ng-container *ngIf="r.rows.length === 0; else noMatch">
+              {{ r.summary.totalCandidates === 0 ? 'لا يوجد متقدمون لهذا الامتحان بعد.' : 'لا توجد نتائج مطابقة لهذه التصفية.' }}
+            </ng-container>
+            <ng-template #noMatch>لا توجد نتائج مطابقة لبحثك.</ng-template>
           </td>
         </tr>
       </tbody>
     </table>
   </ng-container>
+
+  <!-- Per-attempt review overlay: opened from a row's "عرض التفاصيل" button. -->
+  <div class="review-overlay" *ngIf="reviewLoading() || review() || reviewError" (click)="closeReview()">
+    <div class="review-dialog" (click)="$event.stopPropagation()" role="dialog" aria-modal="true">
+      <div class="review-dialog-head">
+        <h3>مراجعة المحاولة<span *ngIf="review() as rv"> — {{ rv.candidateName }}</span></h3>
+        <button type="button" class="review-close" (click)="closeReview()" aria-label="إغلاق">✕</button>
+      </div>
+      <div class="review-dialog-body">
+        <p class="muted" *ngIf="reviewLoading()">جارٍ تحميل التفاصيل…</p>
+        <p class="banner-error" *ngIf="reviewError" role="alert">{{ reviewError }}</p>
+        <app-attempt-review *ngIf="review() as rv" [review]="rv" [revealCorrect]="true"></app-attempt-review>
+      </div>
+    </div>
+  </div>
 
   <div class="table-empty select-prompt" *ngIf="!report() && !loading()">
     اختر امتحاناً لعرض تقرير نتائجه.

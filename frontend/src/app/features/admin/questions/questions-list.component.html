@@ -37,24 +37,48 @@
       </tr>
     </thead>
     <tbody>
-      <tr *ngFor="let question of questions()">
-        <td>{{ question.topicName }}</td>
-        <td>{{ typeLabels[question.type] || question.type }}</td>
-        <td>
-          <span class="badge" [ngClass]="difficultyBadge[question.difficulty] || 'badge-neutral'">
-            {{ difficultyLabels[question.difficulty] || question.difficulty }}
-          </span>
-        </td>
-        <td class="cell-text">{{ question.text }}</td>
-        <td>
-          <span class="badge" [ngClass]="question.isActive ? 'badge-active' : 'badge-neutral'">
-            {{ question.isActive ? 'نشط' : 'معطّل' }}
-          </span>
-        </td>
-        <td class="actions">
-          <button type="button" class="text" (click)="deactivateQuestion(question.id)" [disabled]="!question.isActive">تعطيل</button>
-        </td>
-      </tr>
+      <ng-container *ngFor="let question of questions()">
+        <tr>
+          <td>{{ question.topicName }}</td>
+          <td>{{ typeLabels[question.type] || question.type }}</td>
+          <td>
+            <span class="badge" [ngClass]="difficultyBadge[question.difficulty] || 'badge-neutral'">
+              {{ difficultyLabels[question.difficulty] || question.difficulty }}
+            </span>
+          </td>
+          <td class="cell-text">{{ question.text }}</td>
+          <td>
+            <span class="badge" [ngClass]="question.isActive ? 'badge-active' : 'badge-neutral'">
+              {{ question.isActive ? 'نشط' : 'معطّل' }}
+            </span>
+          </td>
+          <td class="actions">
+            <button type="button" class="text" (click)="toggleExpand(question.id)">
+              {{ expandedId() === question.id ? 'إخفاء الإجابات' : 'عرض الإجابات' }}
+            </button>
+            <button type="button" class="text" (click)="startEdit(question)">تعديل</button>
+            <button type="button" class="text" (click)="deactivateQuestion(question.id)" [disabled]="!question.isActive">تعطيل</button>
+          </td>
+        </tr>
+        <tr *ngIf="expandedId() === question.id" class="answer-detail-row">
+          <td colspan="6">
+            <div class="answer-detail">
+              <ng-container *ngIf="question.type === 'FillBlank'; else optionList">
+                <p><span class="answer-label">الإجابة النموذجية:</span>
+                  <span class="answer-correct">{{ question.correctAnswerText }}</span></p>
+              </ng-container>
+              <ng-template #optionList>
+                <ul class="answer-options">
+                  <li *ngFor="let opt of question.options" [class.answer-correct]="opt.isCorrect">
+                    <span class="answer-mark" *ngIf="opt.isCorrect" aria-hidden="true">✓</span>
+                    {{ opt.text }}
+                  </li>
+                </ul>
+              </ng-template>
+            </div>
+          </td>
+        </tr>
+      </ng-container>
       <tr *ngIf="questions().length === 0">
         <td colspan="6" class="table-empty">لا توجد أسئلة مطابقة — عدّل عوامل التصفية أو أضِف سؤالًا جديدًا أدناه.</td>
       </tr>
@@ -62,11 +86,13 @@
   </table>
 
   <section class="add-question">
-    <h2>إضافة سؤال جديد</h2>
+    <h2>{{ editingQuestion() ? 'تعديل السؤال' : 'إضافة سؤال جديد' }}</h2>
     <app-question-form
       [topics]="topics()"
+      [question]="editingQuestion()"
       (save)="onQuestionSave($event)"
       (imageFileSelected)="onImageFileSelected($event)"
+      (cancelEdit)="cancelEdit()"
     ></app-question-form>
   </section>
 </div>

@@ -23,6 +23,7 @@ describe('ExamService', () => {
     shuffleAnswers: true,
     showResultImmediately: true,
     allowBackNavigation: true,
+    queueMode: 'Auto',
     topicSelections: [{ topicId: '1', displayOrder: 1, difficulty: 'Medium', type: 'Mcq', count: 25 }]
   };
 
@@ -47,7 +48,8 @@ describe('ExamService', () => {
         durationMinutes: 60,
         status: 'Draft',
         totalQuestionCount: 30,
-        totalPoints: 75
+        totalPoints: 75,
+        queueMode: 'Auto'
       }
     ];
 

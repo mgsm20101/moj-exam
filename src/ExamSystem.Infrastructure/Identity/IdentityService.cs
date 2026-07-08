@@ -34,4 +34,16 @@ public class IdentityService : IIdentityService
         var roles = await _userManager.GetRolesAsync(user);
         return new IdentityValidationResult(true, user.Id, user.UserName, roles.ToList());
     }
+
+    public async Task<IdentityUserInfo?> GetUserInfoAsync(string userId)
+    {
+        var user = await _userManager.FindByIdAsync(userId);
+        if (user is null || user.UserName is null)
+        {
+            return null;
+        }
+
+        var roles = await _userManager.GetRolesAsync(user);
+        return new IdentityUserInfo(user.Id, user.UserName, roles.ToList());
+    }
 }

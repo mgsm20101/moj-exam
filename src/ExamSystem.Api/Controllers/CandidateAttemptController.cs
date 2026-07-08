@@ -1,4 +1,5 @@
 using ExamSystem.Application.Features.CandidateExam.TakeExam;
+using ExamSystem.Application.Features.Reports.GetAttemptReview;
 using ExamSystem.Infrastructure.Identity;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
@@ -61,6 +62,17 @@ public class CandidateAttemptController : ControllerBase
     {
         if (Resolve(examId, out var attemptId) is { } forbid) return forbid;
         var result = await _sender.Send(new GetResultQuery(attemptId), cancellationToken);
+        return result.IsSuccess ? Ok(result.Value) : NotFound(new { errors = result.Errors });
+    }
+
+    [HttpGet("review")]
+    public async Task<IActionResult> Review(Guid examId, CancellationToken cancellationToken)
+    {
+        if (Resolve(examId, out var attemptId) is { } forbid) return forbid;
+        // Candidates get a verdict-only review: correct answers are never revealed to them.
+        var result = await _sender.Send(
+            new GetAttemptReviewQuery(attemptId, EnforceShowResultGate: true, RevealCorrectAnswers: false),
+            cancellationToken);
         return result.IsSuccess ? Ok(result.Value) : NotFound(new { errors = result.Errors });
     }
 

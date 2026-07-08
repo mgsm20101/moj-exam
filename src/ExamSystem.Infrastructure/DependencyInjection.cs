@@ -39,6 +39,7 @@ public static class DependencyInjection
         services.Configure<AttemptTokenSettings>(configuration.GetSection(AttemptTokenSettings.SectionName));
         services.AddScoped<IIdentityService, IdentityService>();
         services.AddScoped<IJwtTokenGenerator, JwtTokenGenerator>();
+        services.AddScoped<IRefreshTokenService, RefreshTokenService>();
         services.AddScoped<IAttemptTokenGenerator, AttemptTokenGenerator>();
         services.AddScoped<IImageStorageService, LocalImageStorageService>();
         services.AddScoped<IExcelQuestionParser, ClosedXmlQuestionParser>();

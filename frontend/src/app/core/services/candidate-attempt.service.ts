@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { environment } from '../../../environments/environment';
+import { AttemptReview } from '../../shared/attempt-review/attempt-review.model';
 
 export interface AttemptOption { id: string; text: string; }
 export interface AttemptQuestionState {
@@ -52,6 +53,9 @@ export class CandidateAttemptService {
   }
   result(examId: string): Observable<AttemptResult> {
     return this.http.get<AttemptResult>(`${this.base(examId)}/result`);
+  }
+  review(examId: string): Observable<AttemptReview> {
+    return this.http.get<AttemptReview>(`${this.base(examId)}/review`);
   }
 
   recordTabSwitch(examId: string): Observable<void> {

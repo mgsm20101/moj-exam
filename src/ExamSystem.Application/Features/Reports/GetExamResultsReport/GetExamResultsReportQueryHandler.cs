@@ -81,7 +81,8 @@ public class GetExamResultsReportQueryHandler
                     a.SubmittedAtUtc,
                     candidate?.GovernorateCode ?? 0,
                     a.TabSwitchCount,
-                    grantedCandidateIds.Contains(a.CandidateId));
+                    grantedCandidateIds.Contains(a.CandidateId),
+                    a.Id);
             })
             .OrderByDescending(r => r.Score)
             .ThenBy(r => r.FullName)

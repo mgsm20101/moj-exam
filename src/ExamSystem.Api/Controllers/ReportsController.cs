@@ -1,5 +1,6 @@
 using System.Text.RegularExpressions;
 using ExamSystem.Application.Common.Interfaces;
+using ExamSystem.Application.Features.Reports.GetAttemptReview;
 using ExamSystem.Application.Features.Reports.GetExamResultsReport;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
@@ -50,6 +51,20 @@ public class ReportsController : ControllerBase
         var bytes = _reportWriter.WriteExamResults(result.Value!);
         var fileName = $"{Sanitize(result.Value!.ExamName)} - Results.xlsx";
         return File(bytes, XlsxContentType, fileName);
+    }
+
+    /// <summary>Per-question review of a single attempt (correct vs. the candidate's chosen answers).</summary>
+    [HttpGet("attempts/{attemptId:guid}/review")]
+    public async Task<IActionResult> GetAttemptReview(Guid attemptId, CancellationToken cancellationToken)
+    {
+        var result = await _sender.Send(
+            new GetAttemptReviewQuery(attemptId, EnforceShowResultGate: false, RevealCorrectAnswers: true),
+            cancellationToken);
+        if (!result.IsSuccess)
+        {
+            return NotFound(new { errors = result.Errors });
+        }
+        return Ok(result.Value);
     }
 
     private static ResultsFilter ParseFilter(string? filter) =>

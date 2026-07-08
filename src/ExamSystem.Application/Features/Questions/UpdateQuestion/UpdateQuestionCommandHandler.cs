@@ -29,13 +29,19 @@ public class UpdateQuestionCommandHandler : IRequestHandler<UpdateQuestionComman
         question.IsActive = request.IsActive;
         question.ModifiedAtUtc = DateTime.UtcNow;
 
-        question.Options.Clear();
+        // Replace the option set. We go through the DbSet (not the navigation collection) on purpose:
+        // QuestionOption.Id is a Guid PK treated as ValueGeneratedOnAdd, and adding an entity that
+        // already has a Guid to a *tracked* parent's navigation makes EF classify it as an existing
+        // row (→ UPDATE, which affects 0 rows and throws DbUpdateConcurrencyException). RemoveRange +
+        // DbSet.Add force the correct DELETE-then-INSERT states regardless of the key heuristic.
+        _db.QuestionOptions.RemoveRange(question.Options);
         if (request.Options is not null)
         {
             for (var i = 0; i < request.Options.Count; i++)
             {
-                question.Options.Add(new QuestionOption
+                _db.QuestionOptions.Add(new QuestionOption
                 {
+                    QuestionId = question.Id,
                     Text = request.Options[i].Text,
                     IsCorrect = request.Options[i].IsCorrect,
                     DisplayOrder = i + 1

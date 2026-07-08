@@ -28,7 +28,7 @@ describe('LoginComponent', () => {
   });
 
   it('navigates to /admin on successful login', () => {
-    const response: LoginResponse = { token: 't', userName: 'admin', roles: ['Admin'] };
+    const response: LoginResponse = { token: 't', refreshToken: 'r', userName: 'admin', roles: ['Admin'] };
     authService.login.and.returnValue(of(response));
     component.form.setValue({ userName: 'admin', password: 'secret' });
 

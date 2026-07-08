@@ -1,0 +1,65 @@
+<div class="review">
+  <div class="review-summary">
+    <div class="review-score">
+      <span class="review-score-value">{{ review.score }} / {{ review.totalPoints }}</span>
+      <span class="review-score-pct">({{ review.scorePercentage }}%)</span>
+    </div>
+    <span class="badge" [ngClass]="review.passed ? 'badge-success' : 'badge-danger'">
+      {{ review.passed ? 'ناجح' : 'راسب' }}
+    </span>
+    <button type="button" class="wrong-toggle" (click)="toggleWrongOnly()" [class.active]="showWrongOnly">
+      {{ showWrongOnly ? 'عرض كل الأسئلة' : 'عرض الأسئلة الخطأ فقط (' + wrongCount + ')' }}
+    </button>
+  </div>
+
+  <ol class="review-questions">
+    <li
+      *ngFor="let q of visibleQuestions"
+      class="review-question"
+      [class.q-correct]="q.isCorrect"
+      [class.q-wrong]="!q.isCorrect">
+      <div class="q-head">
+        <span class="q-order">سؤال {{ q.displayOrder }}</span>
+        <span class="badge q-status" [ngClass]="q.isCorrect ? 'badge-success' : 'badge-danger'">
+          {{ q.isCorrect ? 'صحيح' : (q.wasAnswered ? 'خطأ' : 'لم تتم الإجابة') }}
+        </span>
+      </div>
+
+      <p class="q-text">{{ q.text }}</p>
+      <img *ngIf="q.imageUrl" [src]="q.imageUrl" alt="" class="q-image" />
+
+      <!-- MCQ / TrueFalse: list the options. Admins see the correct option highlighted; candidates
+           see only their own choice coloured by whether it was right. -->
+      <ul class="q-options" *ngIf="q.type !== 'FillBlank'">
+        <li
+          *ngFor="let o of q.options"
+          class="q-option"
+          [ngClass]="{
+            'opt-correct': revealCorrect && o.isCorrect,
+            'opt-selected-correct': !revealCorrect && o.wasSelected && q.isCorrect,
+            'opt-selected-wrong': o.wasSelected && !o.isCorrect && (revealCorrect || !q.isCorrect)
+          }">
+          <span class="opt-text">{{ o.text }}</span>
+          <span class="opt-tags">
+            <span class="tag tag-correct" *ngIf="revealCorrect && o.isCorrect">الإجابة الصحيحة</span>
+            <span class="tag tag-chosen" *ngIf="o.wasSelected">إجابة الممتحن</span>
+          </span>
+        </li>
+      </ul>
+
+      <!-- FillBlank: the typed answer; the correct text is shown to admins only. -->
+      <div class="q-fillblank" *ngIf="q.type === 'FillBlank'">
+        <p class="fb-line">
+          <span class="fb-label">إجابة الممتحن:</span>
+          <span class="fb-answer" [class.fb-wrong]="!q.isCorrect" [class.fb-correct]="q.isCorrect">
+            {{ q.candidateAnswerText || '— لم تتم الإجابة —' }}
+          </span>
+        </p>
+        <p class="fb-line" *ngIf="revealCorrect">
+          <span class="fb-label">الإجابة الصحيحة:</span>
+          <span class="fb-answer fb-correct">{{ q.correctAnswerText }}</span>
+        </p>
+      </div>
+    </li>
+  </ol>
+</div>

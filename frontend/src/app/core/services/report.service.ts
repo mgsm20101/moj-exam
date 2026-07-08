@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { environment } from '../../../environments/environment';
+import { AttemptReview } from '../../shared/attempt-review/attempt-review.model';
 
 export type ResultsFilter = 'all' | 'passed' | 'failed';
 
@@ -17,6 +18,7 @@ export interface ExamResultRow {
   governorateCode: number;
   tabSwitchCount: number;
   hasActiveRetakeGrant: boolean;
+  attemptId: string;
 }
 
 export interface ExamResultsSummary {
@@ -51,6 +53,10 @@ export class ReportService {
   exportExamResults(examId: string, filter: ResultsFilter = 'all'): Observable<Blob> {
     const params = new HttpParams().set('filter', filter);
     return this.http.get(`${this.baseUrl}/exams/${examId}/results/export`, { params, responseType: 'blob' });
+  }
+
+  getAttemptReview(attemptId: string): Observable<AttemptReview> {
+    return this.http.get<AttemptReview>(`${this.baseUrl}/attempts/${attemptId}/review`);
   }
 
   grantRetake(examId: string, nationalId: string): Observable<void> {

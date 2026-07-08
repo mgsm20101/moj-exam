@@ -6,11 +6,16 @@ public class LoginCommandHandler : IRequestHandler<LoginCommand, Result<LoginRes
 {
     private readonly IIdentityService _identityService;
     private readonly IJwtTokenGenerator _jwtTokenGenerator;
+    private readonly IRefreshTokenService _refreshTokenService;
 
-    public LoginCommandHandler(IIdentityService identityService, IJwtTokenGenerator jwtTokenGenerator)
+    public LoginCommandHandler(
+        IIdentityService identityService,
+        IJwtTokenGenerator jwtTokenGenerator,
+        IRefreshTokenService refreshTokenService)
     {
         _identityService = identityService;
         _jwtTokenGenerator = jwtTokenGenerator;
+        _refreshTokenService = refreshTokenService;
     }
 
     public async Task<Result<LoginResponse>> Handle(LoginCommand request, CancellationToken cancellationToken)
@@ -23,6 +28,7 @@ public class LoginCommandHandler : IRequestHandler<LoginCommand, Result<LoginRes
         }
 
         var token = _jwtTokenGenerator.GenerateToken(validation.UserId, validation.UserName, validation.Roles);
-        return Result<LoginResponse>.Success(new LoginResponse(token, validation.UserName, validation.Roles));
+        var refreshToken = await _refreshTokenService.IssueAsync(validation.UserId, cancellationToken);
+        return Result<LoginResponse>.Success(new LoginResponse(token, refreshToken, validation.UserName, validation.Roles));
     }
 }

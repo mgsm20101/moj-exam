@@ -51,4 +51,66 @@ public class AuthControllerTests : IClassFixture<TestWebApplicationFactory>
         var body = await response.Content.ReadAsStringAsync();
         Assert.DoesNotContain("token", body, StringComparison.OrdinalIgnoreCase);
     }
+
+    [Fact]
+    public async Task Refresh_WithValidToken_ReturnsNewTokenPair()
+    {
+        var client = _factory.CreateClient();
+
+        var login = await client.PostAsJsonAsync("/api/auth/login", new LoginCommand("admin", TestWebApplicationFactory.SeedAdminPassword));
+        var loginBody = await login.Content.ReadFromJsonAsync<LoginResponse>();
+        Assert.False(string.IsNullOrWhiteSpace(loginBody!.RefreshToken));
+
+        var refresh = await client.PostAsJsonAsync("/api/auth/refresh", new { refreshToken = loginBody.RefreshToken });
+
+        Assert.Equal(HttpStatusCode.OK, refresh.StatusCode);
+        var refreshed = await refresh.Content.ReadFromJsonAsync<LoginResponse>();
+        Assert.False(string.IsNullOrWhiteSpace(refreshed!.Token));
+        Assert.False(string.IsNullOrWhiteSpace(refreshed.RefreshToken));
+        // Rotation: the new refresh token must differ from the one just consumed.
+        Assert.NotEqual(loginBody.RefreshToken, refreshed.RefreshToken);
+    }
+
+    [Fact]
+    public async Task Refresh_WithRotatedOutToken_ReturnsUnauthorized()
+    {
+        var client = _factory.CreateClient();
+
+        var login = await client.PostAsJsonAsync("/api/auth/login", new LoginCommand("admin", TestWebApplicationFactory.SeedAdminPassword));
+        var loginBody = await login.Content.ReadFromJsonAsync<LoginResponse>();
+
+        // First refresh consumes (and revokes) the original token.
+        await client.PostAsJsonAsync("/api/auth/refresh", new { refreshToken = loginBody!.RefreshToken });
+
+        // Re-using the now-revoked original token must fail.
+        var reuse = await client.PostAsJsonAsync("/api/auth/refresh", new { refreshToken = loginBody.RefreshToken });
+
+        Assert.Equal(HttpStatusCode.Unauthorized, reuse.StatusCode);
+    }
+
+    [Fact]
+    public async Task Refresh_WithBogusToken_ReturnsUnauthorized()
+    {
+        var client = _factory.CreateClient();
+
+        var response = await client.PostAsJsonAsync("/api/auth/refresh", new { refreshToken = "not-a-real-token" });
+
+        Assert.Equal(HttpStatusCode.Unauthorized, response.StatusCode);
+    }
+
+    [Fact]
+    public async Task Logout_RevokesRefreshToken()
+    {
+        var client = _factory.CreateClient();
+
+        var login = await client.PostAsJsonAsync("/api/auth/login", new LoginCommand("admin", TestWebApplicationFactory.SeedAdminPassword));
+        var loginBody = await login.Content.ReadFromJsonAsync<LoginResponse>();
+
+        var logout = await client.PostAsJsonAsync("/api/auth/logout", new { refreshToken = loginBody!.RefreshToken });
+        Assert.Equal(HttpStatusCode.NoContent, logout.StatusCode);
+
+        // A revoked token can no longer be refreshed.
+        var refresh = await client.PostAsJsonAsync("/api/auth/refresh", new { refreshToken = loginBody.RefreshToken });
+        Assert.Equal(HttpStatusCode.Unauthorized, refresh.StatusCode);
+    }
 }
