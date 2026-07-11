@@ -37,9 +37,10 @@
   </ng-container>
 
   <ng-container *ngIf="form.value.type !== 'FillBlank'" formArrayName="options">
+    <label>الاختيارات</label>
     <div *ngFor="let option of options.controls; let i = index" [formGroupName]="i" class="option-row">
       <input type="text" formControlName="text" placeholder="نص الاختيار {{ i + 1 }}" />
-      <label>
+      <label class="option-correct">
         <input
           type="radio"
           [name]="'correctOption'"
@@ -47,7 +48,16 @@
           (change)="selectCorrectOption(i)" />
         صحيحة
       </label>
+      <button
+        type="button"
+        class="text option-remove"
+        (click)="removeOption(i)"
+        [disabled]="options.length <= 2"
+        [attr.aria-label]="'حذف الاختيار ' + (i + 1)">
+        ✕
+      </button>
     </div>
+    <button type="button" class="text option-add" (click)="addOption()">+ إضافة اختيار</button>
   </ng-container>
 
   <p class="error" *ngIf="validationError()">{{ validationError() }}</p>

@@ -39,6 +39,13 @@
   animation: ledger-rise-in var(--dur-slow) var(--ease-out);
 }
 
+// Wide variant (client note 1): the exam-setup form has many fields plus the
+// Topic × Difficulty × Type matrix, so it claims (near) the full page width
+// instead of the cramped 560px drawer. Collapses to full width on small screens.
+.form-panel--wide {
+  width: min(1120px, 100%);
+}
+
 .form-panel-header {
   display: flex;
   align-items: center;

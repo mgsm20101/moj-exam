@@ -183,6 +183,14 @@ export class ExamsListComponent implements OnInit {
     });
   }
 
+  reopenExam(id: string): void {
+    this.errorMessage = null;
+    this.examService.reopen(id).subscribe({
+      next: () => this.load(),
+      error: err => (this.errorMessage = (err.error?.errors ?? ['تعذّر إعادة تشغيل الامتحان.']).join(' ، '))
+    });
+  }
+
   archiveExam(id: string): void {
     this.errorMessage = null;
     this.examService.archive(id).subscribe({

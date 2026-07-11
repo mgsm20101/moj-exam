@@ -19,6 +19,14 @@ export class ExamResultsReportComponent implements OnInit {
   /// Only exams that could have attempts — a Draft has never been taken.
   reportableExams = computed(() => this.exams().filter(e => e.status !== 'Draft'));
 
+  /// Client note 5: split the picker into "current" (Published/Closed) and a dated "archive".
+  currentExams = computed(() => this.reportableExams().filter(e => e.status !== 'Archived'));
+  /// Archived exams, most recent first — the archive reads as a timeline.
+  archivedExams = computed(() =>
+    this.reportableExams()
+      .filter(e => e.status === 'Archived')
+      .sort((a, b) => new Date(b.startAtUtc).getTime() - new Date(a.startAtUtc).getTime()));
+
   exams = signal<ExamSummary[]>([]);
   selectedExamId = signal<string | null>(null);
   report = signal<ExamResultsReport | null>(null);

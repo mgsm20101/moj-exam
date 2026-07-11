@@ -63,4 +63,23 @@ describe('ExamResultsReportComponent (search & sort)', () => {
     component.setSort('fullName');
     expect(component.sortedRows().map(r => r.fullName)).toEqual(['أحمد']);
   });
+
+  it('splits the picker into current exams and a date-sorted archive (client note 5)', () => {
+    const exam = (id: string, status: string, startAtUtc: string) => ({
+      id, name: id, startAtUtc, endAtUtc: startAtUtc, durationMinutes: 60,
+      status, queueMode: 'Auto', totalQuestionCount: 1, totalPoints: 10
+    }) as any;
+
+    component.exams.set([
+      exam('draft', 'Draft', '2026-01-01T00:00:00Z'),
+      exam('published', 'Published', '2026-05-01T00:00:00Z'),
+      exam('arch-old', 'Archived', '2026-02-01T00:00:00Z'),
+      exam('arch-new', 'Archived', '2026-04-01T00:00:00Z')
+    ]);
+
+    // Draft never appears; Published stays in "current".
+    expect(component.currentExams().map(e => e.id)).toEqual(['published']);
+    // Archive is newest-first.
+    expect(component.archivedExams().map(e => e.id)).toEqual(['arch-new', 'arch-old']);
+  });
 });

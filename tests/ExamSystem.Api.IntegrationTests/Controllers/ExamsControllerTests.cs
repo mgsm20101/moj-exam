@@ -111,6 +111,43 @@ public class ExamsControllerTests : IClassFixture<TestWebApplicationFactory>
     }
 
     [Fact]
+    public async Task Reopen_OnClosedExam_ReturnsPublishedAgain()
+    {
+        var client = await _factory.CreateAuthenticatedAdminClientAsync();
+        var topicId = await CreateTopicAsync(client, "Excel Skills - Reopen");
+        await CreateMcqQuestionAsync(client, topicId, "Medium");
+
+        var createResponse = await client.PostAsJsonAsync("/api/admin/exams", BuildExamPayload(topicId, count: 1));
+        var created = await createResponse.Content.ReadFromJsonAsync<IdResponse>();
+
+        (await client.PostAsync($"/api/admin/exams/{created!.Id}/publish", null)).EnsureSuccessStatusCode();
+        (await client.PostAsync($"/api/admin/exams/{created.Id}/close", null)).EnsureSuccessStatusCode();
+
+        var reopenResponse = await client.PostAsync($"/api/admin/exams/{created.Id}/reopen", null);
+        Assert.Equal(HttpStatusCode.NoContent, reopenResponse.StatusCode);
+
+        var getResponse = await client.GetAsync($"/api/admin/exams/{created.Id}");
+        var detail = await getResponse.Content.ReadFromJsonAsync<ExamDetailResponse>();
+        Assert.Equal("Published", detail!.Status);
+    }
+
+    [Fact]
+    public async Task Reopen_OnPublishedExam_ReturnsBadRequest()
+    {
+        var client = await _factory.CreateAuthenticatedAdminClientAsync();
+        var topicId = await CreateTopicAsync(client, "Excel Skills - Reopen Invalid");
+        await CreateMcqQuestionAsync(client, topicId, "Medium");
+
+        var createResponse = await client.PostAsJsonAsync("/api/admin/exams", BuildExamPayload(topicId, count: 1));
+        var created = await createResponse.Content.ReadFromJsonAsync<IdResponse>();
+
+        (await client.PostAsync($"/api/admin/exams/{created!.Id}/publish", null)).EnsureSuccessStatusCode();
+
+        var reopenResponse = await client.PostAsync($"/api/admin/exams/{created.Id}/reopen", null);
+        Assert.Equal(HttpStatusCode.BadRequest, reopenResponse.StatusCode);
+    }
+
+    [Fact]
     public async Task Create_WithoutAuth_ReturnsUnauthorized()
     {
         var client = _factory.CreateClient();

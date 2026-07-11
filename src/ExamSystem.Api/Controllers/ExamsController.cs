@@ -10,6 +10,7 @@ using ExamSystem.Application.Features.Exams.GetExamLiveCounts;
 using ExamSystem.Application.Features.Exams.GetExams;
 using ExamSystem.Application.Features.Exams.OpenNextBatch;
 using ExamSystem.Application.Features.Exams.PublishExam;
+using ExamSystem.Application.Features.Exams.ReopenExam;
 using ExamSystem.Application.Features.Exams.SetQueueMode;
 using ExamSystem.Application.Features.Exams.UpdateExam;
 using ExamSystem.Domain.Queue;
@@ -109,6 +110,18 @@ public class ExamsController : ControllerBase
     public async Task<IActionResult> Close(Guid id, CancellationToken cancellationToken)
     {
         var result = await _sender.Send(new CloseExamCommand(id), cancellationToken);
+        if (!result.IsSuccess)
+        {
+            return BadRequest(new { errors = result.Errors });
+        }
+        return NoContent();
+    }
+
+    /// <summary>Reopens a Closed exam back to Published (client note 6: "start" the exam again).</summary>
+    [HttpPost("{id:guid}/reopen")]
+    public async Task<IActionResult> Reopen(Guid id, CancellationToken cancellationToken)
+    {
+        var result = await _sender.Send(new ReopenExamCommand(id), cancellationToken);
         if (!result.IsSuccess)
         {
             return BadRequest(new { errors = result.Errors });

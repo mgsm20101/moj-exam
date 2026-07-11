@@ -50,6 +50,20 @@ export class QuestionFormComponent {
     return this.fb.group({ text: [text], isCorrect: [isCorrect] });
   }
 
+  /// Adds an empty choice — the admin can author as many options as the question needs.
+  addOption(): void {
+    this.options.push(this.buildOption());
+  }
+
+  /// Removes a choice; keeps a floor of two options so an MCQ always has at least two answers.
+  /// If the removed option was the correct one, the selection is cleared for the admin to re-pick.
+  removeOption(index: number): void {
+    if (this.options.length <= 2) {
+      return;
+    }
+    this.options.removeAt(index);
+  }
+
   /// Pre-fills the form from an existing question (edit mode): scalar fields + a rebuilt options array.
   private populate(q: Question): void {
     this.form.patchValue({

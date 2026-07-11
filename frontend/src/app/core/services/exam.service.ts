@@ -106,6 +106,11 @@ export class ExamService {
     return this.http.post<void>(`${this.baseUrl}/${id}/close`, null);
   }
 
+  /** Reopens a Closed exam back to Published (client note 6: "start" it again). */
+  reopen(id: string): Observable<void> {
+    return this.http.post<void>(`${this.baseUrl}/${id}/reopen`, null);
+  }
+
   archive(id: string): Observable<void> {
     return this.http.post<void>(`${this.baseUrl}/${id}/archive`, null);
   }

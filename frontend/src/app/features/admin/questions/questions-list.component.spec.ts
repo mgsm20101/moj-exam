@@ -93,6 +93,37 @@ describe('QuestionsListComponent', () => {
     expect(component.expandedId()).toBeNull();
   });
 
+  it('pages the question list client-side and clamps navigation to valid pages', () => {
+    const many: Question[] = Array.from({ length: 23 }, (_, i) => ({
+      ...questions[0], id: `q${i}`, text: `Q${i}`
+    }));
+    questionService.getAll.and.returnValue(of(many));
+    fixture.detectChanges();
+
+    expect(component.totalPages()).toBe(3);           // 23 / 10 → 3 pages
+    expect(component.pagedQuestions().length).toBe(10);
+
+    component.goToPage(3);
+    expect(component.pagedQuestions().length).toBe(3); // last page has the remaining 3
+
+    component.goToPage(99);                             // clamps to the last page
+    expect(component.currentPage()).toBe(3);
+
+    component.goToPage(0);                              // clamps to the first page
+    expect(component.currentPage()).toBe(1);
+  });
+
+  it('applyFilters() resets pagination back to the first page', () => {
+    const many: Question[] = Array.from({ length: 23 }, (_, i) => ({ ...questions[0], id: `q${i}` }));
+    questionService.getAll.and.returnValue(of(many));
+    fixture.detectChanges();
+    component.goToPage(3);
+
+    component.applyFilters();
+
+    expect(component.currentPage()).toBe(1);
+  });
+
   it('deactivateQuestion() calls the service and reloads the list', () => {
     fixture.detectChanges();
     questionService.deactivate.and.returnValue(of(undefined));
@@ -105,6 +136,8 @@ describe('QuestionsListComponent', () => {
   });
 
   it('onImageFileSelected() uploads the file and sets the child form imageUrl on success', () => {
+    fixture.detectChanges();
+    component.openCreateForm();
     fixture.detectChanges();
     const file = new File(['x'], 'photo.png', { type: 'image/png' });
     questionService.uploadImage.and.returnValue(of({ url: 'https://cdn/photo.png' }));
@@ -128,6 +161,8 @@ describe('QuestionsListComponent', () => {
 
   it('emitting imageFileSelected from the form template triggers the upload', () => {
     fixture.detectChanges();
+    component.openCreateForm();
+    fixture.detectChanges();
     const file = new File(['x'], 'photo.png', { type: 'image/png' });
     questionService.uploadImage.and.returnValue(of({ url: 'https://cdn/photo.png' }));
     spyOn(component, 'onImageFileSelected').and.callThrough();
@@ -139,6 +174,8 @@ describe('QuestionsListComponent', () => {
   });
 
   it('onQuestionSave() resets the child form after a successful save', () => {
+    fixture.detectChanges();
+    component.openCreateForm();
     fixture.detectChanges();
     questionService.create.and.returnValue(of({ id: 'q2' }));
     const resetFormSpy = spyOn(component.questionForm!, 'resetForm');

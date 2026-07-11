@@ -80,22 +80,37 @@ td.actions button:not(.danger):not(.text):hover:not(:disabled) {
   color: var(--slate-grey);
 }
 
-// --- Matrix table (exam form: Topic × Type distribution) -----------------
+// --- Matrix table (exam form: Topic × Difficulty × Type distribution) ----
+// Seven columns must fit inside the ~560px form-panel; keep cells compact so
+// the "متقدم" (Hard) columns stay visible instead of overflowing off-screen.
+// The wrapper still scrolls on very narrow viewports as a safety net.
+.matrix-scroll {
+  overflow-x: auto;
+}
+
 .matrix-table th,
 .matrix-table td {
   text-align: center;
+  padding-inline: var(--space-xs);
+}
+
+// Difficulty/type headers wrap onto two lines instead of forcing width
+.matrix-table thead th {
+  white-space: normal;
+  line-height: var(--lh-label);
 }
 
 .matrix-table th:first-child,
 .matrix-table td:first-child {
   text-align: start;
+  padding-inline-start: var(--space-md);
   font-weight: var(--fw-semibold);
   color: var(--ink-black);
 }
 
 .matrix-table input[type="number"] {
-  width: 4.5rem;
+  width: 3rem;
   text-align: center;
-  padding: 6px 8px;
+  padding: 6px 4px;
   margin: 0 auto;
 }
