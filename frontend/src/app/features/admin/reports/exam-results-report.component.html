@@ -13,9 +13,16 @@
       <span>الامتحان</span>
       <select (change)="onExamChange($any($event.target).value)">
         <option value="">— اختر امتحاناً —</option>
-        <option *ngFor="let exam of reportableExams()" [value]="exam.id" [selected]="exam.id === selectedExamId()">
-          {{ exam.name }}
-        </option>
+        <optgroup label="الامتحانات الحالية" *ngIf="currentExams().length">
+          <option *ngFor="let exam of currentExams()" [value]="exam.id" [selected]="exam.id === selectedExamId()">
+            {{ exam.name }}
+          </option>
+        </optgroup>
+        <optgroup label="الأرشيف (الأحدث أولاً)" *ngIf="archivedExams().length">
+          <option *ngFor="let exam of archivedExams()" [value]="exam.id" [selected]="exam.id === selectedExamId()">
+            {{ exam.name }} — {{ exam.startAtUtc | date: 'yyyy/MM/dd' }}
+          </option>
+        </optgroup>
       </select>
     </label>
 

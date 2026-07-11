@@ -98,6 +98,126 @@
 .player-timer { font-variant-numeric: tabular-nums; font-weight: var(--fw-bold); }
 .player-timer.low { color: var(--alert-red); }
 .player-actions { display: flex; gap: var(--space-sm); }
+
+// --- Full-page exam player (redesigned) --------------------------------
+// The player owns the whole surface instead of floating as a small 560px card:
+// a sticky top bar + a two-column body (question | question-map) that collapses
+// to one column on narrow screens.
+.candidate-surface:has(.exam-player) {
+  align-items: stretch;
+  justify-content: flex-start;
+  padding: 0;
+}
+
+.exam-player {
+  width: 100%;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  animation: ledger-fade-in var(--dur-base) var(--ease-out);
+}
+
+.exam-player-topbar {
+  position: sticky;
+  top: 0;
+  z-index: 5;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-md);
+  padding: var(--space-md) var(--space-xl);
+  background: var(--pure-white);
+  border-bottom: 2px solid var(--judicial-gold);
+  box-shadow: var(--shadow-resting);
+}
+
+.exam-player-topbar .player-timer { font-size: var(--fs-title); }
+.exam-player-progress { color: var(--slate-grey); font-weight: var(--fw-semibold); }
+
+.exam-player-body {
+  flex: 1;
+  width: 100%;
+  max-width: 1200px;
+  margin-inline: auto;
+  padding: var(--space-xl) var(--space-lg);
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 300px;
+  gap: var(--space-xl);
+  align-items: start;
+}
+
+.exam-player-main {
+  background: var(--pure-white);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-resting);
+  padding: var(--space-2xl) var(--space-xl);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xl);
+}
+
+.exam-player-controls {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-md);
+  border-top: 1px solid var(--hairline-grey);
+  padding-top: var(--space-lg);
+}
+.exam-player-controls .submit-btn { width: auto; padding-inline: var(--space-2xl); }
+
+.exam-player-aside {
+  position: sticky;
+  top: 88px;   // clears the sticky top bar
+  background: var(--pure-white);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-resting);
+  padding: var(--space-lg);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md);
+}
+.aside-title { font-size: var(--fs-body); font-weight: var(--fw-semibold); margin: 0; }
+.exam-player-aside .q-nav { justify-content: flex-start; }
+
+.aside-legend {
+  display: flex; flex-wrap: wrap; gap: var(--space-md);
+  font-size: var(--fs-label); color: var(--slate-grey);
+  border-top: 1px solid var(--hairline-grey); padding-top: var(--space-sm);
+}
+.legend-dot {
+  display: inline-block; width: 12px; height: 12px; border-radius: 4px;
+  border: 1px solid var(--hairline-grey); margin-inline-end: 4px; vertical-align: middle;
+}
+.legend-dot.answered { border-color: var(--judicial-green); color: var(--judicial-green); background: #eaf3f0; }
+.legend-dot.flagged { border-color: var(--caution-amber); }
+
+// Stack the question map beneath the question on tablets/phones.
+@media (max-width: 900px) {
+  .exam-player-body { grid-template-columns: 1fr; }
+  .exam-player-aside { position: static; order: 2; }
+  .exam-player-main { padding: var(--space-xl) var(--space-lg); }
+}
+
+// --- Final-submit confirmation overlay ---------------------------------
+.exam-confirm-overlay {
+  position: fixed; inset: 0; z-index: 20;
+  display: grid; place-items: center;
+  background: rgba(17, 24, 39, 0.42);
+  padding: var(--space-md);
+  animation: ledger-fade-in var(--dur-base) var(--ease-out);
+}
+.exam-confirm-dialog {
+  width: min(440px, 100%);
+  background: var(--pure-white);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-overlay);
+  padding: var(--space-2xl) var(--space-xl);
+  text-align: center;
+  display: flex; flex-direction: column; gap: var(--space-lg);
+}
+.exam-confirm-actions { display: flex; gap: var(--space-md); justify-content: center; }
+.exam-confirm-actions .btn-primary { width: auto; padding-inline: var(--space-2xl); }
 .btn-ghost {
   background: var(--pure-white); color: var(--judicial-green);
   border: 1px solid var(--judicial-green); border-radius: var(--radius-md);

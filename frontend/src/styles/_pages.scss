@@ -76,6 +76,21 @@
   margin-top: var(--space-sm);
 }
 
+// --- Pagination bar (question bank) --------------------------------------
+.pager {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-md);
+  margin-top: var(--space-md);
+}
+
+.pager-status {
+  color: var(--slate-grey);
+  font-size: var(--fs-label);
+  white-space: nowrap;
+}
+
 // --- Inline create form (topics) -----------------------------------------
 .new-topic-form {
   display: flex;
@@ -115,15 +130,11 @@
   align-self: flex-start;
 }
 
-// --- Question form (mirrors exam-form rhythm) ----------------------------
+// --- Question form (lives inside the add/edit modal panel) ---------------
 .question-form {
   display: flex;
   flex-direction: column;
   gap: var(--space-md);
-  background: var(--pure-white);
-  border-radius: var(--radius-md);
-  padding: var(--space-lg);
-  box-shadow: var(--shadow-resting);
 }
 
 .question-form label {
@@ -152,6 +163,28 @@
   white-space: nowrap;
   font-weight: var(--fw-regular);
   color: var(--slate-grey);
+}
+
+// Remove-choice control: compact, muted until hovered, turns to the danger hue.
+.option-remove {
+  flex: 0 0 auto;
+  padding: 4px 8px;
+  color: var(--slate-grey);
+  line-height: 1;
+}
+
+.option-remove:hover:not(:disabled) {
+  color: var(--error, #ef4444);
+}
+
+.option-remove:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+}
+
+// Add-choice control: left-aligned link-style action beneath the choices.
+.option-add {
+  align-self: flex-start;
 }
 
 .question-image-preview {

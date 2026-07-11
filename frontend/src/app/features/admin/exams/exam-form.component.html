@@ -87,6 +87,7 @@
   </div>
 
   <h3>توزيع الأسئلة لكل موضوع</h3>
+  <div class="matrix-scroll">
   <table class="matrix-table" formArrayName="topicRows">
     <thead>
       <tr>
@@ -103,6 +104,7 @@
       </tr>
     </tbody>
   </table>
+  </div>
 
   <div class="banner-error" *ngIf="validationError()" role="alert">{{ validationError() }}</div>
 

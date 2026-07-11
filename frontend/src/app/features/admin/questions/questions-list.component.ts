@@ -1,4 +1,4 @@
-import { Component, OnInit, signal, ViewChild } from '@angular/core';
+import { Component, OnInit, computed, signal, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Observable } from 'rxjs';
@@ -23,8 +23,26 @@ export class QuestionsListComponent implements OnInit {
 
   /// The question currently being edited (null = the form is in "add" mode).
   editingQuestion = signal<Question | null>(null);
+  /// Whether the add/edit form is shown in its modal (client note 4 — no more scroll-to-bottom).
+  isFormOpen = signal(false);
   /// Row whose answers/options detail is expanded.
   expandedId = signal<string | null>(null);
+
+  // --- Pagination (client note 3) -----------------------------------------
+  // The API returns the full filtered list; we page it client-side to keep the bank scannable.
+  readonly pageSize = 10;
+  currentPage = signal(1);
+  totalPages = computed(() => Math.max(1, Math.ceil(this.questions().length / this.pageSize)));
+  pagedQuestions = computed(() => {
+    const start = (this.currentPage() - 1) * this.pageSize;
+    return this.questions().slice(start, start + this.pageSize);
+  });
+
+  goToPage(page: number): void {
+    const clamped = Math.min(Math.max(1, page), this.totalPages());
+    this.currentPage.set(clamped);
+    this.expandedId.set(null);
+  }
 
   readonly typeLabels: Record<string, string> = {
     Mcq: 'اختيار من متعدد',
@@ -58,7 +76,10 @@ export class QuestionsListComponent implements OnInit {
         topicId: this.selectedTopicId || undefined,
         difficulty: this.selectedDifficulty || undefined
       })
-      .subscribe(questions => this.questions.set(questions));
+      .subscribe(questions => {
+        this.questions.set(questions);
+        this.currentPage.set(1);
+      });
   }
 
   onQuestionSave(input: QuestionInput): void {
@@ -72,23 +93,34 @@ export class QuestionsListComponent implements OnInit {
     request$.subscribe({
       next: () => {
         this.applyFilters();
-        this.editingQuestion.set(null);
-        this.questionForm?.resetForm();
+        this.closeForm();
       },
       error: () => (this.errorMessage = 'تعذّر حفظ السؤال — تحقق من صيغة الإجابة أو الاختيارات.')
     });
   }
 
+  /// Opens the modal in "add" mode (client note 4).
+  openCreateForm(): void {
+    this.errorMessage = null;
+    this.editingQuestion.set(null);
+    this.questionForm?.resetForm();
+    this.isFormOpen.set(true);
+  }
+
   startEdit(question: Question): void {
     this.errorMessage = null;
     this.editingQuestion.set(question);
-    // Scroll the edit form into view so the admin sees the pre-filled fields.
-    setTimeout(() => document.querySelector('.add-question')?.scrollIntoView({ behavior: 'smooth' }));
+    this.isFormOpen.set(true);
+  }
+
+  closeForm(): void {
+    this.isFormOpen.set(false);
+    this.editingQuestion.set(null);
+    this.questionForm?.resetForm();
   }
 
   cancelEdit(): void {
-    this.editingQuestion.set(null);
-    this.questionForm?.resetForm();
+    this.closeForm();
   }
 
   toggleExpand(id: string): void {

@@ -116,6 +116,36 @@ describe('QuestionFormComponent', () => {
     expect(component.options.at(1).value).toEqual({ text: 'B', isCorrect: true });
   });
 
+  it('addOption() appends choices and lets the admin save an Mcq with more than two options', () => {
+    let emitted: any = null;
+    component.save.subscribe(value => (emitted = value));
+
+    component.form.patchValue({ topicId: 't1', type: 'Mcq', difficulty: 'Medium', text: 'Pick one' });
+    component.addOption();
+    component.addOption();
+    expect(component.options.length).toBe(4);
+
+    component.options.at(0).patchValue({ text: 'A', isCorrect: false });
+    component.options.at(1).patchValue({ text: 'B', isCorrect: false });
+    component.options.at(2).patchValue({ text: 'C', isCorrect: true });
+    component.options.at(3).patchValue({ text: 'D', isCorrect: false });
+    component.submit();
+
+    expect(emitted.options.length).toBe(4);
+    expect(emitted.options[2]).toEqual({ text: 'C', isCorrect: true });
+  });
+
+  it('removeOption() drops a choice but never goes below two options', () => {
+    component.addOption();                 // 3 options
+    expect(component.options.length).toBe(3);
+
+    component.removeOption(2);              // back to 2
+    expect(component.options.length).toBe(2);
+
+    component.removeOption(0);              // floor holds at 2 — no-op
+    expect(component.options.length).toBe(2);
+  });
+
   it('emits cancelEdit when cancel() is called', () => {
     let cancelled = false;
     component.cancelEdit.subscribe(() => (cancelled = true));

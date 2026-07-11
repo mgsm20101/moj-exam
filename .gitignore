@@ -21,3 +21,6 @@ appsettings.*.local.json
 
 ## Runtime-generated content
 src/ExamSystem.Api/wwwroot/
+
+# Windows crash dumps
+*.stackdump
